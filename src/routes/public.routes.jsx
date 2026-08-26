@@ -8,8 +8,8 @@ import MainLayout from "../layouts/MainLayout";
 
 const publicRoutes = (
   <Route element={<MainLayout />}>
-    {/* <Route path="/" element={<Home />} />
-    <Route path="/search" element={<Search />} />
+    <Route path="/" element={<Home />} />
+    {/* <Route path="/search" element={<Search />} />
     <Route path="/recipe/:id" element={<Recipe />} />
     <Route path="/about" element={<About />} /> */}
   </Route>

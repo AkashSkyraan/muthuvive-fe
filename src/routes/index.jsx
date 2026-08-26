@@ -3,17 +3,18 @@ import React from "react";
 import publicRoutes from "./public.routes";
 import AuthRoutes from "./auth.routes";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Header from "../components/Header.jsx";
 
 const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
         {AuthRoutes()}
+        {publicRoutes}
 
-        <Route element={<publicRoutes />}>
-          {/* <Route path="/" element={<Home />} />
-           */}
-        </Route>
+        {/* <Route element={<publicRoutes />}>
+          <Route path="/" element={<Header />} />
+        </Route> */}
 
         {/* <Route path="*" element={<NotFound />} /> */}
       </Routes>
