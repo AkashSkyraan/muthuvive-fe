@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { images } from "../../config/Images";
 
 const features = [
   {
@@ -205,8 +206,7 @@ function Login() {
       <section
         className="relative flex min-h-[650px] w-full items-center overflow-hidden bg-cover bg-center lg:min-h-[100%] lg:w-[55%]"
         style={{
-          backgroundImage:
-            "url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1800&q=80')",
+          backgroundImage: `url(${images.park})`,
         }}
       >
         {/* Overlay */}
@@ -214,7 +214,7 @@ function Login() {
 
         {/* Content */}
         <div className="relative z-10 mx-auto w-full max-w-5xl px-8 py-16 lg:px-14 xl:px-20">
-          <h1 className="max-w-2xl text-4xl font-bold leading-[1.15] tracking-tight text-white sm:text-5xl xl:text-[56px]">
+          <h1 className="max-w-xl text-4xl font-bold leading-[1.15] tracking-tight text-white sm:text-5xl xl:text-[56px]">
             Find A Place You’ll Love
             <br />
             To Call Home
