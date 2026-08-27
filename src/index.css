@@ -1,6 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap');
+
 @import "tailwindcss";
 
+@theme {
+  /* Colors */
+  --color-primary: #FFFFFF;
+  --color-secondary: #1158EB;
 
+  /* Fonts */
+  --font-primary: "DM Sans", sans-serif;
+  --font-heading: "DM Sans", sans-serif;
+}
 
 body {
   margin: 0;
@@ -15,4 +25,5 @@ body {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  font-family: var(--font-primary)
 }
