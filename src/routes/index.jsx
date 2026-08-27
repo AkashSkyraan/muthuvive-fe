@@ -9,7 +9,7 @@ const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {AuthRoutes()}
+        {AuthRoutes}
         {publicRoutes}
 
         {/* <Route element={<publicRoutes />}>

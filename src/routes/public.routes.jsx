@@ -1,7 +1,8 @@
 import { Route } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
+import Home from "../views/public/Home";
 
-// import Home from "../pages/Home";
+
 // import Search from "../pages/Search";
 // import Recipe from "../pages/Recipe";
 // import About from "../pages/About";
