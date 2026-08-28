@@ -1,12 +1,13 @@
 import React from "react";
 import logo from "../assets/icons/Logo.png";
-import locationIcon from "../assets/icons/location-white.png";
 import callIcon from "../assets/icons/call-white.png";
 import mailIcon from "../assets/icons/mail-white.png";
 import whatsappIcon from "../assets/icons/whatsapp-white.png";
 import instagramIcon from "../assets/icons/instagram.png";
 import facebookIcon from "../assets/icons/facebook.png";
 import twitterIcon from "../assets/icons/twitter.png";
+import images from "../config/Images";
+import icons from "../config/Icons";
 
 const Footer = () => {
   return (
@@ -21,24 +22,24 @@ const Footer = () => {
             <ul className="flex flex-col gap-y-3 text-sm text-gray-300">
               <li className="flex items-start text-left gap-x-2">
                 <img
-                  src={locationIcon}
+                  src={icons.locationWhiteIcon}
                   alt="location"
                   className="w-4 h-4 mt-0.5"
                 />
                 <span>Tarde build Road,Chennai, Viruthnagar,-64100</span>
               </li>
               <li className="flex items-center gap-x-2">
-                <img src={callIcon} alt="call" className="w-4 h-4" />
+                <img src={icons.callWhiteIcon} alt="call" className="w-4 h-4" />
                 <a href="#">+91 9923 45672</a>
               </li>
               <li className="flex items-center gap-x-2">
-                <img src={mailIcon} alt="mail" className="w-4 h-4" />
+                <img src={icons.mailIcon} alt="mail" className="w-4 h-4" />
                 <a href="#">muthview's123@gmail.com</a>
               </li>
             </ul>
 
             <div className="mt-4 sm:mt-6 bg-white rounded-md px-6 py-1 sm:px-10 sm:py-2 w-fit">
-              <img src={logo} alt="Logo" className="" />
+              <img src={images.logo} alt="Logo" className="" />
             </div>
           </div>
 
@@ -102,25 +103,41 @@ const Footer = () => {
                 href="#"
                 className="w-9 h-9 flex items-center justify-center bg-white rounded-md"
               >
-                <img src={whatsappIcon} alt="whatsapp" className="w-9 h-9" />
+                <img
+                  src={icons.whatsappIcon}
+                  alt="whatsapp"
+                  className="w-9 h-9"
+                />
               </a>
               <a
                 href="#"
                 className="w-9 h-9 flex items-center justify-center bg-white/10 rounded-md"
               >
-                <img src={instagramIcon} alt="instagram" className="w-9 h-9" />
+                <img
+                  src={icons.instagramIcon}
+                  alt="instagram"
+                  className="w-9 h-9"
+                />
               </a>
               <a
                 href="#"
                 className="w-9 h-9 flex items-center justify-center bg-white/10 rounded-md"
               >
-                <img src={facebookIcon} alt="facebook" className="w-9 h-9" />
+                <img
+                  src={icons.facebookIcon}
+                  alt="facebook"
+                  className="w-9 h-9"
+                />
               </a>
               <a
                 href="#"
                 className="w-9 h-9 flex items-center justify-center bg-white/10 rounded-md"
               >
-                <img src={twitterIcon} alt="twitter" className="w-9 h-9" />
+                <img
+                  src={icons.twitterIcon}
+                  alt="twitter"
+                  className="w-9 h-9"
+                />
               </a>
             </div>
           </div>

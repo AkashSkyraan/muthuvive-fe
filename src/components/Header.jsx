@@ -1,12 +1,39 @@
 import React, { useState } from "react";
-import { Button } from "antd";
-import { MenuOutlined, CloseOutlined } from "@ant-design/icons";
-import logo from "../assets/icons/Logo.png";
-import callIcon from "../assets/icons/call-black.png";
-import userProfileHolder from "../assets/icons/userProfileHolder.png";
+import { Button, Popover } from "antd";
+import { MenuOutlined, CloseOutlined, UserOutlined } from "@ant-design/icons";
+import images from "../config/Images.jsx";
+import icons from "../config/Icons.jsx";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAccountPopoverOpen, setIsAccountPopoverOpen] = useState(false);
+
+  const accountPopoverContent = (
+    <div className="w-64 p-1">
+      <div className="flex items-center gap-x-2">
+        <UserOutlined className="text-gray-500" />
+        <p className="text-xs text-gray-600">
+          Login or sign Up Your Account to Explore
+        </p>
+      </div>
+
+      <div className="flex items-center gap-x-3 mt-3">
+        <Button
+          className="!border-secondary !text-secondary flex-1"
+          onClick={() => setIsAccountPopoverOpen(false)}
+        >
+          Login
+        </Button>
+        <Button
+          type="primary"
+          className="!bg-secondary flex-1"
+          onClick={() => setIsAccountPopoverOpen(false)}
+        >
+          Sign UP
+        </Button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="w-full md:h-[12%] bg-primary">
@@ -14,7 +41,11 @@ const Header = () => {
         <div className="grid grid-cols-[40%_60%] md:grid-cols-[25%_75%] lg:grid-cols-[20%_80%] xl:grid-cols-[40%_60%]">
           <div className="flex items-center">
             <a href="#">
-              <img src={logo} alt="Logo" className="" />
+              <img
+                src={images.logo}
+                alt="Logo"
+                className="w-24 sm:w-32 lg:w-36 xl:w-40 h-auto"
+              />
             </a>
           </div>
 
@@ -48,7 +79,7 @@ const Header = () => {
 
             <div className="flex items-center">
               <img
-                src={callIcon}
+                src={icons.callBlackIcon}
                 alt="call"
                 className="w-6 h-6 lg:w-5 lg:h-5 xl:w-6 xl:h-6"
               />
@@ -61,13 +92,21 @@ const Header = () => {
             </div>
 
             <div>
-              <a>
-                <img
-                  src={userProfileHolder}
-                  alt="user-profile-placeholder"
-                  className="w-[75%]"
-                />
-              </a>
+              <Popover
+                content={accountPopoverContent}
+                trigger="click"
+                open={isAccountPopoverOpen}
+                onOpenChange={setIsAccountPopoverOpen}
+                placement="bottomRight"
+              >
+                <button>
+                  <img
+                    src={icons.userAvatarHolder}
+                    alt="user-profile-placeholder"
+                    className="w-[75%] hover: cursor-pointer"
+                  />
+                </button>
+              </Popover>
             </div>
           </div>
 
@@ -86,7 +125,7 @@ const Header = () => {
           <div className="w-[90%] mx-auto p-4">
             <div className="flex items-center justify-around">
               <a href="#">
-                <img src={logo} alt="Logo" className="" />
+                <img src={images.logo} alt="Logo" className="" />
               </a>
               <button onClick={() => setIsMenuOpen(false)} className="ms-5">
                 <CloseOutlined />
@@ -133,7 +172,7 @@ const Header = () => {
 
             <div className="flex items-center mt-8">
               <img
-                src={callIcon}
+                src={icons.callBlackIcon}
                 alt="call"
                 className="w-5 h-5 md:w-6 md:h-6"
               />
@@ -143,13 +182,21 @@ const Header = () => {
             </div>
 
             <div className="mt-8">
-              <a>
-                <img
-                  src={userProfileHolder}
-                  alt="user-profile-placeholder"
-                  className="w-6 md:w-10"
-                />
-              </a>
+              <Popover
+                content={accountPopoverContent}
+                trigger="click"
+                open={isAccountPopoverOpen}
+                onOpenChange={setIsAccountPopoverOpen}
+                placement="bottomLeft"
+              >
+                <button>
+                  <img
+                    src={icons.userAvatarHolder}
+                    alt="user-profile-placeholder"
+                    className="w-6 md:w-10 hover: cursor-pointer"
+                  />
+                </button>
+              </Popover>
             </div>
           </div>
         </div>

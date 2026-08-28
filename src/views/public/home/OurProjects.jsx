@@ -1,13 +1,27 @@
 import React, { useState } from "react";
 import { Segmented } from "antd";
+import images from "../../../config/Images.jsx";
 
-const tabOptions = ["Ongoing Projects", "Upcoming", "Sold Projects"];
+const tabOptions = [
+  {
+    key: 0,
+    label: "Ongoing Projects",
+  },
+  {
+    key: 1,
+    label: "Upcoming",
+  },
+  {
+    key: 2,
+    label: "Sold Projects",
+  },
+];
 
 // Dynamic data - replace with API response
 const projects = [
   {
     id: 1,
-    image: "",
+    image: images.farmLand,
     price: "₹ 1.5 Lk",
     unit: "Per Cent",
     title: "Arjunavel Plots",
@@ -16,7 +30,7 @@ const projects = [
   },
   {
     id: 2,
-    image: "",
+    image: images.farmLand,
     price: "₹ 2.5 Lk",
     unit: "Per Cent",
     title: "Arjunavel Plots",
@@ -25,7 +39,7 @@ const projects = [
   },
   {
     id: 3,
-    image: "",
+    image: images.farmLand,
     price: "₹ 3.5 Lk",
     unit: "Per Cent",
     title: "Arjunavel Plots",
@@ -34,7 +48,7 @@ const projects = [
   },
   {
     id: 4,
-    image: "",
+    image: images.farmLand,
     price: "₹ 2.5 Lk",
     unit: "Per Cent",
     title: "Arjunavel Plots",
@@ -43,7 +57,7 @@ const projects = [
   },
   {
     id: 5,
-    image: "",
+    image: images.farmLand,
     price: "₹ 2.5 Lk",
     unit: "Per Cent",
     title: "Arjunavel Plots",
@@ -95,16 +109,25 @@ const DTCPProjects = () => {
           </p>
         </div>
 
-        <div className="flex justify-center mt-6">
-          <Segmented
-            options={tabOptions}
-            value={activeTab}
-            onChange={setActiveTab}
-            className="!bg-gray-100 !p-1"
-          />
+        <div className="flex w-[90%] md:w-[55%] mx-auto mt-6 rounded-lg bg-[#E6E6E6]">
+          {tabOptions.map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => setActiveTab(tab.key)}
+              className={`flex-1 rounded-xs py-2 md:py-2 text-xs md:text-sm transition-colors duration-400 ${
+                activeTab === tab.key
+                  ? "bg-secondary text-primary"
+                  : "text-black"
+              }
+              ${tab.key !== tabOptions.length - 1 ? "border-r border-black/20" : ""}`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
-
-        <div className="flex flex-wrap gap-4 mt-8">
+        
+        <div className="flex flex-wrap gap-4 mt-10">
           {projects.map((project) => (
             <ProjectCard key={project.id} project={project} />
           ))}
