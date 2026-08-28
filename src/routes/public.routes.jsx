@@ -1,9 +1,10 @@
 import { Route } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
-import Home from "../views/public/Home";
-
 
 import Home from "../views/public/home/Hero.jsx";
+import SearchPage from "../views/public/search/SearhPage.jsx";
+import Pagination from "../components/common/pagination/Pagination.jsx";
+
 // import Home from "../views/public/home/Our.jsx";
 // import Search from "../pages/Search";
 // import Recipe from "../pages/Recipe";
@@ -12,9 +13,8 @@ import Home from "../views/public/home/Hero.jsx";
 const publicRoutes = (
   <Route element={<MainLayout />}>
     <Route path="/" element={<Home />} />
-    <Route path="/search" element={<Search />} />
-    {/* <Route path="/recipe/:id" element={<Recipe />} /> */}
-    {/* <Route path="/about" element={<About />} /> */}
+    <Route path="/search" element={<SearchPage />} />
+    <Route path="/page" element={<Pagination />} />
   </Route>
 );
 

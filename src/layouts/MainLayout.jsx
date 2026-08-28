@@ -6,7 +6,7 @@ import Footer from "../components/Footer";
 const MainLayout = () => {
   return (
     <div className="main-layout">
-      <Header />
+      {/* <Header /> */}
 
       <div className="main-content">
         {/* <Sidebar /> */}
@@ -16,7 +16,7 @@ const MainLayout = () => {
         </main>
       </div>
 
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 };
