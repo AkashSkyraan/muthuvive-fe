@@ -1,5 +1,5 @@
 import React from "react";
-import icons from "../config/Icons.jsx";
+import icons from "../../../config/Icons.jsx";
 
 // Dynamic data - replace with API response
 const features = [

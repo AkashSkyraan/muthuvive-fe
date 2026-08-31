@@ -1,7 +1,6 @@
 import React from "react";
 import { Pagination as AntPagination } from "antd";
 
-
 import "./Pagination.css";
 import { images } from "../../../config/Images";
 

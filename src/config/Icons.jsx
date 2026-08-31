@@ -27,6 +27,10 @@ import checkIcon from "../assets/icons/checkmark.png";
 import starIcon from "../assets/icons/Star.svg";
 import targetIcon from "../assets/icons/target.png";
 import viewIcon from "../assets/icons/view.png";
+import mailBlackIcon from "../assets/icons/mail-black.png";
+import mailBlueIcon from "../assets/icons/mail-blue.png";
+import callBlueIcon from "../assets/icons/call-blue.png";
+import locationBlueIcon from "../assets/icons/location-blue.png";
 
 export const icons = {
   callBlackIcon,
@@ -58,6 +62,10 @@ export const icons = {
   starIcon,
   targetIcon,
   viewIcon,
+  mailBlackIcon,
+  mailBlueIcon,
+  callBlueIcon,
+  locationBlueIcon,
 };
 
 export default icons;

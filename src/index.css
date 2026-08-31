@@ -27,3 +27,17 @@ body {
   box-sizing: border-box;
   font-family: var(--font-primary)
 }
+
+@keyframes marquee-team {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee-team {
+  animation: marquee-team 25s linear infinite;
+}
