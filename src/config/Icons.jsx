@@ -31,8 +31,12 @@ import mailBlackIcon from "../assets/icons/mail-black.png";
 import mailBlueIcon from "../assets/icons/mail-blue.png";
 import callBlueIcon from "../assets/icons/call-blue.png";
 import locationBlueIcon from "../assets/icons/location-blue.png";
+import investmentIcon from "../assets/icons/investment.png";
+import commercialResidentialIcon from "../assets/icons/commercial-residential.png";
 
 export const icons = {
+  investmentIcon,
+  commercialResidentialIcon,
   callBlackIcon,
   callWhiteIcon,
   userAvatarHolder,

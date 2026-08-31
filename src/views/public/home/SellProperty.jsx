@@ -1,6 +1,7 @@
 import React from "react";
 import { Button } from "antd";
 import icons from "../../../config/Icons.jsx";
+import SubscriptionCard from "../../../components/cards/SubscriptionCard.jsx";
 
 const planFeatures = [
   "365 Days Listing",
@@ -37,7 +38,7 @@ const SellProperty = () => {
 
           {/* Right plan card */}
           <div className="w-full lg:w-1/3">
-            <div className="bg-white rounded-lg border border-secondary max-w-md mx-auto lg:mx-0">
+            {/* <div className="bg-white rounded-lg border border-secondary max-w-md mx-auto lg:mx-0">
               <div className="border-b border-gray-200 px-5 py-3">
                 <h3 className="text-sm font-semibold text-gray-900">
                   Plan Details
@@ -73,7 +74,8 @@ const SellProperty = () => {
                   ))}
                 </ul>
               </div>
-            </div>
+            </div> */}
+            <SubscriptionCard />
           </div>
         </div>
       </div>

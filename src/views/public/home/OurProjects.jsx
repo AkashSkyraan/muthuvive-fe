@@ -68,7 +68,7 @@ const projects = [
 
 const ProjectCard = ({ project }) => {
   return (
-    <div className="relative rounded-lg overflow-hidden h-64 shrink-0 w-[calc(50%-8px)] sm:w-[calc(33.33%-11px)] lg:w-[calc(20%-13px)]">
+    <div className="relative rounded-lg overflow-hidden h-64 shrink-0 w-full sm:w-[calc(33.33%-11px)] lg:w-[calc(20%-13px)]">
       <img
         src={project.image}
         alt={project.title}
@@ -126,8 +126,8 @@ const DTCPProjects = () => {
             </button>
           ))}
         </div>
-        
-        <div className="flex flex-wrap gap-4 mt-10">
+
+        <div className="flex flex-wrap gap-4 mt-12">
           {projects.map((project) => (
             <ProjectCard key={project.id} project={project} />
           ))}

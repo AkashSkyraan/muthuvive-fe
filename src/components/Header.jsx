@@ -3,14 +3,45 @@ import { Button, Popover } from "antd";
 import { MenuOutlined, CloseOutlined, UserOutlined } from "@ant-design/icons";
 import images from "../config/Images.jsx";
 import icons from "../config/Icons.jsx";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAccountPopoverOpen, setIsAccountPopoverOpen] = useState(false);
 
+  const propertyCategories = [
+    { key: "farmland", label: "Farmland", icon: icons.farmlandIcon },
+    {
+      key: "dtcp-approved",
+      label: "DTCP Approved",
+      icon: icons.dtcpApprovedIcon,
+    },
+    {
+      key: "agriculture-land",
+      label: "Agriculture Land",
+      icon: icons.agriculturalLandsIcon,
+    },
+    {
+      key: "commercial-land",
+      label: "Commercial Land",
+      icon: icons.commercialLandIcon,
+    },
+    {
+      key: "construction",
+      label: "Construction",
+      icon: icons.constructionIcon,
+    },
+    { key: "investment-land", label: "Investment", icon: icons.investmentIcon },
+    {
+      key: "commercial-residential",
+      label: "Commercial / Residential Buildings",
+      icon: icons.commercialResidentialIcon,
+    },
+  ];
+
   const accountPopoverContent = (
-    <div className="w-64 p-1">
-      <div className="flex items-center gap-x-2">
+    <div className="w-64 p-1 z-40">
+      <div className="flex items-center gap-x-2 ">
         <UserOutlined className="text-gray-500" />
         <p className="text-xs text-gray-600">
           Login or sign Up Your Account to Explore
@@ -34,19 +65,35 @@ const Header = () => {
       </div>
     </div>
   );
+  const propertiesPopoverContent = (
+    <div className="w-55 py-1 z-40">
+      {propertyCategories.map((category) => (
+        <Link
+          key={category.key}
+          to={`/properties/${category.key}`}
+          className="flex items-center gap-x-3 px-2 py-2 rounded-md hover:bg-gray-50 transition-colors"
+        >
+          <img src={category.icon} alt={category.label} className="w-5 h-5" />
+          <span className="text-sm text-gray-800 hover:text-secondary">
+            {category.label}
+          </span>
+        </Link>
+      ))}
+    </div>
+  );
 
   return (
-    <div className="w-full md:h-[12%] bg-primary">
+    <div className="w-full md:h-[12%] bg-primary sticky top-0 z-30">
       <div className="w-[90%] p-4 mx-auto">
         <div className="grid grid-cols-[40%_60%] md:grid-cols-[25%_75%] lg:grid-cols-[20%_80%] xl:grid-cols-[40%_60%]">
           <div className="flex items-center">
-            <a href="#">
+            <Link to="/">
               <img
                 src={images.logo}
                 alt="Logo"
                 className="w-24 sm:w-32 lg:w-36 xl:w-40 h-auto"
               />
-            </a>
+            </Link>
           </div>
 
           {/* Desktop nav */}
@@ -54,19 +101,29 @@ const Header = () => {
             <div className="">
               <ul className="flex gap-x-5 lg:gap-x-4 xl:gap-x-5 text-sm">
                 <li className="transition-colors hover:text-secondary">
-                  <a href="#">Home</a>
+                  <Link to="/">Home</Link>
                 </li>
                 <li className="transition-colors hover:text-secondary">
-                  <a href="#">Properties</a>
+                  <Popover
+                    content={propertiesPopoverContent}
+                    trigger="hover"
+                    placement="bottomLeft"
+                    arrow={false}
+                    align={{
+                      offset: [0, 10],
+                    }}
+                  >
+                    <Link to="/properties">Properties</Link>
+                  </Popover>
                 </li>
                 <li className="transition-colors hover:text-secondary">
-                  <a href="#">Gallery</a>
+                  <Link to="gallery">Gallery</Link>
                 </li>
                 <li className="transition-colors hover:text-secondary">
-                  <a href="#">AboutUs</a>
+                  <Link to="/about">AboutUs</Link>
                 </li>
                 <li className="transition-colors hover:text-secondary">
-                  <a href="#">ContactUs</a>
+                  <Link to="/contactus">ContactUs</Link>
                 </li>
               </ul>
             </div>
@@ -98,6 +155,10 @@ const Header = () => {
                 open={isAccountPopoverOpen}
                 onOpenChange={setIsAccountPopoverOpen}
                 placement="bottomRight"
+                arrow={false}
+                align={{
+                  offset: [0, 15],
+                }}
               >
                 <button>
                   <img
@@ -124,9 +185,9 @@ const Header = () => {
         <div className="fixed inset-0 z-50 bg-primary md:lg overflow-y-auto">
           <div className="w-[90%] mx-auto p-4">
             <div className="flex items-center justify-around">
-              <a href="#">
+              <Link to="/">
                 <img src={images.logo} alt="Logo" className="" />
-              </a>
+              </Link>
               <button onClick={() => setIsMenuOpen(false)} className="ms-5">
                 <CloseOutlined />
               </button>
@@ -134,29 +195,29 @@ const Header = () => {
 
             <ul className="flex flex-col text-start gap-y-5 text-sm mt-8">
               <li className="transition-colors hover:text-secondary">
-                <a href="#" onClick={() => setIsMenuOpen(false)}>
+                <Link to="/" onClick={() => setIsMenuOpen(false)}>
                   Home
-                </a>
+                </Link>
               </li>
               <li className="transition-colors hover:text-secondary">
-                <a href="#" onClick={() => setIsMenuOpen(false)}>
+                <Link to="/properties" onClick={() => setIsMenuOpen(false)}>
                   Properties
-                </a>
+                </Link>
               </li>
               <li className="transition-colors hover:text-secondary">
-                <a href="#" onClick={() => setIsMenuOpen(false)}>
+                <Link to="/gallery" onClick={() => setIsMenuOpen(false)}>
                   Gallery
-                </a>
+                </Link>
               </li>
               <li className="transition-colors hover:text-secondary">
-                <a href="#" onClick={() => setIsMenuOpen(false)}>
+                <Link to="/about" onClick={() => setIsMenuOpen(false)}>
                   AboutUs
-                </a>
+                </Link>
               </li>
               <li className="transition-colors hover:text-secondary">
-                <a href="#" onClick={() => setIsMenuOpen(false)}>
+                <Link to="/contactus" onClick={() => setIsMenuOpen(false)}>
                   ContactUs
-                </a>
+                </Link>
               </li>
             </ul>
 

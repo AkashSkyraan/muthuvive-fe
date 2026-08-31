@@ -8,6 +8,7 @@ import facebookIcon from "../assets/icons/facebook.png";
 import twitterIcon from "../assets/icons/twitter.png";
 import images from "../config/Images";
 import icons from "../config/Icons";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -26,7 +27,7 @@ const Footer = () => {
                   alt="location"
                   className="w-4 h-4 mt-0.5"
                 />
-                <span>Tarde build Road,Chennai, Viruthnagar,-64100</span>
+                <span>Tarde build Road,Chennai, Viruthnagar-641006</span>
               </li>
               <li className="flex items-center gap-x-2">
                 <img src={icons.callWhiteIcon} alt="call" className="w-4 h-4" />
@@ -39,7 +40,9 @@ const Footer = () => {
             </ul>
 
             <div className="mt-4 sm:mt-6 bg-white rounded-md px-6 py-1 sm:px-10 sm:py-2 w-fit">
-              <img src={images.logo} alt="Logo" className="" />
+              <Link to="/">
+                <img src={images.logo} alt="Logo" className="" />
+              </Link>
             </div>
           </div>
 
@@ -50,19 +53,19 @@ const Footer = () => {
 
             <ul className="flex flex-col text-start gap-y-3 text-sm text-gray-300">
               <li>
-                <a href="#">Properties</a>
+                <Link to="/properties">Properties</Link>
               </li>
               <li>
-                <a href="#">Sell my properties</a>
+                <Link to="/sellproperties">Sell my properties</Link>
               </li>
               <li>
-                <a href="#">Gallery</a>
+                <Link to="gallery">Gallery</Link>
               </li>
               <li>
-                <a href="#">About Us</a>
+                <Link to="/about">About Us</Link>
               </li>
               <li>
-                <a href="#">Contact Us</a>
+                <Link to="contactus">Contact Us</Link>
               </li>
             </ul>
           </div>
@@ -74,16 +77,16 @@ const Footer = () => {
 
             <ul className="flex flex-col text-start gap-y-3 text-sm text-gray-300">
               <li>
-                <a href="#">Agricultural</a>
+                <Link to="/agriculture-land">Agricultural</Link>
               </li>
               <li>
-                <a href="#">Commercial</a>
+                <Link to="commercial-land">Commercial</Link>
               </li>
               <li>
-                <a href="#">DTCP Approved</a>
+                <Link to="/dtcp-approved">DTCP Approved</Link>
               </li>
               <li>
-                <a href="#">Farmland</a>
+                <Link to="/farmland">Farmland</Link>
               </li>
             </ul>
           </div>
@@ -100,7 +103,9 @@ const Footer = () => {
 
             <div className="flex items-center gap-x-3 mt-5">
               <a
-                href="#"
+                href="https://wa.me/919456783490"
+                target="blank"
+                rel="noopener noreferrer"
                 className="w-9 h-9 flex items-center justify-center bg-white rounded-md"
               >
                 <img
@@ -110,7 +115,9 @@ const Footer = () => {
                 />
               </a>
               <a
-                href="#"
+                href="https://www.instagram.com"
+                target="blank"
+                rel="noopener noreferrer"
                 className="w-9 h-9 flex items-center justify-center bg-white/10 rounded-md"
               >
                 <img
@@ -120,7 +127,9 @@ const Footer = () => {
                 />
               </a>
               <a
-                href="#"
+                href="https://www.facebook.com"
+                target="blank"
+                rel="noopener noreferrer"
                 className="w-9 h-9 flex items-center justify-center bg-white/10 rounded-md"
               >
                 <img
@@ -130,7 +139,9 @@ const Footer = () => {
                 />
               </a>
               <a
-                href="#"
+                href="https://www.twitter.com"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-9 h-9 flex items-center justify-center bg-white/10 rounded-md"
               >
                 <img

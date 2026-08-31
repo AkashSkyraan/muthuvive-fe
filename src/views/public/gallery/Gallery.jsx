@@ -148,7 +148,7 @@ const Gallery = () => {
     <div className="w-full py-16">
       <div className="w-[90%] mx-auto">
         {/* Tabs */}
-        <div className="flex items-center gap-x-6 overflow-x-auto pb-3 border-b border-gray-200 whitespace-nowrap">
+        <div className="flex items-center gap-x-6 overflow-x-auto pb-3 border-b border-gray-200 whitespace-nowrap justify-center overflow-y-hidden">
           {categories.map((category) => (
             <button
               key={category.key}

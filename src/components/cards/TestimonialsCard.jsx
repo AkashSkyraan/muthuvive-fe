@@ -2,69 +2,71 @@ import React, { useRef, useState, useEffect } from "react";
 import icons from "../../config/Icons.jsx";
 import images from "../../config/Images.jsx";
 import { ArrowLeftOutlined, ArrowRightOutlined } from "@ant-design/icons";
+import { getTestimonials } from "../../api/home.api.js";
 
 // Dynamic data - replace with API response
-const testimonials = [
-  {
-    id: 1,
-    image: images.testimonial,
-    name: "Sanjay Sakthivel",
-    location: "Tamil Nadu, India",
-    review:
-      "Highlight the best of your properties by using the List Category shortcode. You can list categories, types, cities and states of your choice.",
-    rating: 3,
-  },
-  {
-    id: 2,
-    image: images.testimonial,
-    name: "Velavan",
-    location: "Tamil Nadu, India",
-    review:
-      "Highlight the best of your properties by using the List Category shortcode. You can list categories, types, cities and states of your choice.",
-    rating: 4,
-  },
-  {
-    id: 3,
-    image: images.testimonial,
-    name: "Sugumaran",
-    location: "Tamil Nadu, India",
-    review:
-      "Highlight the best of your properties by using the List Category shortcode. You can list categories, types, cities and states of your choice.",
-    rating: 1,
-  },
-  {
-    id: 4,
-    image: images.testimonial,
-    name: "Karthik Raja",
-    location: "Tamil Nadu, India",
-    review:
-      "Highlight the best of your properties by using the List Category shortcode. You can list categories, types, cities and states of your choice.",
-    rating: 5,
-  },
-  {
-    id: 5,
-    image: images.testimonial,
-    name: "Karthik Raja",
-    location: "Tamil Nadu, India",
-    review:
-      "Highlight the best of your properties by using the List Category shortcode. You can list categories, types, cities and states of your choice.",
-    rating: 5,
-  },
-  {
-    id: 6,
-    image: images.testimonial,
-    name: "Karthik Raja",
-    location: "Tamil Nadu, India",
-    review:
-      "Highlight the best of your properties by using the List Category shortcode. You can list categories, types, cities and states of your choice.",
-    rating: 5,
-  },
-];
+// const testimonials = [
+//   {
+//     id: 1,
+//     image: images.testimonial,
+//     name: "Sanjay Sakthivel",
+//     location: "Tamil Nadu, India",
+//     review:
+//       "Highlight the best of your properties by using the List Category shortcode. You can list categories, types, cities and states of your choice.",
+//     rating: 3,
+//   },
+//   {
+//     id: 2,
+//     image: images.testimonial,
+//     name: "Velavan",
+//     location: "Tamil Nadu, India",
+//     review:
+//       "Highlight the best of your properties by using the List Category shortcode. You can list categories, types, cities and states of your choice.",
+//     rating: 4,
+//   },
+//   {
+//     id: 3,
+//     image: images.testimonial,
+//     name: "Sugumaran",
+//     location: "Tamil Nadu, India",
+//     review:
+//       "Highlight the best of your properties by using the List Category shortcode. You can list categories, types, cities and states of your choice.",
+//     rating: 1,
+//   },
+//   {
+//     id: 4,
+//     image: images.testimonial,
+//     name: "Karthik Raja",
+//     location: "Tamil Nadu, India",
+//     review:
+//       "Highlight the best of your properties by using the List Category shortcode. You can list categories, types, cities and states of your choice.",
+//     rating: 5,
+//   },
+//   {
+//     id: 5,
+//     image: images.testimonial,
+//     name: "Karthik Raja",
+//     location: "Tamil Nadu, India",
+//     review:
+//       "Highlight the best of your properties by using the List Category shortcode. You can list categories, types, cities and states of your choice.",
+//     rating: 5,
+//   },
+//   {
+//     id: 6,
+//     image: images.testimonial,
+//     name: "Karthik Raja",
+//     location: "Tamil Nadu, India",
+//     review:
+//       "Highlight the best of your properties by using the List Category shortcode. You can list categories, types, cities and states of your choice.",
+//     rating: 5,
+//   },
+// ];
 
 const Testimonials = () => {
   const scrollRef = useRef(null);
   const [isAtStart, setIsAtStart] = useState(true);
   const [isAtEnd, setIsAtEnd] = useState(false);
+  const [testimonials, setTestimonials] = useState([]);
 
   const checkScrollBounds = () => {
     const el = scrollRef.current;
@@ -72,6 +74,15 @@ const Testimonials = () => {
     setIsAtStart(el.scrollLeft <= 4);
     setIsAtEnd(el.scrollLeft + el.clientWidth >= el.scrollWidth - 4);
   };
+
+  useEffect(() => {
+    const fetchTestimonials = async () => {
+      const data = await getTestimonials();
+      setTestimonials(data);
+    };
+
+    fetchTestimonials();
+  }, []);
 
   useEffect(() => {
     checkScrollBounds();
@@ -131,13 +142,13 @@ const Testimonials = () => {
 
           <div
             ref={scrollRef}
-            className="flex gap-x-5 overflow-x-auto scroll-smooth snap-x snap-mandatory px-12 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+            className="flex items-stretch gap-x-5 overflow-x-auto scroll-smooth snap-x snap-mandatory px-12 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
           >
             {testimonials.map((testimonial) => (
               <div
                 key={testimonial.id}
                 data-card
-                className="bg-white border border-gray-100 rounded-lg p-5 w-full sm:w-[240px] md:w-[calc(33.33%-14px)] shrink-0 snap-center md:snap-start"
+                className="bg-white border border-gray-100 rounded-lg p-5 w-full sm:w-[240px] md:w-[calc(33.33%-14px)] shrink-0 snap-center md:snap-start text-start flex flex-col"
               >
                 <div className="flex items-center gap-x-3">
                   <img
@@ -157,10 +168,10 @@ const Testimonials = () => {
                 </div>
 
                 <p className="text-xs text-gray-500 mt-4 leading-relaxed">
-                  {testimonial.review}
+                  {testimonial.content}
                 </p>
 
-                <div className="flex items-center gap-x-1 mt-4">
+                <div className="flex items-center gap-x-1 mt-auto pt-4">
                   {Array.from({ length: testimonial.rating }).map(
                     (_, index) => (
                       <img
