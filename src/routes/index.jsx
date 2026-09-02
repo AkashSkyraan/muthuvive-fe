@@ -2,6 +2,7 @@ import React from "react";
 
 import publicRoutes from "./public.routes";
 import AuthRoutes from "./auth.routes";
+import SellPropertyRoutes from "./sellProperty.routes.jsx";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Header from "../components/Header.jsx";
 
@@ -11,6 +12,7 @@ const AppRoutes = () => {
       <Routes>
         {AuthRoutes}
         {publicRoutes}
+        {SellPropertyRoutes}
 
         {/* <Route element={<publicRoutes />}>
           <Route path="/" element={<Header />} />
