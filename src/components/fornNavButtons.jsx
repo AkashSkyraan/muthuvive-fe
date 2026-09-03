@@ -2,7 +2,12 @@
 import React from "react";
 import { Button } from "antd";
 
-const FormNavigationButtons = ({ onPrevious, onNext, disableNext }) => {
+const FormNavigationButtons = ({
+  onPrevious,
+  onNext,
+  disableNext,
+  nextLabel = "Next",
+}) => {
   return (
     <div className="flex justify-end gap-x-5 mt-6">
       <Button onClick={onPrevious} className="rounded-full px-6">
@@ -14,7 +19,7 @@ const FormNavigationButtons = ({ onPrevious, onNext, disableNext }) => {
         disabled={disableNext}
         className="rounded-full px-6"
       >
-        Next
+        {nextLabel}
       </Button>
     </div>
   );

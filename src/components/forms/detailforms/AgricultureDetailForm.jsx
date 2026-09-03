@@ -93,22 +93,32 @@ const UnitField = ({
   defaultUnit,
 }) => (
   <div>
-    <p className="text-sm text-start font-semibold text-gray-900 mb-2">{label}</p>
-    <div className="flex items-center rounded-xl bg-gray-100 overflow-hidden">
+    <p className="text-sm text-start font-semibold text-gray-900 mb-2">
+      {label}
+    </p>
+    <div className="flex items-stretch rounded-xl bg-[#f3f3f3] overflow-hidden border-2 border-gray-200">
       <Form.Item name={valueName} noStyle>
         <Input
           placeholder="200"
-          variant="borderless"
+          variant="outlined"
           className={`flex-1 ${inputClassName}`}
         />
       </Form.Item>
-      <div className="w-px h-6 bg-gray-300 shrink-0" />
+      <div className="w-px bg-gray-300 shrink-0" />
       <Form.Item name={unitName} noStyle initialValue={defaultUnit}>
         <Select
-          variant="borderless"
+          variant="outlined"
           suffixIcon={<DownOutlined className="text-gray-500 text-xs" />}
-          className="!w-24 shrink-0"
+          className="!w-24 shrink-0 !h-auto
+            [&_.ant-select-selector]:!bg-white
+            [&_.ant-select-selector]:!h-full
+            [&_.ant-select-selector]:!rounded-none
+            [&_.ant-select-selector]:!flex
+            [&_.ant-select-selector]:!items-center
+            [&_.ant-select-selector]:!mx-0
+            [&_.ant-select-selector]:!my-0"
           options={unitOptions}
+          style={{ backgroundColor: "#FFFFFF" }}
         />
       </Form.Item>
     </div>
@@ -198,7 +208,7 @@ const PropertyDetailsForm = () => {
         >
           <Input
             placeholder="Muthvive's Agriculture Land for sale"
-            className="!rounded-xl !bg-gray-100 !border-gray-200 !px-5 !py-3 !text-sm"
+            className="!rounded-xl bg-[#f3f3f3]! !px-5 !py-3 !text-sm"
           />
         </Form.Item>
 
@@ -209,6 +219,9 @@ const PropertyDetailsForm = () => {
           unitOptions={areaUnitOptions}
           defaultUnit="acres"
           className="text-start!"
+          style={{
+            backgroundColor: "#FFFFFF",
+          }}
         />
 
         <Form.Item
@@ -219,6 +232,7 @@ const PropertyDetailsForm = () => {
           <ToggleGroup
             options={roadPlanOptions}
             onChange={handleRoadPlanChange}
+            className=""
           />
         </Form.Item>
 
@@ -313,12 +327,21 @@ const PropertyDetailsForm = () => {
         <Form.Item
           label={fieldLabel("Property Facing")}
           name="propertyFacing"
-          className="!mb-0"
+          className="mb-0!"
         >
           <Select
             placeholder="Select facing"
-            suffixIcon={<DownOutlined className="text-gray-700" />}
-            className="w-full [&_.ant-select-selector]:!rounded-xl [&_.ant-select-selector]:!bg-gray-100 [&_.ant-select-selector]:!border-gray-200 [&_.ant-select-selector]:!px-5 [&_.ant-select-selector]:!h-12 [&_.ant-select-selection-item]:!leading-[48px] [&_.ant-select-selection-placeholder]:!leading-[48px]"
+            suffixIcon={<DownOutlined className="text-black!" />}
+            className="w-full py-2.5!
+             [&_.ant-select-selector]:!rounded-xl 
+             [&_.ant-select-selector]:!border-gray-200 
+             [&_.ant-select-selector]:!px-5 
+             [&_.ant-select-selector]:!h-12 
+             [&_.ant-select-selection-item]:!leading-[48px] 
+             [&_.ant-select-selection-placeholder]:!leading-[48px]"
+            style={{
+              backgroundColor: "#f3f3f3",
+            }}
             options={facingOptions}
           />
         </Form.Item>
@@ -326,7 +349,7 @@ const PropertyDetailsForm = () => {
         <Form.Item
           label={fieldLabel("Any Construction done on this property ?")}
           name="constructionDone"
-          className="!mb-0"
+          className="mb-0!"
         >
           <ToggleGroup
             options={yesNoOptions}
@@ -358,7 +381,7 @@ const PropertyDetailsForm = () => {
               maxLength={500}
               showCount
               rows={4}
-              className="!rounded-xl !bg-gray-100 !border-gray-200 !px-5 !py-3 !text-sm"
+              className="!rounded-xl !bg-[#f3f3f3] !border-gray-200 !px-5 !py-3 !text-sm"
             />
           </Form.Item>
         )}

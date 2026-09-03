@@ -38,6 +38,59 @@ body {
   }
 }
 
-.animate-marquee-team {
-  animation: marquee-team 25s linear infinite;
+
+/* Ant Design Select - focused state */
+.ant-select {
+  --ant-select-active-border-color: #000000 !important;
+  --ant-select-hover-border-color: #000000 !important;
+  --ant-select-active-outline-color: rgba(0, 0, 0, 0.1) !important;
+  --ant-select-active-outline-width: 2px !important;
 }
+.ant-select:hover .ant-select-selector {
+  border-color: #000000 !important;
+}
+
+.ant-select-focused .ant-select-selector {
+  border-color: #000000 !important;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* =========================================
+   Ant Design Input - Focus
+   ========================================= */
+
+.ant-input:focus,
+.ant-input-focused {
+  border-color: #000 !important;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08) !important;
+}
+
+.ant-input.ant-input-outlined:focus,
+.ant-input.ant-input-outlined.ant-input-focused {
+  border-color: #000000 !important;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08) !important;
+  outline: none !important;
+}
+
+/* Ant Design Input */
+.ant-input:hover {
+  border-color: #000 !important;
+}
+
+.ant-input:focus,
+.ant-input-focused {
+  border-color: #000 !important;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08) !important;
+  outline: none !important;
+}
+
+.image-preview-modal .ant-modal-content {
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.image-preview-modal .ant-modal-body {
+  padding: 0 !important;
+}
+

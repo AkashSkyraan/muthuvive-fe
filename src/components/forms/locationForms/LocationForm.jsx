@@ -85,7 +85,7 @@ const LocationForm = () => {
           <Select
             placeholder="Select your Category"
             suffixIcon={<DownOutlined className="text-gray-700" />}
-            className={`w-full ${selectClassName}`}
+            className={`w-full bg-[#f3f3f3]! ${selectClassName}`}
             options={countries}
           />
         </Form.Item>
@@ -103,7 +103,7 @@ const LocationForm = () => {
               />
             }
             disabled={!isStateEnabled}
-            className={`w-full ${selectClassName}`}
+            className={`w-full bg-[#f3f3f3]! ${selectClassName}`}
             options={states}
             onChange={handleStateChange}
           />
@@ -124,7 +124,7 @@ const LocationForm = () => {
               />
             }
             disabled={!isDistrictEnabled}
-            className={`w-full ${selectClassName}`}
+            className={`w-full bg-[#f3f3f3]! ${selectClassName}`}
             options={districts}
             onChange={handleDistrictChange}
           />
@@ -143,7 +143,7 @@ const LocationForm = () => {
               />
             }
             disabled={!isCityEnabled}
-            className={`w-full ${selectClassName}`}
+            className={`w-full bg-[#f3f3f3]! ${selectClassName}`}
             options={cities}
           />
         </Form.Item>

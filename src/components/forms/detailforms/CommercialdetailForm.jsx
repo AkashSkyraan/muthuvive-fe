@@ -93,7 +93,7 @@ const UnitField = ({
         </button>
       )}
     </div>
-    <div className="flex items-center rounded-xl bg-gray-100 overflow-hidden">
+    <div className="flex items-center rounded-xl bg-[#f3f3f3] overflow-hidden">
       <Form.Item name={valueName} noStyle>
         <Input
           placeholder="200"
@@ -182,7 +182,7 @@ const CommercialPropertyDetailsForm = ({ onPrevious, onNext }) => {
         >
           <Input
             placeholder="Muthvive's Agriculture Land for sale"
-            className="!rounded-xl !bg-gray-100 !border-gray-200 !px-5 !py-3 !text-sm"
+            className="!rounded-xl !bg-[#f3f3f3] !border-gray-200 !px-5 !py-3 !text-sm"
           />
         </Form.Item>
 
@@ -235,11 +235,17 @@ const CommercialPropertyDetailsForm = ({ onPrevious, onNext }) => {
         )}
 
         <div>
-          <p className="text-sm font-semibold text-gray-900 mb-3">Floor Plan</p>
+          <p className="text-sm text-start font-semibold text-gray-900 mb-3">
+            Floor Plan
+          </p>
 
           <div className="flex flex-col gap-4">
             <Form.Item
-              label={<span className="text-sm text-gray-700">Total Floor</span>}
+              label={
+                <span className="text-sm  font-semibold text-gray-700">
+                  Total Floor
+                </span>
+              }
               name="totalFloor"
               className="!mb-0"
             >
@@ -251,7 +257,7 @@ const CommercialPropertyDetailsForm = ({ onPrevious, onNext }) => {
 
             <Form.Item
               label={
-                <span className="text-sm text-gray-700">
+                <span className="text-sm font-semibold text-gray-700">
                   Your Floor (Optional)
                 </span>
               }
@@ -332,7 +338,7 @@ const CommercialPropertyDetailsForm = ({ onPrevious, onNext }) => {
           <Select
             placeholder="Select facing"
             suffixIcon={<DownOutlined className="text-gray-700" />}
-            className={`w-full ${selectSelectorClassName}`}
+            className={`w-full py-2.5! bg-[#f3f3f3]! ${selectSelectorClassName}`}
             options={facingOptions}
           />
         </Form.Item>

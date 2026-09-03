@@ -34,7 +34,7 @@ const SellPropertyLayout = () => {
           <div className="flex flex-col lg:flex-row gap-8 lg:h-[80vh]">
             {/* Stepper - first row on mobile/tablet, left sidebar on desktop */}
             <aside
-              className="lg:w-[400px] lg:h-full lg:overflow-y-auto [&::-webkit-scrollbar]:w-2 
+              className="lg:w-[380px] lg:h-full lg:overflow-y-auto [&::-webkit-scrollbar]:w-2 
                  [&::-webkit-scrollbar-track]:bg-gray-100 
                  [&::-webkit-scrollbar-thumb]:bg-gray-300 
                  [&::-webkit-scrollbar-thumb]:rounded-full"
@@ -44,7 +44,7 @@ const SellPropertyLayout = () => {
 
             {/* Dynamic Form - below the stepper on mobile/tablet, right column on desktop */}
             <section
-              className="flex-1 lg:h-full lg:overflow-y-auto [&::-webkit-scrollbar]:w-2 
+              className="flex-1 px-0 sm:px-7 lg:h-full lg:overflow-y-auto [&::-webkit-scrollbar]:w-2 
                     [&::-webkit-scrollbar-track]:bg-gray-100 
                     [&::-webkit-scrollbar-thumb]:bg-gray-300
                     [&::-webkit-scrollbar-thumb]:rounded-full"

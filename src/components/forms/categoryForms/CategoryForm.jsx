@@ -21,7 +21,7 @@ const propertyCategoryTypes = [
 ];
 
 const selectClassName =
-  "!h-12 [&_.ant-select-selector]:!rounded-full [&_.ant-select-selector]:!bg-gray-500 [&_.ant-select-selector]:!border-gray-500 [&_.ant-select-selector]:!px-5 [&_.ant-select-selector]:!h-12 [&_.ant-select-selection-item]:!leading-[48px] [&_.ant-select-selection-placeholder]:!leading-[48px] [&_.ant-select-selection-item]:!text-white [&_.ant-select-selection-placeholder]:!text-white";
+  "!h-12 [&_.ant-select-selector]:!rounded-full [&_.ant-select-selector]:!bg-gray-500 [&_.ant-select-selector]:!px-5 [&_.ant-select-selector]:!h-12 [&_.ant-select-selection-item]:!leading-[48px] [&_.ant-select-selection-placeholder]:!leading-[48px] [&_.ant-select-selection-item]:!text-white [&_.ant-select-selection-placeholder]:!text-white";
 
 const PropertyCategoryForm = ({ onPrevious }) => {
   const [form] = Form.useForm();
@@ -66,7 +66,8 @@ const PropertyCategoryForm = ({ onPrevious }) => {
           <Select
             placeholder="Select your Category"
             suffixIcon={<DownOutlined className="text-gray-900!" />}
-            className={`w-full ${selectClassName}`}
+            className={`w-full bg-[#f3f3f3]!
+             ${selectClassName}`}
             options={propertyCategories}
             onChange={handleCategoryChange}
           />
@@ -93,7 +94,7 @@ const PropertyCategoryForm = ({ onPrevious }) => {
             placeholder="Select your Category"
             suffixIcon={<DownOutlined className="text-gray-400" />}
             disabled={!isCategoryTypeEnabled}
-            className={`w-full ${selectClassName}`}
+            className={`w-full bg-[#f3f3f3]! ${selectClassName}`}
             options={propertyCategoryTypes}
           />
         </Form.Item>
