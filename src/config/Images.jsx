@@ -22,8 +22,22 @@ import mission1_sub_img from "../assets/images/mission1_sub_img.png";
 import missio2_img from "../assets/images/missio2_img.png";
 import mission2_sub_img from "../assets/images/mission2_sub_img.png";
 import worker from "../assets/images/worker1.png";
+import agriBannerImage from "../assets/images/Category-Banner-images/Agriculture.jpg";
+import commercialBannerImage from "../assets/images/Category-Banner-images/Commercial.jpg";
+import constructionBannerImage from "../assets/images/Category-Banner-images/Construction.jpg";
+import dtcpBannerImage from "../assets/images/Category-Banner-images/dtcp.jpg";
+import farmlandBannerImage from "../assets/images/Category-Banner-images/Farmland.jpg";
+import investmentBannerImage from "../assets/images/Category-Banner-images/Investment-land.jpg";
+import residentialBannerImage from "../assets/images/Category-Banner-images/Residential-Buildings.jpg";
 
 export const images = {
+  agriBannerImage,
+  commercialBannerImage,
+  constructionBannerImage,
+  dtcpBannerImage,
+  farmlandBannerImage,
+  investmentBannerImage,
+  residentialBannerImage,
   park,
   document,
   map,

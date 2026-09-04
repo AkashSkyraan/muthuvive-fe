@@ -33,7 +33,7 @@ const Header = () => {
     },
     { key: "investment-land", label: "Investment", icon: icons.investmentIcon },
     {
-      key: "commercial-residential",
+      key: "commercial-residential-building",
       label: "Commercial / Residential Buildings",
       icon: icons.commercialResidentialIcon,
     },
@@ -113,7 +113,7 @@ const Header = () => {
                       offset: [0, 10],
                     }}
                   >
-                    <Link to="/properties">Properties</Link>
+                    Properties
                   </Popover>
                 </li>
                 <li className="transition-colors hover:text-secondary">
@@ -129,9 +129,11 @@ const Header = () => {
             </div>
 
             <div>
-              <Button type="primary" className="!bg-secondary">
-                Sell my Properties
-              </Button>
+              <Link to="/sell-property">
+                <Button type="primary" className="!bg-secondary">
+                  Sell my Properties
+                </Button>
+              </Link>
             </div>
 
             <div className="flex items-center">

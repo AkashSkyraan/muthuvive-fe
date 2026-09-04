@@ -29,14 +29,21 @@ body {
 }
 
 @keyframes marquee-team {
-  from {
+  0% {
     transform: translateX(0);
   }
 
-  to {
+  100% {
     transform: translateX(-50%);
   }
 }
+.animate-marquee-team {
+  display: flex;
+  width: max-content; /* container fits content */
+  animation: marquee-team 30s linear infinite;
+  will-change: transform;
+}
+
 
 
 /* Ant Design Select - focused state */

@@ -32,8 +32,8 @@ const ScrollToTop = () => {
       onClick={scrollToTop}
       aria-label="Scroll to top"
       className={`
-        fixed bottom-32 right-5 sm:right-4 z-60
-        w-9 h-9 sm:w-10 sm:h-10
+        fixed bottom-32 right-5 sm:right-5 z-60
+        w-9 h-9 sm:w-9 sm:h-9
         rounded-lg
         bg-secondary
         flex items-center justify-center
@@ -45,7 +45,7 @@ const ScrollToTop = () => {
         }
       `}
     >
-      <span className="text-white text-2xl sm:text-3xl">↑</span>
+      <span className="text-white text-2xl sm:text-lg">↑</span>
     </button>
   );
 };

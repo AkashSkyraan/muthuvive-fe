@@ -33,6 +33,7 @@ import callBlueIcon from "../assets/icons/call-blue.png";
 import locationBlueIcon from "../assets/icons/location-blue.png";
 import investmentIcon from "../assets/icons/investment.png";
 import commercialResidentialIcon from "../assets/icons/commercial-residential.png";
+import { Icon } from "@iconify/react";
 
 export const icons = {
   investmentIcon,

@@ -41,7 +41,11 @@ const Footer = () => {
 
             <div className="mt-4 sm:mt-6 bg-white rounded-md px-6 py-1 sm:px-10 sm:py-2 w-fit">
               <Link to="/">
-                <img src={images.logo} alt="Logo" className="" />
+                <img
+                  src={images.logo}
+                  alt="Logo"
+                  className="h-6 xs:h-7 sm:h-9 md:h-10 lg:h-11 w-auto"
+                />
               </Link>
             </div>
           </div>
