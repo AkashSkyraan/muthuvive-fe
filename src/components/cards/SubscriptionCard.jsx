@@ -24,7 +24,7 @@ const SubscriptionCard = () => {
     fetchsubscriptionsPlans();
   }, []);
   return (
-    <div className="bg-white rounded-lg border border-secondary max-w-md mx-auto lg:mx-0">
+    <div className="bg-white rounded-lg border border-secondary w-full max-w-md mx-auto lg:mx-0">
       <div className="border-b border-gray-200 px-5 py-3">
         <h3 className="text-sm font-semibold text-gray-900">Plan Details</h3>
       </div>

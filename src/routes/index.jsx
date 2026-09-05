@@ -5,22 +5,17 @@ import AuthRoutes from "./auth.routes";
 import SellPropertyRoutes from "./sellProperty.routes.jsx";
 import PropertyRoutes from "./property.routes.jsx";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Header from "../components/Header.jsx";
+import ScrollToTop from "../components/common/ScrollToTop.jsx";
 
 const AppRoutes = () => {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         {AuthRoutes}
         {publicRoutes}
         {SellPropertyRoutes}
         {PropertyRoutes}
-
-        {/* <Route element={<publicRoutes />}>
-          <Route path="/" element={<Header />} />
-        </Route> */}
-
-        {/* <Route path="*" element={<NotFound />} /> */}
       </Routes>
     </BrowserRouter>
   );

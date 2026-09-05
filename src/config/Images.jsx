@@ -29,8 +29,12 @@ import dtcpBannerImage from "../assets/images/Category-Banner-images/dtcp.jpg";
 import farmlandBannerImage from "../assets/images/Category-Banner-images/Farmland.jpg";
 import investmentBannerImage from "../assets/images/Category-Banner-images/Investment-land.jpg";
 import residentialBannerImage from "../assets/images/Category-Banner-images/Residential-Buildings.jpg";
+import rectangle from "../assets/images/rectangle1.png";
+import propertydocument from "../assets/images/propertydocument.png";
 
 export const images = {
+  propertydocument,
+  rectangle,
   agriBannerImage,
   commercialBannerImage,
   constructionBannerImage,

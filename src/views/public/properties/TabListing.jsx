@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 
-const CategoryTabs = ({ categories = [] }) => {
+const CategoryTabs = ({ categories = [], onChange }) => {
   const scrollRef = useRef(null);
 
   const [activeCategory, setActiveCategory] = useState(
@@ -46,8 +46,15 @@ const CategoryTabs = ({ categories = [] }) => {
     });
   };
 
+  const handleTabClick = (category) => {
+    setActiveCategory(category.key);
+
+    // Tell the parent which tab was clicked
+    onChange?.(category.key);
+  };
+
   return (
-    <div className="flex w-full items-center gap-2 sm:gap-3">
+    <div className={`flex w-full items-center gap-2 sm:gap-3`}>
       {/* Previous */}
       <button
         type="button"
@@ -70,7 +77,7 @@ const CategoryTabs = ({ categories = [] }) => {
             <React.Fragment key={category.key}>
               <button
                 type="button"
-                onClick={() => setActiveCategory(category.key)}
+                onClick={() => handleTabClick(category)}
                 className={`shrink-0 whitespace-nowrap border-b-2 pb-1 text-sm font-medium transition-colors hover:cursor-pointer ${
                   isActive
                     ? "border-[#1557e8] text-[#1557e8]"

@@ -34,8 +34,22 @@ import locationBlueIcon from "../assets/icons/location-blue.png";
 import investmentIcon from "../assets/icons/investment.png";
 import commercialResidentialIcon from "../assets/icons/commercial-residential.png";
 import { Icon } from "@iconify/react";
+import qualityIcon from "../assets/icons/quality.png";
+import safetyIcon from "../assets/icons/safety.png";
+import deliveryIcon from "../assets/icons/delivery.png";
+import solutionsIcon from "../assets/icons/solutions.png";
+import bookmarkIcon2 from "../assets/icons/bookmark-2.png";
+import sentIcon from "../assets/icons/sent.png";
+import copyIcon from "../assets/icons/copy.png";
 
 export const icons = {
+  bookmarkIcon2,
+  copyIcon,
+  sentIcon,
+  qualityIcon,
+  safetyIcon,
+  deliveryIcon,
+  solutionsIcon,
   investmentIcon,
   commercialResidentialIcon,
   callBlackIcon,

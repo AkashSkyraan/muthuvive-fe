@@ -27,7 +27,7 @@ const Header = () => {
       icon: icons.commercialLandIcon,
     },
     {
-      key: "construction",
+      key: "construction-services",
       label: "Construction",
       icon: icons.constructionIcon,
     },
@@ -83,7 +83,10 @@ const Header = () => {
   );
 
   return (
-    <div className="w-full md:h-[12%] bg-primary sticky top-0 z-30">
+    <div
+      id="main-header"
+      className="w-full md:h-[12%] bg-primary sticky top-0 z-30"
+    >
       <div className="w-[90%] p-4 mx-auto">
         <div className="grid grid-cols-[40%_60%] md:grid-cols-[25%_75%] lg:grid-cols-[20%_80%] xl:grid-cols-[40%_60%]">
           <div className="flex items-center">

@@ -2,13 +2,14 @@ import React from "react";
 import { Button } from "antd";
 import images from "../../../config/Images.jsx";
 import ProjectCard from "../../../components/cards/ProjectCard.jsx";
+import { Link } from "react-router-dom";
 
 // Dynamic data - replace with API response
 const listings = [
   {
     id: 1,
     image: images.agricultureLand,
-    category: "Agriculture Land",
+    category: "agriculture-land",
     title: "Boutique Space On Greenville Road",
     price: "₹ 12,00,000 / Per Acre",
     address:
@@ -20,7 +21,7 @@ const listings = [
   {
     id: 2,
     image: images.agricultureLand,
-    category: "Agriculture Land",
+    category: "farmland",
     title: "Boutique Space On Greenville Road",
     price: "₹ 12,00,000 / Per Acre",
     address:
@@ -32,7 +33,7 @@ const listings = [
   {
     id: 3,
     image: images.agricultureLand,
-    category: "Agriculture Land",
+    category: "agriculture-land",
     title: "Boutique Space On Greenville Road",
     price: "₹ 12,00,000 / Per Acre",
     address:
@@ -44,7 +45,7 @@ const listings = [
   {
     id: 4,
     image: images.agricultureLand,
-    category: "Agriculture Land",
+    category: "agriculture-land",
     title: "Boutique Space On Greenville Road",
     price: "₹ 12,00,000 / Per Acre",
     address:
@@ -56,7 +57,7 @@ const listings = [
   {
     id: 5,
     image: images.agricultureLand,
-    category: "Agriculture Land",
+    category: "agriculture-land",
     title: "Boutique Space On Greenville Road",
     price: "₹ 12,00,000 / Per Acre",
     address:
@@ -68,7 +69,7 @@ const listings = [
   {
     id: 6,
     image: images.agricultureLand,
-    category: "Agriculture Land",
+    category: "agriculture-land",
     title: "Boutique Space On Greenville Road",
     price: "₹ 12,00,000 / Per Acre",
     address:
@@ -80,7 +81,7 @@ const listings = [
   // {
   //   id: 7,
   //   image: images.agricultureLand,
-  //   category: "Agriculture Land",
+  //   category: "agriculture-land",
   //   title: "Boutique Space On Greenville Road",
   //   price: "₹ 12,00,000 / Per Acre",
   //   address:
@@ -110,7 +111,9 @@ const MarketListings = () => {
             10 listings = 10 cards, laid out in this responsive grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10 text-start">
           {listings.map((listing) => (
-            <ProjectCard key={listing.id} listing={listing} />
+            <Link to={`/properties/${listing.category}/${listing.id}`}>
+              <ProjectCard key={listing.id} listing={listing} />
+            </Link>
           ))}
         </div>
 

@@ -101,3 +101,10 @@ body {
   padding: 0 !important;
 }
 
+/* ============================================================
+   Ant Design Collapse - Remove horizontal content padding
+   ============================================================ */
+.property-info-collapse .ant-collapse-content-box {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}

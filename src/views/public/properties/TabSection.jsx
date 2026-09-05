@@ -20,7 +20,13 @@ import React, { useState } from "react";
 //   defaultActiveKey="ongoing"
 // />
 
-const TabSection = ({ tabs = [], activeKey, onChange, defaultActiveKey }) => {
+const TabSection = ({
+  tabs = [],
+  activeKey,
+  onChange,
+  defaultActiveKey,
+  alignment = "start",
+}) => {
   const [internalActiveKey, setInternalActiveKey] = useState(
     defaultActiveKey || tabs[0]?.key,
   );
@@ -38,7 +44,7 @@ const TabSection = ({ tabs = [], activeKey, onChange, defaultActiveKey }) => {
   };
 
   return (
-    <div className="flex w-[90%] mx-auto justify-start">
+    <div className={`flex w-[90%] mx-auto justify-${alignment}`}>
       <div
         className="
           flex

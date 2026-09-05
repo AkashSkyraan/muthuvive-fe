@@ -5,7 +5,7 @@ import icons from "../../config/Icons.jsx";
 // { id, image, category, title, price, address, area, hospitals, schools }.
 const ProjectCard = ({ listing }) => {
   return (
-    <div className="bg-white rounded-lg overflow-hidden border border-gray-100">
+    <div className="bg-white rounded-lg overflow-hidden border border-gray-100 cursor-pointer">
       <div className="relative h-48 sm:h-44 lg:h-48">
         <img
           src={listing.image}
