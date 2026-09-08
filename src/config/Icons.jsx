@@ -41,8 +41,10 @@ import solutionsIcon from "../assets/icons/solutions.png";
 import bookmarkIcon2 from "../assets/icons/bookmark-2.png";
 import sentIcon from "../assets/icons/sent.png";
 import copyIcon from "../assets/icons/copy.png";
+import diamondIcon from "../assets/icons/diamond.png";
 
 export const icons = {
+  diamondIcon,
   bookmarkIcon2,
   copyIcon,
   sentIcon,

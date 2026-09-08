@@ -4,10 +4,21 @@ import { MenuOutlined, CloseOutlined, UserOutlined } from "@ant-design/icons";
 import images from "../config/Images.jsx";
 import icons from "../config/Icons.jsx";
 import { Link } from "react-router-dom";
+import useScrollLock from "../hooks/UseScrollLock.jsx";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAccountPopoverOpen, setIsAccountPopoverOpen] = useState(false);
+  useScrollLock(isAccountPopoverOpen);
+
+  // ASSUMPTION: token is stored under "authToken" - swap this key if your
+  // app uses a different one.
+  const isLoggedIn = !!localStorage.getItem("authToken");
+
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    window.location.reload();
+  };
 
   const propertyCategories = [
     { key: "farmland", label: "Farmland", icon: icons.farmlandIcon },
@@ -39,7 +50,7 @@ const Header = () => {
     },
   ];
 
-  const accountPopoverContent = (
+  const loggedOutPopoverContent = (
     <div className="w-64 p-1 z-40">
       <div className="flex items-center gap-x-2 ">
         <UserOutlined className="text-gray-500" />
@@ -65,6 +76,142 @@ const Header = () => {
       </div>
     </div>
   );
+
+  const loggedInPopoverContent = (
+    <div className="w-64 sm:w-72 p-1 z-40 max-h-[70vh] overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="flex flex-col items-center text-center pb-3 border-b border-gray-100">
+        <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold text-lg">
+          M
+        </div>
+        <p className="mt-2 text-sm font-semibold text-gray-900">
+          Muthvive's Properties
+        </p>
+      </div>
+
+      <div className="pt-3">
+        <p className="text-base font-semibold text-gray-900 mb-1 px-1">
+          My Activity
+        </p>
+        <ul className="flex flex-col text-sm text-gray-600">
+          <li>
+            <Link
+              to="/my-properties"
+              onClick={() => setIsAccountPopoverOpen(false)}
+              className="block px-1 py-1.5 !text-[#3E3E3E] font-semibold"
+            >
+              My Properties
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/saved-lands"
+              onClick={() => setIsAccountPopoverOpen(false)}
+              className="block px-1 py-1.5 !text-[#3E3E3E] font-semibold"
+            >
+              Saved Lands
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/recently-viewed"
+              onClick={() => setIsAccountPopoverOpen(false)}
+              className="block px-1 py-1.5 !text-[#3E3E3E] font-semibold"
+            >
+              Recently Viewed Properties
+            </Link>
+          </li>
+        </ul>
+
+        <p className="text-base font-semibold text-gray-900 mt-3 mb-1 px-1">
+          Account Settings
+        </p>
+        <ul className="flex flex-col text-sm text-gray-600">
+          <li>
+            <Link
+              to="/my-profile"
+              onClick={() => setIsAccountPopoverOpen(false)}
+              className="block px-1 py-1.5 !text-[#3E3E3E] font-semibold"
+            >
+              My Profile
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/change-password"
+              onClick={() => setIsAccountPopoverOpen(false)}
+              className="block px-1 py-1.5 !text-[#3E3E3E] font-semibold"
+            >
+              Change Password
+            </Link>
+          </li>
+        </ul>
+
+        <p className="text-base font-semibold text-gray-900 mt-3 mb-1 px-1">
+          General Settings
+        </p>
+        <ul className="flex flex-col text-sm text-gray-600">
+          <li>
+            <Link
+              to="/about"
+              onClick={() => setIsAccountPopoverOpen(false)}
+              className="block px-1 py-1.5 !text-[#3E3E3E] font-semibold"
+            >
+              About Us
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/contactus"
+              onClick={() => setIsAccountPopoverOpen(false)}
+              className="block px-1 py-1.5 !text-[#3E3E3E] font-semibold"
+            >
+              Contact Us
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/gallery"
+              onClick={() => setIsAccountPopoverOpen(false)}
+              className="block px-1 py-1.5 !text-[#3E3E3E] font-semibold"
+            >
+              Gallery
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/terms-and-conditions"
+              onClick={() => setIsAccountPopoverOpen(false)}
+              className="block px-1 py-1.5 !text-[#3E3E3E] font-semibold"
+            >
+              Terms &amp; conditions
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/privacy-policy"
+              onClick={() => setIsAccountPopoverOpen(false)}
+              className="block px-1 py-1.5 !text-[#3E3E3E] font-semibold"
+            >
+              Privacy Policy
+            </Link>
+          </li>
+        </ul>
+
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="w-full text-left px-1 py-1.5 mt-2 pt-2 border-t border-gray-100 text-sm text-gray-600 !text-[#3E3E3E] font-semibold"
+        >
+          Logout
+        </button>
+      </div>
+    </div>
+  );
+
+  const accountPopoverContent = isLoggedIn
+    ? loggedInPopoverContent
+    : loggedOutPopoverContent;
+
   const propertiesPopoverContent = (
     <div className="w-55 py-1 z-40">
       {propertyCategories.map((category) => (
@@ -85,7 +232,7 @@ const Header = () => {
   return (
     <div
       id="main-header"
-      className="w-full md:h-[12%] bg-primary sticky top-0 z-30"
+      className="w-full md:h-[12%] bg-primary sticky top-0 z-30 shadow-lg"
     >
       <div className="w-[90%] p-4 mx-auto">
         <div className="grid grid-cols-[40%_60%] md:grid-cols-[25%_75%] lg:grid-cols-[20%_80%] xl:grid-cols-[40%_60%]">

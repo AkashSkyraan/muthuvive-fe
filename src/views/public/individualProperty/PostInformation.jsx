@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { InfoCircleFilled, DownOutlined } from "@ant-design/icons";
+import { InfoCircleOutlined, DownOutlined } from "@ant-design/icons";
 
 const defaultSteps = [
   {
@@ -74,7 +74,7 @@ const PropertyPostInfo = ({
         className="w-full flex items-center justify-between gap-2 bg-[#fbe6a2] px-4 py-3 sm:px-5 sm:py-4 text-left"
       >
         <span className="flex items-center gap-2 text-sm sm:text-base font-semibold text-gray-900">
-          <InfoCircleFilled className="text-gray-900" />
+          <InfoCircleOutlined className="text-gray-900" />
           {title}
         </span>
         <DownOutlined

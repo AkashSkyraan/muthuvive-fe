@@ -7,6 +7,7 @@ import Home from "../views/public/home/Index.jsx";
 import About from "../views/public/about/index";
 import Gallery from "../views/public/gallery/index.jsx";
 import Contact from "../views/public/contact/index.jsx";
+import ProfilePage from "../views/public/profilepage/ProfilePage.jsx";
 
 // import Home from "../views/public/home/Our.jsx";
 // import Search from "../pages/Search";
@@ -21,6 +22,7 @@ const publicRoutes = (
     <Route path="/about" element={<About />} />
     <Route path="/gallery" element={<Gallery />} />
     <Route path="/contactus" element={<Contact />} />
+    <Route path="/profile" element={<ProfilePage />} />
   </Route>
 );
 

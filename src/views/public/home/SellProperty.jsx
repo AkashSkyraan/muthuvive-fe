@@ -1,17 +1,20 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "antd";
 import icons from "../../../config/Icons.jsx";
 import SubscriptionCard from "../../../components/cards/SubscriptionCard.jsx";
-
-const planFeatures = [
-  "365 Days Listing",
-  "Wider Visibility",
-  "Property Promotion",
-  "Regular Verification",
-  "Better Selling Opportunity",
-];
+import { getSubscriptionPlans } from "../../../api/subscriptionPlans.api.js";
 
 const SellProperty = () => {
+  const [plans, setPlans] = useState([]);
+
+  useEffect(() => {
+    const fetchPlans = async () => {
+      const data = await getSubscriptionPlans();
+      setPlans(data);
+    };
+
+    fetchPlans();
+  }, []);
   return (
     <div className="w-full py-16">
       <div className="w-[90%] mx-auto rounded-xl bg-gradient-to-r from-[#FFF6F6] via-[#EEF3FF] to-[#e8ecfb] p-6 md:p-10">
@@ -75,7 +78,7 @@ const SellProperty = () => {
                 </ul>
               </div>
             </div> */}
-            <SubscriptionCard />
+            <SubscriptionCard plans={plans} />
           </div>
         </div>
       </div>

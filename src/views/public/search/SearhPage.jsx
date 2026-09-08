@@ -113,7 +113,7 @@ function SearchPage() {
   }, []);
 
   return (
-    <div className="flex w-full flex-col items-stretch gap-3 py-4 px-4 sm:px-5 min-[850px]:flex-row md:items-center md:gap-8 md:py-5">
+    <div className="flex w-full flex-col items-stretch gap-3 py-4 px-4 sm:px-3 min-[850px]:flex-row md:items-center md:gap-8 md:py-3">
       {/* Location */}
       <div className="flex min-h-[45px] w-full items-center rounded-sm border border-[#999999] bg-white px-5 md:flex-1">
         <div className="flex shrink-0 items-center text-[#17213D]">
