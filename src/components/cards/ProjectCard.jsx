@@ -4,7 +4,7 @@ import icons from "../../config/Icons.jsx";
 // Renders a single property listing card. Pass one `listing` object with
 // { id, image, category, title, price, address, area, hospitals, schools }.
 const ProjectCard = ({ listing }) => {
-  console.log(listing);
+  // console.log(listing);
   return (
     <div className="bg-white rounded-lg overflow-hidden border border-gray-100 cursor-pointer">
       <div className="relative h-48 sm:h-44 lg:h-48">

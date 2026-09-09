@@ -6,7 +6,7 @@ const GetInTouch = () => {
   const [form] = Form.useForm();
 
   const handleFinish = (values) => {
-    console.log("Contact form submitted:", values);
+    // console.log("Contact form submitted:", values);
   };
 
   return (

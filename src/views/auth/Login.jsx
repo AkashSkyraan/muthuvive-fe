@@ -45,7 +45,7 @@ function Login() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log("Login submitted");
+    // console.log("Login submitted");
   };
 
   return (

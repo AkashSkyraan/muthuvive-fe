@@ -221,7 +221,7 @@ const PropertyDetails = () => {
   const handleTabChange = (key) => {
     const section = document.getElementById(key);
     const header = document.getElementById("main-header");
-    console.log(header);
+    // console.log(header);
 
     if (!section) return;
 

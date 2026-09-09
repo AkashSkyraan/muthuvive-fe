@@ -1,7 +1,7 @@
 import { Route } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
 
-import SearchPage from "../views/public/search/SearhPage.jsx";
+import SearchPage from "../views/public/search/index.jsx";
 import Pagination from "../components/common/pagination/Pagination.jsx";
 import Home from "../views/public/home/Index.jsx";
 import About from "../views/public/about/index";

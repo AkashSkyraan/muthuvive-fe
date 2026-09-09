@@ -12,7 +12,7 @@ const EnquiryForm = () => {
   const canSubmit = agreeContact && agreeTerms;
 
   const handleFinish = (values) => {
-    console.log("Enquiry submitted:", values);
+    // console.log("Enquiry submitted:", values);
   };
 
   const scrollToTop = () => {

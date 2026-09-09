@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Select } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 import FormNavigationButtons from "../../fornNavButtons";
 import { useNavigate } from "react-router-dom";
+import { getLocationCategories } from "../../../api/propertyForm.api";
 
 // Dynamic data - replace with API response
 const countries = [{ value: "india", label: "India" }];
@@ -37,22 +38,162 @@ const LocationForm = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
 
+  const [stateOptions, setStateOptions] = useState([]);
+  const [districtOptions, setDistrictOptions] = useState([]);
+  const [cityOptions, setCityOptions] = useState([]);
+  const [citySearchText, setCitySearchText] = useState("");
+
+  const [locationParams, setLocationParams] = useState({
+    country: "india",
+    state: "",
+    district: "",
+  });
+
   const country = Form.useWatch("country", form);
   const state = Form.useWatch("state", form);
   const district = Form.useWatch("district", form);
+  const city = Form.useWatch("city", form);
 
   const isStateEnabled = Boolean(country);
   const isDistrictEnabled = Boolean(state);
   const isCityEnabled = Boolean(district);
 
-  const handleStateChange = () => {
-    // A new state invalidates whatever district/city were picked before
-    form.setFieldsValue({ district: undefined, city: undefined });
+  // Next only enables once every field actually has a value - touched
+  // alone (the old check) doesn't guarantee filled, e.g. clicking into
+  // a field and back out counts as touched but leaves it empty.
+  const isAllFieldsFilled = Boolean(country && state && district && city);
+
+  // Only show city options once the user has typed at least 3 letters -
+  // filters the already-fetched cityOptions client-side, no extra API
+  // calls needed since the full list for the district is already in
+  // memory.
+  const filteredCityOptions =
+    citySearchText.trim().length >= 3
+      ? cityOptions.filter((option) =>
+          option.city
+            ?.toLowerCase()
+            .includes(citySearchText.trim().toLowerCase()),
+        )
+      : [];
+
+  // Fetch states when country changes
+  useEffect(() => {
+    if (!locationParams.country) {
+      setStateOptions([]);
+      return;
+    }
+
+    const fetchStates = async () => {
+      try {
+        const data = await getLocationCategories({
+          country: locationParams?.country,
+        });
+
+        setStateOptions(data);
+      } catch (error) {
+        console.error("Failed to fetch states:", error);
+        setStateOptions([]);
+      }
+    };
+
+    fetchStates();
+  }, [locationParams.country]);
+
+  // Fetch districts when state changes
+  useEffect(() => {
+    if (!locationParams.state) {
+      setDistrictOptions([]);
+      return;
+    }
+
+    const fetchDistricts = async () => {
+      try {
+        const data = await getLocationCategories({
+          country: locationParams.country,
+          state: locationParams.state,
+        });
+
+        setDistrictOptions(data);
+      } catch (error) {
+        console.error("Failed to fetch districts:", error);
+        setDistrictOptions([]);
+      }
+    };
+
+    fetchDistricts();
+  }, [locationParams.country, locationParams.state]);
+
+  // Fetch cities when district changes
+  useEffect(() => {
+    if (!locationParams.district) {
+      setCityOptions([]);
+      return;
+    }
+
+    const fetchCities = async () => {
+      try {
+        const data = await getLocationCategories({
+          country: locationParams.country,
+          state: locationParams.state,
+          district: locationParams.district,
+        });
+
+        setCityOptions(data);
+      } catch (error) {
+        console.error("Failed to fetch cities:", error);
+        setCityOptions([]);
+      }
+    };
+
+    fetchCities();
+  }, [locationParams.country, locationParams.state, locationParams.district]);
+
+  const handleCountryChange = (value) => {
+    form.setFieldsValue({
+      state: undefined,
+      district: undefined,
+      city: undefined,
+    });
+
+    setStateOptions([]);
+    setDistrictOptions([]);
+    setCityOptions([]);
+    setCitySearchText("");
+
+    setLocationParams({
+      country: value,
+      state: "",
+      district: "",
+    });
   };
 
-  const handleDistrictChange = () => {
-    // A new district invalidates whatever city was picked before
+  const handleStateChange = (value) => {
+    form.setFieldsValue({
+      district: undefined,
+      city: undefined,
+    });
+
+    setDistrictOptions([]);
+    setCityOptions([]);
+    setCitySearchText("");
+
+    setLocationParams((prev) => ({
+      ...prev,
+      state: value,
+      district: "",
+    }));
+  };
+
+  const handleDistrictChange = (value) => {
     form.setFieldValue("city", undefined);
+
+    setCityOptions([]);
+    setCitySearchText("");
+
+    setLocationParams((prev) => ({
+      ...prev,
+      district: value,
+    }));
   };
 
   const fieldLabel = (text, enabled) => (
@@ -64,11 +205,13 @@ const LocationForm = () => {
       {text}
     </span>
   );
+
   const handleNext = async () => {
     const values = await form.validateFields();
 
     navigate("/sell-property/details");
   };
+
   const handlePrevious = async () => {
     navigate("/sell-property");
   };
@@ -87,6 +230,7 @@ const LocationForm = () => {
             suffixIcon={<DownOutlined className="text-gray-700" />}
             className={`w-full bg-[#f3f3f3]! ${selectClassName}`}
             options={countries}
+            onChange={handleCountryChange}
           />
         </Form.Item>
 
@@ -104,8 +248,12 @@ const LocationForm = () => {
             }
             disabled={!isStateEnabled}
             className={`w-full bg-[#f3f3f3]! ${selectClassName}`}
-            options={states}
+            options={stateOptions}
             onChange={handleStateChange}
+            fieldNames={{
+              label: "state",
+              value: "state",
+            }}
           />
         </Form.Item>
 
@@ -125,8 +273,12 @@ const LocationForm = () => {
             }
             disabled={!isDistrictEnabled}
             className={`w-full bg-[#f3f3f3]! ${selectClassName}`}
-            options={districts}
+            options={districtOptions}
             onChange={handleDistrictChange}
+            fieldNames={{
+              label: "district",
+              value: "district",
+            }}
           />
         </Form.Item>
 
@@ -136,7 +288,16 @@ const LocationForm = () => {
           rules={[{ required: true, message: "Please select a city" }]}
         >
           <Select
-            placeholder="Select your City"
+            placeholder="Type at least 3 letters to search"
+            showSearch
+            filterOption={false}
+            searchValue={citySearchText}
+            onSearch={setCitySearchText}
+            notFoundContent={
+              citySearchText.trim().length < 3
+                ? "Type at least 3 letters"
+                : "No matching cities"
+            }
             suffixIcon={
               <DownOutlined
                 className={isCityEnabled ? "text-gray-700" : "text-gray-400"}
@@ -144,13 +305,17 @@ const LocationForm = () => {
             }
             disabled={!isCityEnabled}
             className={`w-full bg-[#f3f3f3]! ${selectClassName}`}
-            options={cities}
+            options={filteredCityOptions}
+            fieldNames={{
+              label: "city",
+              value: "city",
+            }}
           />
         </Form.Item>
         <FormNavigationButtons
           onPrevious={handlePrevious}
           onNext={handleNext}
-          disableNext={!form.isFieldsTouched(true)}
+          disableNext={!isAllFieldsFilled}
         />
       </Form>
     </div>

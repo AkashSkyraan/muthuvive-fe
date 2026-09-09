@@ -198,7 +198,7 @@ const MyProperties = () => {
   // ============================================================
 
   const handleSellProperty = () => {
-    console.log("Sell my property");
+    // console.log("Sell my property");
   };
 
   // ============================================================
@@ -208,7 +208,7 @@ const MyProperties = () => {
   // ============================================================
 
   const handleSort = () => {
-    console.log("Sort clicked");
+    // console.log("Sort clicked");
   };
 
   return (

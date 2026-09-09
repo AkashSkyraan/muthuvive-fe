@@ -1,12 +1,13 @@
 import React from "react";
 import { useSellProperty } from "../../context/SellPropertyContext";
-import sellPropertyFormConfig from "./formConfig";
+import { sellPropertyFormConfig, categoryConfigMap } from "./formConfig";
 import { useNavigate } from "react-router-dom";
 
 const Location = () => {
   const { category } = useSellProperty();
   const navigate = useNavigate();
-  const LocationForm = sellPropertyFormConfig[category]?.location;
+  const categoryKey = categoryConfigMap[category];
+  const LocationForm = sellPropertyFormConfig[categoryKey]?.location;
 
   if (!LocationForm) {
     return (

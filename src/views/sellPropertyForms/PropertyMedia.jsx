@@ -1,14 +1,14 @@
 import React from "react";
 import { useSellProperty } from "../../context/SellPropertyContext";
-import sellPropertyFormConfig from "./formConfig";
+import { sellPropertyFormConfig, categoryConfigMap } from "./formConfig";
 import { useNavigate } from "react-router-dom";
 
 const PropertyMedia = () => {
   const { category } = useSellProperty();
   const navigate = useNavigate();
 
-  const MediaForm = sellPropertyFormConfig[category]?.media;
-
+  const categoryKey = categoryConfigMap[category];
+  const MediaForm = sellPropertyFormConfig[categoryKey]?.media;
   if (!MediaForm) {
     return (
       <div className="flex flex-col items-center justify-center gap-4 p-6">

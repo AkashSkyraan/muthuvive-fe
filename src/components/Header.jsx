@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Popover } from "antd";
+import { Button, Popover, Drawer } from "antd";
 import { MenuOutlined, CloseOutlined, UserOutlined } from "@ant-design/icons";
 import images from "../config/Images.jsx";
 import icons from "../config/Icons.jsx";
@@ -323,8 +323,28 @@ const Header = () => {
             </div>
           </div>
 
-          {/* Mobile hamburger trigger */}
-          <div className="flex lg:hidden items-center justify-end">
+          {/* Mobile hamburger trigger + account avatar */}
+          <div className="flex lg:hidden items-center justify-end gap-x-4">
+            <Popover
+              content={accountPopoverContent}
+              trigger="click"
+              open={isAccountPopoverOpen}
+              onOpenChange={setIsAccountPopoverOpen}
+              placement="bottomRight"
+              arrow={false}
+              align={{
+                offset: [0, 15],
+              }}
+            >
+              <button>
+                <img
+                  src={icons.userAvatarHolder}
+                  alt="user-profile-placeholder"
+                  className="w-6 h-6 hover:cursor-pointer"
+                />
+              </button>
+            </Popover>
+
             <button onClick={() => setIsMenuOpen(true)}>
               <MenuOutlined className="w-7 h-7" />
             </button>
@@ -332,42 +352,69 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Mobile menu overlay */}
-      {isMenuOpen && (
-        <div className="fixed inset-0 z-50 bg-primary md:lg overflow-y-auto">
+      {/* Mobile menu - antd Drawer, right to left */}
+      <Drawer
+        placement="right"
+        open={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+        closable={false}
+        size="85%"
+        styles={{ body: { padding: 0 } }}
+      >
+        <div className="bg-primary h-full overflow-y-auto">
           <div className="w-[90%] mx-auto p-4">
-            <div className="flex items-center justify-around">
-              <Link to="/">
-                <img src={images.logo} alt="Logo" className="" />
+            <div className="flex items-center justify-between">
+              <Link to="/" onClick={() => setIsMenuOpen(false)}>
+                <img src={images.logo} alt="Logo" className="w-36 h-auto" />
               </Link>
-              <button onClick={() => setIsMenuOpen(false)} className="ms-5">
-                <CloseOutlined />
+              <button onClick={() => setIsMenuOpen(false)}>
+                <CloseOutlined className="text-lg" />
               </button>
             </div>
 
             <ul className="flex flex-col text-start gap-y-5 text-sm mt-8">
-              <li className="transition-colors hover:text-secondary">
-                <Link to="/" onClick={() => setIsMenuOpen(false)}>
+              <li className="transition-colors">
+                <Link
+                  to="/"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="!text-black"
+                >
                   Home
                 </Link>
               </li>
-              <li className="transition-colors hover:text-secondary">
-                <Link to="/properties" onClick={() => setIsMenuOpen(false)}>
+              <li className="transition-colors">
+                <Link
+                  to="/properties"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="!text-black"
+                >
                   Properties
                 </Link>
               </li>
-              <li className="transition-colors hover:text-secondary">
-                <Link to="/gallery" onClick={() => setIsMenuOpen(false)}>
+              <li className="transition-colors">
+                <Link
+                  to="/gallery"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="!text-black"
+                >
                   Gallery
                 </Link>
               </li>
-              <li className="transition-colors hover:text-secondary">
-                <Link to="/about" onClick={() => setIsMenuOpen(false)}>
+              <li className="transition-colors">
+                <Link
+                  to="/about"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="!text-black"
+                >
                   AboutUs
                 </Link>
               </li>
-              <li className="transition-colors hover:text-secondary">
-                <Link to="/contactus" onClick={() => setIsMenuOpen(false)}>
+              <li className="transition-colors">
+                <Link
+                  to="/contactus"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="!text-black"
+                >
                   ContactUs
                 </Link>
               </li>
@@ -389,31 +436,16 @@ const Header = () => {
                 alt="call"
                 className="w-5 h-5 md:w-6 md:h-6"
               />
-              <a href="#" className="underline underline-offset-2 ml-2 text-sm">
+              <a
+                href="#"
+                className="underline underline-offset-2 ml-2 text-sm !text-black"
+              >
                 +91 9456783490
               </a>
             </div>
-
-            <div className="mt-8">
-              <Popover
-                content={accountPopoverContent}
-                trigger="click"
-                open={isAccountPopoverOpen}
-                onOpenChange={setIsAccountPopoverOpen}
-                placement="bottomLeft"
-              >
-                <button>
-                  <img
-                    src={icons.userAvatarHolder}
-                    alt="user-profile-placeholder"
-                    className="w-6 md:w-10 hover: cursor-pointer"
-                  />
-                </button>
-              </Popover>
-            </div>
           </div>
         </div>
-      )}
+      </Drawer>
     </div>
   );
 };
