@@ -8,12 +8,12 @@ const PageBanner = ({ title, description }) => {
       <div className="absolute inset-0 bg-blue-400/20 [clip-path:polygon(0_0,20%_0,0%_35%)]"></div>
 
       <div className="relative h-full flex flex-col items-center justify-center text-center px-4">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">
+        <h1 className="text-3xl sm:text-3xl md:text-4xl font-bold text-white">
           {title}
         </h1>
 
         {description && (
-          <p className="text-xs sm:text-sm text-gray-200 mt-3 max-w-xl">
+          <p className="text-sm sm:text-sm lg:text-base text-gray-200 mt-3 max-w-xl w-[85%] md:w-[55%] lg:w-[50%] xl:w-[30%]">
             {description}
           </p>
         )}

@@ -9,33 +9,39 @@ import twitterIcon from "../assets/icons/twitter.png";
 import images from "../config/Images";
 import icons from "../config/Icons";
 import { Link } from "react-router-dom";
+import { useAboutUs } from "../context/AboutusContext";
 
 const Footer = () => {
+  const { aboutUs, loading, error } = useAboutUs();
   return (
     <div className="w-full bg-[#141B34] overflow-x-clip">
       <div className="w-[90%] p-4 mx-auto py-14">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-10 gap-y-6">
           <div className="">
-            <h3 className="text-white text-lg text-start font-semibold mb-5">
+            <h3 className="text-white text-xl text-start font-semibold mb-5">
               Contact Us
             </h3>
 
-            <ul className="flex flex-col gap-y-3 text-sm text-gray-300">
+            <ul className="flex flex-col gap-y-3 text-base text-gray-300">
               <li className="flex items-start text-left gap-x-2">
                 <img
                   src={icons.locationWhiteIcon}
                   alt="location"
                   className="w-4 h-4 mt-0.5"
                 />
-                <span>Tarde build Road,Chennai, Viruthnagar-641006</span>
+                <span>{aboutUs?.[0]?.address}</span>
               </li>
               <li className="flex items-center gap-x-2">
                 <img src={icons.callWhiteIcon} alt="call" className="w-4 h-4" />
-                <a href="#">+91 9923 45672</a>
+                <a href={`tel:+91${aboutUs?.[0]?.mobile}`}>
+                  +91 {aboutUs?.[0]?.mobile}
+                </a>
               </li>
               <li className="flex items-center gap-x-2">
                 <img src={icons.mailIcon} alt="mail" className="w-4 h-4" />
-                <a href="#">muthview's123@gmail.com</a>
+                <a href={`mailto:${aboutUs?.[0]?.email}`}>
+                  {aboutUs?.[0]?.email}
+                </a>
               </li>
             </ul>
 
@@ -51,16 +57,16 @@ const Footer = () => {
           </div>
 
           <div className="">
-            <h3 className="text-white text-start text-lg font-semibold mb-3 sm:mb-5">
+            <h3 className="text-white text-start text-xl font-semibold mb-3 sm:mb-5">
               Quick Access
             </h3>
 
-            <ul className="flex flex-col text-start gap-y-3 text-sm text-gray-300">
+            <ul className="flex flex-col text-start gap-y-3 text-base text-gray-300">
+              {/* <li>
+                <Link to="/properties/dtcp-approved">Properties</Link>
+              </li> */}
               <li>
-                <Link to="/properties">Properties</Link>
-              </li>
-              <li>
-                <Link to="/sellproperties">Sell my properties</Link>
+                <Link to="/sell-property">Sell my properties</Link>
               </li>
               <li>
                 <Link to="gallery">Gallery</Link>
@@ -75,39 +81,39 @@ const Footer = () => {
           </div>
 
           <div className="">
-            <h3 className="text-white text-lg text-start font-semibold mb-3 sm:mb-5">
+            <h3 className="text-white text-xl text-start font-semibold mb-3 sm:mb-5">
               Properties
             </h3>
 
-            <ul className="flex flex-col text-start gap-y-3 text-sm text-gray-300">
+            <ul className="flex flex-col text-start gap-y-3 text-base text-gray-300">
               <li>
-                <Link to="/agriculture-land">Agricultural</Link>
+                <Link to="/properties/agriculture-land">Agricultural</Link>
               </li>
               <li>
-                <Link to="commercial-land">Commercial</Link>
+                <Link to="/properties/commercial-land">Commercial</Link>
               </li>
               <li>
-                <Link to="/dtcp-approved">DTCP Approved</Link>
+                <Link to="/properties/dtcp-approved">DTCP Approved</Link>
               </li>
               <li>
-                <Link to="/farmland">Farmland</Link>
+                <Link to="/properties/farmland">Farmland</Link>
               </li>
             </ul>
           </div>
 
           <div className="">
-            <h3 className="text-white text-lg text-start font-semibold mb-3 sm:mb-5">
+            <h3 className="text-white text-xl text-start font-semibold mb-3 sm:mb-5">
               About Us
             </h3>
 
-            <p className="text-sm text-gray-300 leading-relaxed text-left">
+            <p className="text-base text-gray-300 leading-relaxed text-left">
               Highlight the best of your properties by using the List Category
               shortcode. You can list categories, types,
             </p>
 
             <div className="flex items-center gap-x-3 mt-5">
               <a
-                href="https://wa.me/919456783490"
+                href={`https://wa.me/91${aboutUs?.[0]?.mobile}`}
                 target="blank"
                 rel="noopener noreferrer"
                 className="w-9 h-9 flex items-center justify-center bg-white rounded-md"

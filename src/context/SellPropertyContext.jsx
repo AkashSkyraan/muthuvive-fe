@@ -3,21 +3,10 @@ import React, { createContext, useContext, useState } from "react";
 const SellPropertyContext = createContext(null);
 
 export const SellPropertyProvider = ({ children }) => {
-  // ---------------------------------------------
-  // PROPERTY CATEGORY
-  // ---------------------------------------------
-
+  
   const [category, setCategory] = useState(null);
 
-  // ---------------------------------------------
-  // CURRENT STEP
-  // ---------------------------------------------
-
   const [currentStep, setCurrentStep] = useState(0);
-
-  // ---------------------------------------------
-  // FORM DATA
-  // ---------------------------------------------
 
   const [formData, setFormData] = useState({
     location: {},
@@ -26,10 +15,6 @@ export const SellPropertyProvider = ({ children }) => {
     media: {},
   });
 
-  // ---------------------------------------------
-  // UPDATE FORM DATA
-  // ---------------------------------------------
-
   const updateFormData = (section, values) => {
     setFormData((previous) => ({
       ...previous,
@@ -37,9 +22,6 @@ export const SellPropertyProvider = ({ children }) => {
     }));
   };
 
-  // ---------------------------------------------
-  // CONTEXT VALUE
-  // ---------------------------------------------
   const value = {
     category,
     setCategory,

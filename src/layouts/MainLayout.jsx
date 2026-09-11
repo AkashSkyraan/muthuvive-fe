@@ -4,24 +4,30 @@ import Header from "../components/Header.jsx";
 import Footer from "../components/Footer";
 import FloatingIcon from "../components/floatingIcons/FloatingIcons.jsx";
 import ScrollToTop from "../components/floatingIcons/ScrollToTop.jsx";
+import { AboutUsProvider } from "../context/AboutusContext.jsx";
+import { EnquiryProvider } from "../context/EnquiryContext.jsx";
 
 const MainLayout = () => {
   return (
-    <div className="main-layout">
-      <Header />
+    <EnquiryProvider>
+      <AboutUsProvider>
+        <div className="main-layout">
+          <Header />
 
-      <div className="main-content">
-        {/* <Sidebar /> */}
+          <div className="main-content">
+            {/* <Sidebar /> */}
 
-        <main>
-          <Outlet />
-          <FloatingIcon />
-          <ScrollToTop />
-        </main>
-      </div>
+            <main>
+              <Outlet />
+              <FloatingIcon />
+              <ScrollToTop />
+            </main>
+          </div>
 
-      <Footer />
-    </div>
+          <Footer />
+        </div>
+      </AboutUsProvider>
+    </EnquiryProvider>
   );
 };
 

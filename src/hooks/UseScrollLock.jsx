@@ -4,16 +4,32 @@ const useScrollLock = (locked) => {
   useEffect(() => {
     if (!locked) return;
 
-    const preventScroll = (event) => {
+    const preventPageScroll = (event) => {
+      const target = event.target;
+
+      // Allow scrolling inside the Popover
+      if (
+        target instanceof Element &&
+        target.closest(".account-popover-scroll")
+      ) {
+        return;
+      }
+
+      // Prevent page scrolling
       event.preventDefault();
     };
 
-    window.addEventListener("wheel", preventScroll, { passive: false });
-    window.addEventListener("touchmove", preventScroll, { passive: false });
+    document.addEventListener("wheel", preventPageScroll, {
+      passive: false,
+    });
+
+    document.addEventListener("touchmove", preventPageScroll, {
+      passive: false,
+    });
 
     return () => {
-      window.removeEventListener("wheel", preventScroll);
-      window.removeEventListener("touchmove", preventScroll);
+      document.removeEventListener("wheel", preventPageScroll);
+      document.removeEventListener("touchmove", preventPageScroll);
     };
   }, [locked]);
 };

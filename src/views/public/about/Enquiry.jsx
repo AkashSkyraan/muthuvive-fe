@@ -25,7 +25,7 @@ const EnquiryForm = () => {
         <div className="flex flex-col lg:flex-row rounded-xl overflow-hidden">
           {/* Left content */}
           <div className="lg:w-1/2 p-6 sm:p-8 md:p-10 text-start">
-            <span className="inline-block bg-[#dbe4fb] text-secondary text-xs font-medium px-3 py-1.5 rounded-md">
+            <span className="inline-block bg-[#dbe4fb] text-secondary text-base font-medium px-3 py-1.5 rounded-md">
               Enquiry Now
             </span>
 
@@ -33,13 +33,13 @@ const EnquiryForm = () => {
               Let&rsquo;s Work Together
             </h2>
 
-            <p className="text-sm text-gray-500 mt-4 leading-relaxed max-w-md">
+            <p className="text-base text-gray-500 mt-4 leading-relaxed max-w-md">
               Whether you have a question, need more details about our services,
               or want to discuss a potential collaboration, we&rsquo;re here to
               help.
             </p>
 
-            <ul className="flex flex-col gap-y-4 mt-6 text-sm text-gray-700">
+            <ul className="flex flex-col gap-y-4 mt-6 text-base text-gray-700">
               <li className="flex items-center gap-x-3">
                 <img
                   src={icons.locationBlackIcon}
@@ -61,7 +61,7 @@ const EnquiryForm = () => {
 
           {/* Right form */}
           <div className="lg:w-1/2 bg-white p-6 sm:p-8 md:p-10 text-start">
-            <h3 className="text-base font-semibold text-gray-900 pb-4 -mx-6 sm:-mx-8 md:-mx-10 px-6 sm:px-8 md:px-10 border-b border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 pb-4 -mx-6 sm:-mx-8 md:-mx-10 px-6 sm:px-8 md:px-10 border-b border-gray-200">
               Send Enquiry
             </h3>
 
@@ -81,7 +81,7 @@ const EnquiryForm = () => {
                 <Input
                   placeholder="Full Name"
                   variant="borderless"
-                  className="!px-0 !py-3 !border-0 !border-b !border-gray-200 !rounded-none !shadow-none"
+                  className="!px-0 !py-3 !border-0 !border-b !border-gray-200 !rounded-none !shadow-none !text-base"
                 />
               </Form.Item>
 
@@ -98,7 +98,7 @@ const EnquiryForm = () => {
                 <Input
                   placeholder="Mobile Number"
                   variant="borderless"
-                  className="!px-0 !py-3 !border-0 !border-b !border-gray-200 !rounded-none !shadow-none"
+                  className="!px-0 !py-3 !border-0 !border-b !border-gray-200 !rounded-none !shadow-none !text-base"
                 />
               </Form.Item>
 
@@ -113,7 +113,7 @@ const EnquiryForm = () => {
                 <Input
                   placeholder="E-Mail"
                   variant="borderless"
-                  className="!px-0 !py-3 !border-0 !border-b !border-gray-200 !rounded-none !shadow-none"
+                  className="!px-0 !py-3 !border-0 !border-b !border-gray-200 !rounded-none !shadow-none !text-base"
                 />
               </Form.Item>
 
@@ -122,7 +122,7 @@ const EnquiryForm = () => {
                 valuePropName="checked"
                 className="!mb-3 !mt-5"
               >
-                <Checkbox className="text-xs text-gray-600">
+                <Checkbox className="text-xs text-gray-600 !cursor-default">
                   I Agree To Be Contacted By Housing And Agents Via WhatsApp,
                   SMS, Phone, Email Etc
                 </Checkbox>
@@ -133,13 +133,19 @@ const EnquiryForm = () => {
                 valuePropName="checked"
                 className="!mb-6"
               >
-                <Checkbox className="text-xs text-gray-600">
+                <Checkbox className="text-xs text-gray-600 !cursor-default">
                   I Agree To The{" "}
-                  <a href="#" className="underline text-gray-700">
+                  <a
+                    href="#"
+                    className="underline text-gray-700 !cursor-default"
+                  >
                     Terms Of Services
                   </a>{" "}
                   And{" "}
-                  <a href="#" className="underline text-gray-700">
+                  <a
+                    href="#"
+                    className="underline text-gray-700 !cursor-default"
+                  >
                     Privacy Policy
                   </a>
                 </Checkbox>
@@ -150,7 +156,7 @@ const EnquiryForm = () => {
                   htmlType="submit"
                   disabled={!canSubmit}
                   block
-                  className={`!h-11 !font-medium !border-none ${
+                  className={`!h-11 !font-medium !border-none !text-base ${
                     canSubmit
                       ? "!bg-secondary !text-white"
                       : "!bg-gray-400 !text-white"

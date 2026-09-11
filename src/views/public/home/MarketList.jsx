@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 const listings = [
   {
     id: 1,
-    image: images.agricultureLand,
+    image: images.agriland,
     category: "agriculture-land",
     title: "Boutique Space On Greenville Road",
     price: "₹ 12,00,000 / Per Acre",
@@ -20,7 +20,7 @@ const listings = [
   },
   {
     id: 2,
-    image: images.agricultureLand,
+    image: images.agriland,
     category: "farmland",
     title: "Boutique Space On Greenville Road",
     price: "₹ 12,00,000 / Per Acre",
@@ -32,7 +32,7 @@ const listings = [
   },
   {
     id: 3,
-    image: images.agricultureLand,
+    image: images.agriland,
     category: "agriculture-land",
     title: "Boutique Space On Greenville Road",
     price: "₹ 12,00,000 / Per Acre",
@@ -44,7 +44,7 @@ const listings = [
   },
   {
     id: 4,
-    image: images.agricultureLand,
+    image: images.agriland,
     category: "agriculture-land",
     title: "Boutique Space On Greenville Road",
     price: "₹ 12,00,000 / Per Acre",
@@ -56,7 +56,7 @@ const listings = [
   },
   {
     id: 5,
-    image: images.agricultureLand,
+    image: images.agriland,
     category: "agriculture-land",
     title: "Boutique Space On Greenville Road",
     price: "₹ 12,00,000 / Per Acre",
@@ -68,7 +68,7 @@ const listings = [
   },
   {
     id: 6,
-    image: images.agricultureLand,
+    image: images.agriland,
     category: "agriculture-land",
     title: "Boutique Space On Greenville Road",
     price: "₹ 12,00,000 / Per Acre",
@@ -80,7 +80,7 @@ const listings = [
   },
   // {
   //   id: 7,
-  //   image: images.agricultureLand,
+  //   image: images.agriland,
   //   category: "agriculture-land",
   //   title: "Boutique Space On Greenville Road",
   //   price: "₹ 12,00,000 / Per Acre",

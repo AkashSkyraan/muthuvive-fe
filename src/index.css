@@ -44,8 +44,6 @@ body {
   will-change: transform;
 }
 
-
-
 /* Ant Design Select - focused state */
 .ant-select {
   --ant-select-active-border-color: #000000 !important;

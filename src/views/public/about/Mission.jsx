@@ -23,7 +23,7 @@ const missionBlocks = [
     id: 3,
     type: "text",
     icon: icons.targetIcon,
-    title: "Our Mission",
+    title: "Our Vision",
     description:
       "Trusted by industry leaders, built for long-lasting results, and designed to deliver reliable, enduring success.Trusted by industry leaders, built for long-lasting results, and designed to deliver reliable, enduring success.Trusted by industry leaders, built for long-lasting results, and designed to deliver reliable, enduring success.",
   },
@@ -45,16 +45,16 @@ const Mission = () => {
             return (
               <div
                 key={block.id}
-                className="bg-gradient-to-br from-[#fff6f6] to-[#eef3ff] rounded-xl p-6 md:p-8 flex flex-col justify-center"
+                className="bg-gradient-to-br from-[#fff6f6] to-[#eef3ff] rounded-xl p-6 md:p-8 flex flex-col justify-center text-start"
               >
                 <div className="flex items-center gap-x-3">
-                  <img src={block.icon} alt={block.title} className="w-6 h-6" />
-                  <h3 className="text-xl md:text-2xl font-bold text-gray-900">
+                  <img src={block.icon} alt={block.title} className="w-8 h-8" />
+                  <h3 className="text-xl md:text-3xl font-semibold text-gray-900">
                     {block.title}
                   </h3>
                 </div>
 
-                <p className="text-sm text-gray-600 mt-4 leading-relaxed">
+                <p className="text-base text-gray-600 mt-4 leading-relaxed">
                   {block.description}
                 </p>
               </div>
@@ -64,8 +64,8 @@ const Mission = () => {
           // Image collage: main image + a smaller overlaid image with a white border
           const overlayPositionClasses =
             block.overlayPosition === "top-left"
-              ? "top-3 left-3 sm:-top-4 sm:-left-4"
-              : "bottom-3 right-3 sm:-bottom-4 sm:-right-4";
+              ? "top-0 left-0 sm:-top-2 sm:-left-2 border-b-5 border-r-5 border-white md:border-b-10 md:border-r-10 rounded-2xl md:rounded-xl"
+              : "bottom-0 right-0 sm:-bottom-2 sm:-right-2 border-t-5 border-l-5 border-white md:border-b-10 md:border-r-10 rounded-2xl md:rounded-xl";
 
           return (
             <div
@@ -79,12 +79,12 @@ const Mission = () => {
               />
 
               <div
-                className={`absolute ${overlayPositionClasses} w-24 h-20 sm:w-32 sm:h-24 rounded-lg overflow-hidden border-4 border-white shadow-lg`}
+                className={`absolute ${overlayPositionClasses} w-36 h-26 sm:w-56 sm:h-40 overflow-hidden border-white shadow-lg`}
               >
                 <img
                   src={block.overlayImage}
                   alt="mission detail"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-center"
                 />
               </div>
             </div>

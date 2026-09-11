@@ -1,12 +1,15 @@
 import React from "react";
 import whatsappIcon from "../../assets/icons/whatsapp.png";
 import callFloatIcon from "../../assets/icons/mobile.png";
+import { useAboutUs } from "../../context/AboutusContext";
 
 const FloatingIcons = () => {
+  const { aboutUs, loading, error } = useAboutUs();
+
   return (
     <div className="fixed bottom-4 right-4 flex flex-col gap-y-3 z-50">
       <a
-        href="https://wa.me/919456783490"
+        href={`https://wa.me/91${aboutUs?.[0]?.mobile}`}
         target="blank"
         rel="noopener noreferrer"
         className="w-11 h-11 rounded-full bg-white shadow-md flex items-center justify-center"
@@ -14,7 +17,7 @@ const FloatingIcons = () => {
         <img src={whatsappIcon} alt="whatsapp" className="w-6 h-6" />
       </a>
       <a
-        href="tel:+919456783490"
+        href={`tel:+91${aboutUs?.[0]?.mobile}`}
         target="blank"
         rel="noopener noreferrer"
         className="w-11 h-11 rounded-full bg-white shadow-md flex items-center justify-center"

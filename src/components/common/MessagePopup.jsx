@@ -1,55 +1,91 @@
-import React, { useRef } from "react";
-import { message } from "antd";
+import React, { useEffect, useState } from "react";
 
-// Module-level reference so showStatusMessage() can be called from any
-// file, without needing to pass the api down through props everywhere.
-let messageApi = null;
+let showMessage = null;
 
-// Mount this ONCE near the root of your app (e.g. in App.jsx) so
-// showStatusMessage() works from anywhere. Mounting it inside
-// ProfilePage works too, but only while ProfilePage is on screen.
-const StatusMessage = () => {
-  const containerRef = useRef(null);
+const StatusMessage = ({ placement = "top-right" }) => {
+  const [message, setMessage] = useState(null);
+  const [top, setTop] = useState(0);
 
-  // getContainer makes antd render notices as position:absolute inside
-  // OUR div instead of its own fixed top-center portal - so positioning
-  // becomes a plain Tailwind-styled wrapper, no CSS override needed.
-  const [api, contextHolder] = message.useMessage({
-    getContainer: () => containerRef.current,
-    top: 8,
-  });
+  useEffect(() => {
+    showMessage = (data) => {
+      setMessage(data);
 
-  messageApi = api;
+      setTimeout(() => {
+        setMessage(null);
+      }, 3000);
+    };
+
+    return () => {
+      showMessage = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    const updatePosition = () => {
+      const header = document.getElementById("main-header");
+
+      if (!header) return;
+
+      const rect = header.getBoundingClientRect();
+
+      setTop(rect.bottom + 16);
+    };
+
+    updatePosition();
+
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition);
+
+    return () => {
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition);
+    };
+  }, []);
+
+  if (!message) return null;
+
+  const placementClasses = {
+    "top-right": "right-4 sm:right-6",
+    "top-left": "left-4 sm:left-6",
+    "top-center": "left-1/2 -translate-x-1/2",
+  };
 
   return (
     <div
-      ref={containerRef}
-      className="fixed top-4 right-4 sm:top-6 sm:right-6 z-[9999] max-w-[90vw] w-fit"
+      className={`
+        fixed
+        z-[9999]
+        ${placementClasses[placement]}
+      `}
+      style={{ top: `${top}px` }}
     >
-      {contextHolder}
+      <div
+        className={`
+          rounded-lg
+          px-5
+          py-2.5
+          text-sm
+          font-medium
+          whitespace-nowrap
+          ${
+            message.type === "success"
+              ? "bg-green-100 text-green-700"
+              : "bg-red-100 text-red-600"
+          }
+        `}
+      >
+        {message.text}
+      </div>
     </div>
   );
 };
 
-// showStatusMessage({ type: "success", text: "Mobile Number Changed Successfully" })
-// showStatusMessage({ type: "error", text: "Mobile Number Change Failed" })
 export const showStatusMessage = ({ type = "success", text }) => {
-  if (!messageApi) return;
-  messageApi.open({
+  if (!showMessage) return;
+
+  showMessage({
     type,
-    icon: null,
-    className: "!bg-transparent !shadow-none !p-0",
-    content: (
-      <span
-        className={`inline-block rounded-full px-5 py-2.5 text-sm font-medium whitespace-nowrap ${
-          type === "success"
-            ? "bg-green-100 text-green-700"
-            : "bg-red-100 text-red-600"
-        }`}
-      >
-        {text}
-      </span>
-    ),
+    text,
   });
 };
 

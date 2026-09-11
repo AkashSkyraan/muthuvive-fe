@@ -1,12 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useAboutUs } from "../../../context/AboutusContext";
 
 // Dynamic data - replace with API response
-const stats = [
-  { id: 1, value: 12, suffix: "+", label: "Years of Expertise" },
-  { id: 2, value: 500, suffix: "+", label: "Completed Projects" },
-  { id: 3, value: 1200, suffix: "+", label: "Happy Clients" },
-  { id: 4, value: 50, suffix: "k", label: "Users" },
-];
 
 const useCountUp = (target, shouldStart, duration = 1500) => {
   const [count, setCount] = useState(0);
@@ -43,7 +38,7 @@ const StatItem = ({ stat, shouldStart }) => {
         {count.toLocaleString()}
         {stat.suffix}
       </p>
-      <p className="text-sm text-gray-500 mt-2">{stat.label}</p>
+      <p className="text-base text-gray-500 mt-2">{stat.label}</p>
     </div>
   );
 };
@@ -51,6 +46,30 @@ const StatItem = ({ stat, shouldStart }) => {
 const Stats = () => {
   const sectionRef = useRef(null);
   const [hasStarted, setHasStarted] = useState(false);
+  const { aboutUs, loading, error } = useAboutUs();
+
+  // Dynamic data - replace with API response
+  const stats = [
+    {
+      id: 1,
+      value: aboutUs?.[0]?.yoe,
+      suffix: "+",
+      label: "Years of Expertise",
+    },
+    {
+      id: 2,
+      value: aboutUs?.[0]?.projects,
+      suffix: "+",
+      label: "Completed Projects",
+    },
+    {
+      id: 3,
+      value: aboutUs?.[0]?.clients,
+      suffix: "+",
+      label: "Happy Clients",
+    },
+    { id: 4, value: aboutUs?.[0]?.users, suffix: "+", label: "Users" },
+  ];
 
   useEffect(() => {
     const observer = new IntersectionObserver(

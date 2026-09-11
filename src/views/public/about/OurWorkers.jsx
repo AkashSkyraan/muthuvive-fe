@@ -45,10 +45,10 @@ const TeamCard = ({ member }) => (
       />
     </div>
 
-    <h3 className="text-sm font-semibold text-gray-900 text-center mt-4">
+    <h3 className="text-base font-semibold text-gray-900 text-center mt-4">
       {member.name}
     </h3>
-    <p className="text-xs text-gray-500 text-center mt-1">{member.role}</p>
+    <p className="text-sm text-gray-500 text-center mt-1">{member.role}</p>
   </div>
 );
 
@@ -56,7 +56,7 @@ const OurTeam = () => {
   return (
     <div className="w-full py-16">
       <div className="text-center px-4">
-        <span className="inline-block bg-[#dbe4fb] text-secondary text-xs font-medium px-3 py-1.5 rounded-md">
+        <span className="inline-block bg-[#dbe4fb] text-secondary text-base font-medium px-3 py-1.5 rounded-md">
           Our Team
         </span>
 
@@ -64,7 +64,7 @@ const OurTeam = () => {
           Our Construction Workers
         </h2>
 
-        <p className="text-sm text-gray-500 mt-3 max-w-2xl mx-auto">
+        <p className="text-base text-center text-gray-500 mt-3 max-w-2xl mx-auto">
           Highlight the best of your properties by using the List Category
           shortcode. You can list categories, types, cities, areas and states of
           your choice.
