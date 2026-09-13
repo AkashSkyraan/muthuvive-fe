@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "antd";
+import { Link } from "react-router-dom";
 
 // data shape: { image, title, description, buttonText?, onButtonClick? }
 const Header = ({ data }) => {
@@ -30,16 +31,17 @@ const Header = ({ data }) => {
             {title}
           </h1>
 
-          <p className="text-xs sm:text-sm text-gray-200 mt-3 max-w-md">
+          <p className="text-xs sm:text-base text-gray-200 mt-3 max-w-[75%] md:max-w-[80%]">
             {description}
           </p>
-
-          <Button
-            onClick={onButtonClick}
-            className="!bg-white !text-secondary !border-none !font-medium mt-5"
-          >
-            {buttonText}
-          </Button>
+          <Link to="/contactus">
+            <Button
+              onClick={onButtonClick}
+              className="!bg-white !text-sm md:!text-base !text-secondary !border-none !font-medium mt-5"
+            >
+              {buttonText}
+            </Button>
+          </Link>
         </div>
       </div>
     </div>

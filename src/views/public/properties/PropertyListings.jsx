@@ -16,7 +16,7 @@ const PropertyGrid = ({ listings = [] }) => {
 
   return (
     <div className="w-full py-10">
-      <div className="w-[90%] mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-start">
+      <div className="w-[95%] mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-start">
         {listings.map((listing) => (
           <Link to={`/properties/${listing.category}/${listing.id}`}>
             <ProjectCard key={listing.id} listing={listing} />

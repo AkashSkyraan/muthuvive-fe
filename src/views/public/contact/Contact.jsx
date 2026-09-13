@@ -160,6 +160,14 @@ const GetInTouch = () => {
                   name="fullName"
                   rules={[
                     { required: true, message: "Please enter your full name" },
+                    {
+                      min: 3,
+                      message: "Name must be at least 3 characters",
+                    },
+                    {
+                      max: 100,
+                      message: "Name cannot exceed 100 characters",
+                    },
                   ]}
                 >
                   <Input
@@ -180,6 +188,10 @@ const GetInTouch = () => {
                       required: true,
                       message: "Please enter your mobile number",
                     },
+                    {
+                      pattern: /^[6-9]\d{9}$/,
+                      message: "Please enter a valid 10-digit mobile number",
+                    },
                   ]}
                 >
                   <Input
@@ -196,8 +208,11 @@ const GetInTouch = () => {
                   }
                   name="email"
                   rules={[
-                    { required: true, message: "Please enter your email" },
-                    { type: "email", message: "Enter a valid email" },
+                    {
+                      required: true,
+                      message: "Please enter your email address",
+                    },
+                    { type: "email", message: "Enter a valid email address" },
                   ]}
                 >
                   <Input
@@ -215,6 +230,10 @@ const GetInTouch = () => {
                   name="message"
                   rules={[
                     { required: true, message: "Please enter your message" },
+                    {
+                      max: 200,
+                      message: "Message cannot exceed 200 characters",
+                    },
                   ]}
                 >
                   <Input.TextArea

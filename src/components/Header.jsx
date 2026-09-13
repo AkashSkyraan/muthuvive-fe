@@ -12,15 +12,24 @@ const Header = () => {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Separate state for desktop and mobile Popovers
+  // ---------------------------------------------------------
+  // Desktop and Mobile Account Popover states
+  // ---------------------------------------------------------
   const [isDesktopAccountOpen, setIsDesktopAccountOpen] = useState(false);
+
   const [isMobileAccountOpen, setIsMobileAccountOpen] = useState(false);
 
-  // Lock scroll if either account Popover is open
+  // ---------------------------------------------------------
+  // Mobile Properties Popover state
+  // ---------------------------------------------------------
+  const [isMobilePropertiesOpen, setIsMobilePropertiesOpen] = useState(false);
+
+  // Lock scroll if account Popover is open
   useScrollLock(isDesktopAccountOpen || isMobileAccountOpen);
 
-  // ASSUMPTION: token is stored under "authToken" - swap this key if your
-  // app uses a different one.
+  // ---------------------------------------------------------
+  // Authentication
+  // ---------------------------------------------------------
   const isLoggedIn = !!localStorage.getItem("authToken");
 
   const handleLogout = () => {
@@ -28,12 +37,17 @@ const Header = () => {
     window.location.reload();
   };
 
-  // Close account Popover
+  // ---------------------------------------------------------
+  // Close Account Popover
+  // ---------------------------------------------------------
   const closeAccountPopover = () => {
     setIsDesktopAccountOpen(false);
     setIsMobileAccountOpen(false);
   };
 
+  // ---------------------------------------------------------
+  // Property Categories
+  // ---------------------------------------------------------
   const propertyCategories = [
     {
       key: "farmland",
@@ -72,6 +86,9 @@ const Header = () => {
     },
   ];
 
+  // ---------------------------------------------------------
+  // Logged Out Account Popover
+  // ---------------------------------------------------------
   const loggedOutPopoverContent = (
     <div className="w-75 p-1 z-40">
       <div className="flex items-center gap-x-2">
@@ -101,6 +118,9 @@ const Header = () => {
     </div>
   );
 
+  // ---------------------------------------------------------
+  // Logged In Account Popover
+  // ---------------------------------------------------------
   const loggedInPopoverContent = (
     <div className="w-64 sm:w-72 p-1 z-40 max-h-[70vh] account-popover-scroll overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden overscroll-contain">
       <div className="flex flex-col items-center text-center pb-3 border-b border-gray-100">
@@ -217,7 +237,7 @@ const Header = () => {
               onClick={closeAccountPopover}
               className="block px-1 py-1.5 !text-[#3E3E3E] font-semibold"
             >
-              Terms &amp; conditions
+              Terms & conditions
             </Link>
           </li>
 
@@ -243,16 +263,26 @@ const Header = () => {
     </div>
   );
 
+  // ---------------------------------------------------------
+  // Account Popover Content
+  // ---------------------------------------------------------
   const accountPopoverContent = isLoggedIn
     ? loggedInPopoverContent
     : loggedInPopoverContent;
 
+  // ---------------------------------------------------------
+  // Properties Popover Content
+  // ---------------------------------------------------------
   const propertiesPopoverContent = (
     <div className="w-55 py-1 z-40">
       {propertyCategories.map((category) => (
         <Link
           key={category.key}
           to={`/properties/${category.key}`}
+          onClick={() => {
+            setIsMobilePropertiesOpen(false);
+            setIsMenuOpen(false);
+          }}
           className="flex items-center gap-x-3 px-2 py-2 rounded-md hover:bg-gray-50 transition-colors"
         >
           <img src={category.icon} alt={category.label} className="w-5 h-5" />
@@ -278,7 +308,7 @@ const Header = () => {
               <img
                 src={images.logo}
                 alt="Logo"
-                className="w-24 sm:w-32 lg:w-36 xl:w-40 h-auto"
+                className="w-30 sm:w-32 lg:w-36 xl:w-40 h-auto"
               />
             </Link>
           </div>
@@ -291,6 +321,7 @@ const Header = () => {
                   <Link to="/">Home</Link>
                 </li>
 
+                {/* Desktop Properties Popover */}
                 <li className="transition-colors hover:text-secondary">
                   <Popover
                     content={propertiesPopoverContent}
@@ -403,7 +434,10 @@ const Header = () => {
       <Drawer
         placement="right"
         open={isMenuOpen}
-        onClose={() => setIsMenuOpen(false)}
+        onClose={() => {
+          setIsMenuOpen(false);
+          setIsMobilePropertiesOpen(false);
+        }}
         closable={false}
         size="85%"
         styles={{
@@ -420,7 +454,12 @@ const Header = () => {
                 <img src={images.logo} alt="Logo" className="w-36 h-auto" />
               </Link>
 
-              <button onClick={() => setIsMenuOpen(false)}>
+              <button
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  setIsMobilePropertiesOpen(false);
+                }}
+              >
                 <CloseOutlined className="text-lg" />
               </button>
             </div>
@@ -437,14 +476,28 @@ const Header = () => {
                 </Link>
               </li>
 
+              {/* -------------------------------------------------
+                  Mobile Properties Popover
+
+                  Clicking Properties opens the SAME
+                  propertiesPopoverContent used on desktop.
+              ------------------------------------------------- */}
               <li className="transition-colors">
-                <Link
-                  to="/search"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="!text-black"
+                <Popover
+                  content={propertiesPopoverContent}
+                  trigger="click"
+                  open={isMobilePropertiesOpen}
+                  onOpenChange={setIsMobilePropertiesOpen}
+                  placement="bottomLeft"
+                  arrow={false}
+                  align={{
+                    offset: [0, 10],
+                  }}
                 >
-                  Properties
-                </Link>
+                  <button type="button" className="!text-black">
+                    Properties
+                  </button>
+                </Popover>
               </li>
 
               <li className="transition-colors">
@@ -496,10 +549,10 @@ const Header = () => {
 
             {/* Sell property */}
             <div className="mt-8 text-start">
-              <Link to="/sell-property">
+              <Link to="/sell-property" onClick={() => setIsMenuOpen(false)}>
                 <Button
                   type="primary"
-                  className="!bg-secondary w-auto max-w-[500px] !text-base"
+                  className="!bg-secondary w-auto max-w-[500px] !py-5 !text-base"
                   block
                 >
                   Sell my Properties

@@ -157,12 +157,12 @@ const Properties = () => {
   return (
     <main className="w-full min-h-screen bg-white">
       <Header data={selectedCategory.hero} />
-      <Projects />
-      <Count />
-      <Ourservices />
+      {/* <Projects /> */}
+      {/* <Count /> */}
+      {/* <Ourservices /> */}
       <OurWorkers />
-      <Categories services={ConstructionServices} />
-      <Testimonials />
+      {/* <Categories services={ConstructionServices} /> */}
+      {/* <Testimonials /> */}
       <Enquiry />
 
       {/* <section className="w-full">

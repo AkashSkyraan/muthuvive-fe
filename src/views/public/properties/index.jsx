@@ -703,8 +703,6 @@ const Properties = () => {
 
   const selectedCategory = categoryData[categorySlug];
 
-  
-
   // --------------------------------------------------------------------------
   // Handle invalid category
   // --------------------------------------------------------------------------
@@ -728,7 +726,7 @@ const Properties = () => {
               <TabListing categories={selectedCategory.categories} />
             )}{" "}
           </div>
-          <div className="pt-5 sm:pt-6">
+          <div className="pt-6 sm:pt-6">
             <TabSection tabs={selectedCategory.tabs} />
           </div>
 

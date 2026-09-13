@@ -24,7 +24,7 @@ const PropertyHeader = ({ data = {} }) => {
               ============================================================ */}
           <div className="min-w-0">
             {/* Property Title */}
-            <h1 className="text-xl sm:text-2xl font-semibold text-gray-950 leading-tight">
+            <h1 className="text-xl sm:text-2xl text-start font-semibold text-gray-950 leading-tight">
               {title}
             </h1>
 
@@ -32,7 +32,7 @@ const PropertyHeader = ({ data = {} }) => {
             <div className="flex items-center gap-x-2 mt-2">
               <EnvironmentOutlined className="text-sm text-gray-800 shrink-0" />
 
-              <span className="text-xs sm:text-sm text-secondary">
+              <span className="text-sm sm:text-base text-secondary">
                 {location}
               </span>
             </div>
@@ -41,7 +41,7 @@ const PropertyHeader = ({ data = {} }) => {
           {/* ============================================================
               RIGHT - Property ID + Actions + Contact Seller
               ============================================================ */}
-          <div className="flex flex-col sm:items-end gap-2 shrink-0">
+          <div className="flex flex-col items-start sm:items-end gap-2 shrink-0">
             {/* Property ID + Action Icons */}
             <div className="flex items-center justify-end gap-x-5">
               {/* Property ID */}
@@ -53,7 +53,7 @@ const PropertyHeader = ({ data = {} }) => {
               {/* Copy */}
               <button
                 type="button"
-                className="flex items-center justify-center text-gray-800 hover:text-secondary transition-colors duration-200 cursor-pointer w-6"
+                className="flex items-center justify-center text-gray-800 hover:text-secondary transition-colors duration-200 cursor-pointer w-5"
                 aria-label="Copy property ID"
                 onClick={() =>
                   navigator.clipboard?.writeText(String(propertyId))
@@ -65,7 +65,7 @@ const PropertyHeader = ({ data = {} }) => {
               {/* Share */}
               <button
                 type="button"
-                className="flex items-center justify-center text-gray-800 hover:text-secondary transition-colors duration-200 cursor-pointer w-6"
+                className="flex items-center justify-center text-gray-800 hover:text-secondary transition-colors duration-200 cursor-pointer w-5"
                 aria-label="Share property"
               >
                 <img src={icons.sentIcon} />
@@ -74,7 +74,7 @@ const PropertyHeader = ({ data = {} }) => {
               {/* Bookmark */}
               <button
                 type="button"
-                className="flex items-center justify-center text-gray-800 hover:text-secondary transition-colors duration-200 cursor-pointer w-6"
+                className="flex items-center justify-center text-gray-800 hover:text-secondary transition-colors duration-200 cursor-pointer w-5"
                 aria-label="Bookmark property"
               >
                 <img src={icons.bookmarkIcon2} />
@@ -89,7 +89,7 @@ const PropertyHeader = ({ data = {} }) => {
                 !border-secondary
                 !h-9
                 !px-10
-                !text-sm
+                !text-sm md:!text-base
                 w-full
                 sm:w-auto
                 mt-3

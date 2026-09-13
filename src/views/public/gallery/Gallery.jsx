@@ -1,68 +1,78 @@
 import React, { useEffect, useState } from "react";
-import images from "../../../config/Images.jsx";
+import { getGalleryImages } from "../../../api/gallery.api.js";
 
-// Dynamic data - replace with API response
-const categories = [
-  { key: "all", label: "All" },
-  { key: "farmland", label: "Farmland" },
-  { key: "commercial-land", label: "Commercial Land" },
-  { key: "agriculture-land", label: "Agriculture Land" },
-  { key: "commercial-residential", label: "Commercial / Residential Building" },
-  { key: "dtcp-approved", label: "DTCP Approved" },
-];
+const formatCategoryLabel = (category) => {
+  if (!category) return "";
 
-// Dynamic data - replace with API response. Each image belongs to one category key above.
+  return category
+    .split("-")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+};
 
-const galleryImages = [
-  { id: 1, src: images.agricultureLand, category: "farmland" },
-  { id: 2, src: images.agriland, category: "farmland" },
-  { id: 3, src: images.farmLand, category: "commercial-residential" },
-  { id: 4, src: images.missio1_img, category: "farmland" },
-  { id: 5, src: images.park, category: "agriculture-land" },
-  { id: 6, src: images.thanjavur, category: "commercial-residential" },
-  { id: 7, src: images.agriland, category: "farmland" },
-  { id: 8, src: images.missio2_img, category: "commercial-land" },
-  { id: 9, src: images.farmLand, category: "commercial-residential" },
-  { id: 10, src: images.agricultureLand, category: "farmland" },
-  { id: 11, src: images.thanjavur, category: "agriculture-land" },
-  { id: 12, src: images.missio1_img, category: "agriculture-land" },
-  { id: 13, src: images.agriland, category: "farmland" },
-  { id: 14, src: images.agricultureLand, category: "agriculture-land" },
-  { id: 15, src: images.farmLand, category: "commercial-residential" },
-];
-
+// ---------------------------------------------------------
+// Helper: Split images into groups of 5
+// ---------------------------------------------------------
 const chunkIntoFives = (items) => {
   const chunks = [];
+
   for (let i = 0; i < items.length; i += 5) {
     chunks.push(items.slice(i, i + 5));
   }
+
   return chunks;
 };
 
+// ---------------------------------------------------------
+// Helper: Put hero image first in each cluster
+// ---------------------------------------------------------
+const prepareClusters = (images) => {
+  const chunks = chunkIntoFives(images);
+
+  return chunks.map((chunk) => {
+    const heroIndex = chunk.findIndex((image) => Number(image.is_hero) === 1);
+
+    if (heroIndex !== -1) {
+      const hero = chunk[heroIndex];
+
+      const remainingImages = chunk.filter((_, index) => index !== heroIndex);
+
+      return [hero, ...remainingImages];
+    }
+
+    // If there is no hero in this cluster,
+    // keep the original order.
+    return chunk;
+  });
+};
+
+// ---------------------------------------------------------
+// Gallery Image
+// ---------------------------------------------------------
 const GalleryImage = ({ src }) => (
   <div className="w-full h-full overflow-hidden rounded-lg">
     <img src={src} alt="gallery" className="w-full h-full object-cover" />
   </div>
 );
 
-// A "stack" is 2 images placed one above the other, splitting the available
-// height equally. flex-1 on each image guarantees they never exceed the
-// height handed to them by the parent slot.
+// ---------------------------------------------------------
+// Image Stack
+// ---------------------------------------------------------
 const ImageStack = ({ topImage, bottomImage }) => (
   <div className="flex flex-col gap-3 h-full w-full">
     <div className="flex-1 min-h-0">
       <GalleryImage src={topImage.src} />
     </div>
+
     <div className="flex-1 min-h-0">
       <GalleryImage src={bottomImage.src} />
     </div>
   </div>
 );
 
-// One cluster = 1 hero image (full available height) + 4 small images split
-// into two stacks. heroPosition ("left" | "middle" | "right") decides which
-// of the three slots the hero sits in - only relevant on desktop, since
-// mobile always falls back to a simple vertical layout below.
+// ---------------------------------------------------------
+// Masonry Cluster
+// ---------------------------------------------------------
 const MasonryCluster = ({ images, isDesktop, heroPosition }) => {
   const [hero, a, b, c, d] = images;
 
@@ -76,6 +86,7 @@ const MasonryCluster = ({ images, isDesktop, heroPosition }) => {
             className="w-full h-full object-cover"
           />
         </div>
+
         <div className="grid grid-cols-2 gap-3">
           {[a, b, c, d].map(
             (image, index) =>
@@ -102,7 +113,9 @@ const MasonryCluster = ({ images, isDesktop, heroPosition }) => {
       <GalleryImage src={hero.src} />
     </div>
   );
+
   const stackOne = <ImageStack topImage={a} bottomImage={b} />;
+
   const stackTwo = <ImageStack topImage={c} bottomImage={d} />;
 
   const slots =
@@ -123,37 +136,147 @@ const MasonryCluster = ({ images, isDesktop, heroPosition }) => {
   );
 };
 
+// ---------------------------------------------------------
+// Main Gallery
+// ---------------------------------------------------------
 const Gallery = () => {
   const [activeTab, setActiveTab] = useState("all");
+
+  const [galleryImages, setGalleryImages] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+
+  const [error, setError] = useState(null);
+
+  // Threshold moved from 768px (md) to 1024px (lg) - the desktop
+  // 3-slot masonry now only applies at true lg widths and up; every
+  // width below that (including what used to fall in the 768-1023px
+  // "desktop" range) gets the hero + 2x2 stacked mobile layout.
   const [isDesktop, setIsDesktop] = useState(
-    typeof window !== "undefined" ? window.innerWidth >= 768 : true,
+    typeof window !== "undefined" ? window.innerWidth >= 1024 : true,
   );
 
+  // -------------------------------------------------------
+  // Fetch Gallery
+  // -------------------------------------------------------
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(min-width: 768px)");
+    const fetchGallery = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const data = await getGalleryImages();
+
+        // Convert API response into the structure
+        // your existing UI already expects.
+        const formattedData = data.map((image) => ({
+          id: image.id,
+          src: image.image,
+          category: image.type,
+          is_hero: image.is_hero,
+        }));
+
+        setGalleryImages(formattedData);
+      } catch (error) {
+        console.error("Failed to fetch gallery:", error);
+
+        setError(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGallery();
+  }, []);
+
+  // -------------------------------------------------------
+  // Desktop / Mobile Detection
+  // -------------------------------------------------------
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(min-width: 1024px)");
+
     const handleChange = (e) => setIsDesktop(e.matches);
+
     mediaQuery.addEventListener("change", handleChange);
+
     return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
 
+  // -------------------------------------------------------
+  // Create categories dynamically from API response
+  //
+  // "All" is always included.
+  // Duplicate categories are removed automatically.
+  // -------------------------------------------------------
+  const categories = [
+    {
+      key: "all",
+      label: "All",
+    },
+
+    ...[
+      ...new Set(galleryImages.map((image) => image.category).filter(Boolean)),
+    ]
+      .sort((a, b) => a.localeCompare(b))
+      .map((category) => ({
+        key: category,
+        label: formatCategoryLabel(category),
+      })),
+  ];
+
+  // -------------------------------------------------------
+  // Filter images based on active category
+  // -------------------------------------------------------
   const filteredImages =
     activeTab === "all"
       ? galleryImages
       : galleryImages.filter((image) => image.category === activeTab);
 
-  const clusters = chunkIntoFives(filteredImages);
+  // -------------------------------------------------------
+  // Prepare clusters
+  //
+  // The image with is_hero === 1 is moved
+  // to the first position of its cluster.
+  // -------------------------------------------------------
+  const clusters = prepareClusters(filteredImages);
+
+  // -------------------------------------------------------
+  // Hero positions
+  // -------------------------------------------------------
   const heroPositions = ["middle", "left", "right"];
+
+  // -------------------------------------------------------
+  // Loading
+  // -------------------------------------------------------
+  if (loading) {
+    return (
+      <div className="w-full py-16">
+        <div className="w-[90%] mx-auto">Loading gallery...</div>
+      </div>
+    );
+  }
+
+  // -------------------------------------------------------
+  // Error
+  // -------------------------------------------------------
+  if (error) {
+    return (
+      <div className="w-full py-16">
+        <div className="w-[90%] mx-auto">Failed to load gallery.</div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full py-16">
       <div className="w-[90%] mx-auto">
         {/* Tabs */}
-        <div className="flex items-center gap-x-6 overflow-x-auto pb-3 border-b border-gray-200 whitespace-nowrap justify-center overflow-y-hidden">
+        <div className="flex items-center gap-x-6 overflow-x-auto pb-3 border-b border-gray-200 whitespace-nowrap justify-start md:justify-center overflow-y-hidden">
           {categories.map((category) => (
             <button
               key={category.key}
               onClick={() => setActiveTab(category.key)}
-              className={`text-sm pb-3 -mb-[13px] border-b-2 transition-colors shrink-0 ${
+              className={`text-base md:text-sm pb-3 -mb-[13px] border-b-2 transition-colors shrink-0 ${
                 activeTab === category.key
                   ? "border-secondary text-secondary font-medium"
                   : "border-transparent text-gray-600 hover:text-secondary"
@@ -164,7 +287,7 @@ const Gallery = () => {
           ))}
         </div>
 
-        {/* Clusters - rendered in order: first section, then second, then third */}
+        {/* Clusters */}
         <div className="flex flex-col gap-6 mt-8">
           {clusters.map((cluster, index) =>
             cluster.length === 5 ? (
@@ -175,7 +298,7 @@ const Gallery = () => {
                 heroPosition={heroPositions[index % 3]}
               />
             ) : (
-              // Leftover images that don't fill a full 5-image cluster
+              // Leftover images
               <div
                 key={index}
                 className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"

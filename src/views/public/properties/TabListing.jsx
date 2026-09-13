@@ -78,7 +78,7 @@ const CategoryTabs = ({ categories = [], onChange }) => {
               <button
                 type="button"
                 onClick={() => handleTabClick(category)}
-                className={`shrink-0 whitespace-nowrap border-b-2 pb-1 text-sm font-medium transition-colors hover:cursor-pointer ${
+                className={`shrink-0 whitespace-nowrap border-b-2 pb-1 text-sm md:text-base font-medium transition-colors hover:cursor-pointer ${
                   isActive
                     ? "border-[#1557e8] text-[#1557e8]"
                     : "border-transparent text-gray-700 hover:text-gray-900"

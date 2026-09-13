@@ -25,7 +25,7 @@ const TabSection = ({
   activeKey,
   onChange,
   defaultActiveKey,
-  alignment = "start",
+  alignment = "center sm:justify-start",
 }) => {
   const [internalActiveKey, setInternalActiveKey] = useState(
     defaultActiveKey || tabs[0]?.key,
@@ -71,7 +71,7 @@ const TabSection = ({
                 whitespace-nowrap
                 px-6
                 py-2.5
-                text-sm
+                text-sm md:text-base
                 font-medium
                 transition-colors
                 ${

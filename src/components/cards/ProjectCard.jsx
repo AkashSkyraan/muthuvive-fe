@@ -18,14 +18,14 @@ const ProjectCard = ({ listing }) => {
           <img src={icons.bookmarkIcon} alt="bookmark" className="w-5 h-5" />
         </button>
 
-        <span className="absolute bottom-3 right-3 bg-white text-secondary text-xs font-medium px-3 py-1 rounded-md">
+        <span className="absolute bottom-3 right-3 bg-white text-secondary text-sm font-medium px-3 py-1 rounded-md">
           {listing.category}
         </span>
       </div>
 
       <div className="p-4">
-        <h3 className="text-sm font-semibold text-gray-900">{listing.title}</h3>
-        <p className="text-secondary text-sm font-semibold mt-1">
+        <h3 className="text-base font-semibold text-gray-900">{listing.title}</h3>
+        <p className="text-secondary text-base font-semibold mt-1">
           {listing.price}
         </p>
 
@@ -35,7 +35,7 @@ const ProjectCard = ({ listing }) => {
             alt="location"
             className="w-4 h-4 mt-0.5 shrink-0"
           />
-          <p className="text-xs text-gray-500 line-clamp-2">
+          <p className="text-sm text-gray-500 line-clamp-2">
             {listing.address}
           </p>
         </div>
@@ -43,15 +43,15 @@ const ProjectCard = ({ listing }) => {
         <div className="flex items-center flex-wrap gap-x-4 gap-y-2 mt-3 pt-4 justify-between">
           <div className="flex items-center gap-x-1.5">
             <img src={icons.areaIcon} alt="area" className="w-4 h-4" />
-            <span className="text-xs text-gray-500">{listing.area}</span>
+            <span className="text-sm text-gray-500">{listing.area}</span>
           </div>
           <div className="flex items-center gap-x-1.5">
             <img src={icons.areaIcon} alt="hospitals" className="w-4 h-4" />
-            <span className="text-xs text-gray-500">{listing.hospitals}</span>
+            <span className="text-sm text-gray-500">{listing.hospitals}</span>
           </div>
           <div className="flex items-center gap-x-1.5">
             <img src={icons.areaIcon} alt="schools" className="w-4 h-4" />
-            <span className="text-xs text-gray-500">{listing.schools}</span>
+            <span className="text-sm text-gray-500">{listing.schools}</span>
           </div>
         </div>
       </div>
