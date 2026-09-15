@@ -93,7 +93,7 @@ const UnitField = ({
   defaultUnit,
 }) => (
   <div>
-    <p className="text-sm text-start font-semibold text-gray-900 mb-2">
+    <p className="text-base text-start font-semibold text-gray-900 mb-2">
       {label}
     </p>
     <div className="flex items-stretch rounded-xl bg-[#f3f3f3] overflow-hidden border-2 border-gray-200">
@@ -108,7 +108,7 @@ const UnitField = ({
       <Form.Item name={unitName} noStyle initialValue={defaultUnit}>
         <Select
           variant="outlined"
-          suffixIcon={<DownOutlined className="text-gray-500 text-xs" />}
+          suffixIcon={<DownOutlined className="text-gray-500 text-sm" />}
           className="!w-24 shrink-0 !h-auto
             [&_.ant-select-selector]:!bg-white
             [&_.ant-select-selector]:!h-full
@@ -126,7 +126,7 @@ const UnitField = ({
 );
 
 const fieldLabel = (text) => (
-  <span className="text-sm font-semibold text-gray-900">{text}</span>
+  <span className="text-base font-semibold text-gray-900">{text}</span>
 );
 
 const PropertyDetailsForm = () => {
@@ -339,6 +339,11 @@ const PropertyDetailsForm = () => {
              [&_.ant-select-selector]:!h-12 
              [&_.ant-select-selection-item]:!leading-[48px] 
              [&_.ant-select-selection-placeholder]:!leading-[48px]"
+            classNames={{
+              popup: {
+                root: "property-category-dropdown",
+              },
+            }}
             style={{
               backgroundColor: "#f3f3f3",
             }}

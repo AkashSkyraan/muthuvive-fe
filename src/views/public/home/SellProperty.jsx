@@ -3,6 +3,7 @@ import { Button } from "antd";
 import icons from "../../../config/Icons.jsx";
 import SubscriptionCard from "../../../components/cards/SubscriptionCard.jsx";
 import { getSubscriptionPlans } from "../../../api/subscriptionPlans.api.js";
+import { Link } from "react-router-dom";
 
 const SellProperty = () => {
   const [plans, setPlans] = useState([]);
@@ -25,18 +26,19 @@ const SellProperty = () => {
               You Want To Sell Your Property ?
             </h2>
 
-            <p className="text-sm text-gray-500 mt-4 leading-relaxed">
+            <p className="text-base text-gray-500 mt-4 leading-relaxed">
               Highlight the best of your properties by using the List Category
               shortcode. You can list categories, types, cities, areas and
               states of your choice.
             </p>
-
-            <Button
-              type="primary"
-              className="!bg-secondary mt-6 w-[55%] sm:w-[45%]"
-            >
-              Sell my property
-            </Button>
+            <Link to="/sell-property">
+              <Button
+                type="primary"
+                className="!bg-secondary mt-6 w-[55%] sm:w-[45%] !text-base !py-4.5"
+              >
+                Sell my property
+              </Button>
+            </Link>
           </div>
 
           {/* Right plan card */}

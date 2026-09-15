@@ -12,7 +12,7 @@ const StatusMessage = ({ placement = "top-right" }) => {
 
       setTimeout(() => {
         setMessage(null);
-      }, 3000);
+      }, 5000);
     };
 
     return () => {

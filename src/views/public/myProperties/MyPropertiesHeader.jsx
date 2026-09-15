@@ -212,6 +212,7 @@ const MyPropertiesHeader = ({
               w-full
             !bg-[#f7f7f7]
               sm:flex-1
+              !text-base
 
               lg:max-w-[510px]
             "

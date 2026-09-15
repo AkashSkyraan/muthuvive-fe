@@ -36,12 +36,12 @@ const MyPropertyCard = ({ data }) => {
         <div className="flex-1 min-w-0 text-start">
           {/* Title row + status date */}
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1">
-            <h3 className="text-sm sm:text-base font-semibold text-gray-900">
+            <h3 className="text-base sm:text-base font-semibold text-gray-900">
               {title}
             </h3>
             {statusLabel && statusDate && (
               <span
-                className={`text-xs shrink-0 ${
+                className={`text-sm shrink-0 ${
                   isRejected ? "text-[#d41010]" : "text-gray-500"
                 }`}
               >
@@ -52,7 +52,7 @@ const MyPropertyCard = ({ data }) => {
 
           {/* Category badge */}
           {category && (
-            <span className="inline-block bg-blue-50 text-secondary text-xs font-medium px-3 py-1 rounded-md mt-2">
+            <span className="inline-block bg-blue-50 text-secondary text-sm font-medium px-3 py-1 rounded-md mt-2">
               {category}
             </span>
           )}
@@ -65,7 +65,7 @@ const MyPropertyCard = ({ data }) => {
                 alt="location"
                 className="w-3.5 h-3.5 shrink-0"
               />
-              <span className="text-xs text-secondary truncate">
+              <span className="text-sm text-secondary truncate">
                 {location}
               </span>
             </div>
@@ -76,7 +76,7 @@ const MyPropertyCard = ({ data }) => {
             {area && (
               <div className="flex items-center gap-x-1.5">
                 <img src={icons.areaIcon} alt="area" className="w-3.5 h-3.5" />
-                <span className="text-xs text-gray-500">{area}</span>
+                <span className="text-sm text-gray-500">{area}</span>
               </div>
             )}
             {hospitals && (
@@ -86,7 +86,7 @@ const MyPropertyCard = ({ data }) => {
                   alt="hospitals"
                   className="w-3.5 h-3.5"
                 />
-                <span className="text-xs text-gray-500">{hospitals}</span>
+                <span className="text-sm text-gray-500">{hospitals}</span>
               </div>
             )}
             {schools && (
@@ -96,7 +96,7 @@ const MyPropertyCard = ({ data }) => {
                   alt="schools"
                   className="w-3.5 h-3.5"
                 />
-                <span className="text-xs text-gray-500">{schools}</span>
+                <span className="text-sm text-gray-500">{schools}</span>
               </div>
             )}
           </div>
@@ -109,7 +109,7 @@ const MyPropertyCard = ({ data }) => {
           {rejectedReason ? (
             <div className="flex items-start gap-x-1.5 !items-end">
               <ExclamationCircleOutlined className="text-red-500 mt-0.5 shrink-0" />
-              <p className="text-xs truncate">
+              <p className="text-sm truncate">
                 <span className="font-bold text-[#d41010]">
                   Rejected Reason :
                 </span>{" "}
@@ -118,11 +118,11 @@ const MyPropertyCard = ({ data }) => {
             </div>
           ) : plan ? (
             <div className="flex flex-nowrap items-center gap-x-3 gap-y-2">
-              <span className="inline-flex items-center gap-x-1.5 bg-secondary border-2 [border-image:linear-gradient(to_right,#EDBB04,#FFE449)_1] text-white text-xs font-medium px-3 py-1.5 rounded-md">
+              <span className="inline-flex items-center gap-x-1.5 bg-secondary border-2 [border-image:linear-gradient(to_right,#EDBB04,#FFE449)_1] text-white text-sm font-medium px-3 py-1.5 rounded-md">
                 {plan}
               </span>
               {typeof expiredInDays === "string" && (
-                <span className="inline-flex items-center gap-x-1.5 text-[#d41010] text-xs font-medium">
+                <span className="inline-flex items-center gap-x-1.5 text-[#d41010] text-sm font-medium">
                   <ClockCircleOutlined />
                   Expired In {expiredInDays} Days
                 </span>
@@ -133,7 +133,7 @@ const MyPropertyCard = ({ data }) => {
 
         <Button
           onClick={() => {}}
-          className="!border-secondary !text-secondary !font-medium shrink-0 w-full sm:w-auto"
+          className="!border-secondary !text-secondary !font-medium shrink-0 w-full sm:w-auto !text-base"
         >
           View More
         </Button>

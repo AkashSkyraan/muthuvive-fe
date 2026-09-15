@@ -97,7 +97,7 @@ const PropertyStepper = () => {
       title: (
         <span
           className={`
-            text-sm
+            text-base
             leading-5
             transition-colors
             duration-300

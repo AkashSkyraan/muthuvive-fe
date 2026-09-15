@@ -41,7 +41,7 @@ const SellPropertyLayout = () => {
           <Header />
 
           {/* ==================== Page Content ==================== */}
-          <main className="flex-1 w-[80%] mx-auto">
+          <main className="flex-1 w-[90%] md:w-[80%] mx-auto">
             {/* ---------- Page Heading ---------- */}
             <section className="container mx-auto px-4 py-8 text-start">
               {/* Back Button */}
@@ -58,13 +58,13 @@ const SellPropertyLayout = () => {
               cursor-pointer
             "
               >
-                <LeftOutlined className="text-sm" />
-                <span>Back</span>
+                <LeftOutlined className="text-base" />
+                <span className="text-base">Back</span>
               </button>
 
               <h1 className="text-2xl font-semibold">Sell Your Property</h1>
 
-              <p className="mt-2 text-sm text-gray-500">
+              <p className="mt-2 text-base text-gray-500">
                 Fill in your property details, photos, documents, and other
                 required information. Then submit the request for review.
               </p>
@@ -117,15 +117,21 @@ const SellPropertyLayout = () => {
             centered
             footer={null}
             width={420}
+            styles={{
+              content: {
+                width: "80%", // fallback for mobile
+                maxWidth: "420px", // cap on desktop
+              },
+            }}
           >
             <div className="px-1 py-2 text-center sm:px-3">
               {/* Title */}
-              <h2 className="text-lg font-semibold text-gray-900">
+              <h2 className="text-xl font-semibold text-gray-900">
                 Leave this form?
               </h2>
 
               {/* Description */}
-              <p className="mt-2 text-sm leading-6 text-gray-500">
+              <p className="mt-2 text-base leading-6 text-gray-500">
                 If you go back, the details you have entered in this form will
                 be erased. Are you sure you want to leave?
               </p>
@@ -142,7 +148,7 @@ const SellPropertyLayout = () => {
                 border border-gray-300
                 bg-white
                 px-5 py-2.5
-                text-sm font-medium text-gray-700
+                text-base font-medium text-gray-700
                 transition-colors duration-200
                 hover:bg-gray-50
                 focus:outline-none
@@ -161,7 +167,7 @@ const SellPropertyLayout = () => {
                 rounded-md
                 bg-red-500
                 px-5 py-2.5
-                text-sm font-medium text-white
+                text-base font-medium text-white
                 transition-colors duration-200
                 hover:bg-red-600
                 focus:outline-none

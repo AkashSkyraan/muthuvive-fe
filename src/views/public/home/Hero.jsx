@@ -4,6 +4,7 @@ import hero_image from "../../../assets/images/hero_img.png";
 import images from "../../../config/Images.jsx";
 import icons from "../../../config/Icons.jsx";
 import SearchPage from "../search/SearhPage.jsx";
+import { Link } from "react-router-dom";
 
 const features = [
   {
@@ -42,7 +43,7 @@ const Hero = () => {
       />
       <div className="absolute inset-0 bg-black/20"></div>
 
-      <div className="relative w-[95%] mx-auto py-10">
+      <div className="relative w-[95%] mx-auto py-6 md:py-10">
         {/* Search bar */}
         <div className="bg-white/20 backdrop-blur-sm rounded-lg p-3 flex flex-col md:flex-row gap-3 my-5">
           <div className="flex-1 flex items-center bg-white rounded-md px-3">
@@ -74,25 +75,29 @@ const Hero = () => {
 
         {/* Heading */}
         <div className="mt-10 max-w-full md:max-w-[70%]">
-          <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold text-start text-white leading-tight">
+          <h1 className="text-3xl sm:text-3xl md:text-5xl font-bold text-start text-white leading-tight">
             Find A Place You&rsquo;ll Love To Call Home
           </h1>
 
-          <p className="mt-4 text-sm md:text-base text-gray-200 text-start max-w-full md:max-w-[80%]">
+          <p className="mt-4 text-base md:text-base text-gray-200 text-start max-w-full md:max-w-[80%]">
             Discover verified properties that match your lifestyle, budget, and
             location. Buy, sell, or rent your perfect property with confidence.
           </p>
 
           <div className="flex flex-wrap items-center gap-4 mt-6">
-            <Button className="!bg-white !text-secondary !border-2 !border-transparent !font-medium !py-5 !px-9">
-              Explore
-            </Button>
-            <Button
-              ghost
-              className="!text-white !border-white !font-medium !py-5 !px-7 !border-2"
-            >
-              Contact Us
-            </Button>
+            <Link to="/search">
+              <Button className="!bg-white !text-secondary !border-2 !border-transparent !font-medium !py-5 !px-9 !text-base">
+                Explore
+              </Button>
+            </Link>
+            <Link to="/contactus">
+              <Button
+                ghost
+                className="!text-white !border-white !font-medium !py-5 !px-7 !border-2 !text-base"
+              >
+                Contact Us
+              </Button>
+            </Link>
           </div>
         </div>
 
@@ -114,10 +119,10 @@ const Hero = () => {
               </div>
 
               <div>
-                <h3 className="text-white text-sm font-semibold text-start">
+                <h3 className="text-white text-base font-semibold text-start">
                   {feature.title}
                 </h3>
-                <p className="text-gray-300 text-xs text-start mt-1 w-full">
+                <p className="text-gray-300 text-sm text-start mt-1 w-full">
                   {feature.desc}
                 </p>
               </div>

@@ -141,7 +141,7 @@ const Header = () => {
         <ul className="flex flex-col text-sm text-gray-600">
           <li>
             <Link
-              to="/my-properties"
+              to="/properties/my-properties"
               onClick={closeAccountPopover}
               className="block px-1 py-1.5 !text-[#3E3E3E] font-semibold"
             >
@@ -151,7 +151,7 @@ const Header = () => {
 
           <li>
             <Link
-              to="/saved-lands"
+              to="/properties/saved-properties"
               onClick={closeAccountPopover}
               className="block px-1 py-1.5 !text-[#3E3E3E] font-semibold"
             >
@@ -161,7 +161,7 @@ const Header = () => {
 
           <li>
             <Link
-              to="/recently-viewed"
+              to="/properties/recent-properties"
               onClick={closeAccountPopover}
               className="block px-1 py-1.5 !text-[#3E3E3E] font-semibold"
             >
@@ -177,7 +177,7 @@ const Header = () => {
         <ul className="flex flex-col text-sm text-gray-600">
           <li>
             <Link
-              to="/my-profile"
+              to="/profile"
               onClick={closeAccountPopover}
               className="block px-1 py-1.5 !text-[#3E3E3E] font-semibold"
             >
@@ -187,7 +187,7 @@ const Header = () => {
 
           <li>
             <Link
-              to="/change-password"
+              to="/forgot-password"
               onClick={closeAccountPopover}
               className="block px-1 py-1.5 !text-[#3E3E3E] font-semibold"
             >

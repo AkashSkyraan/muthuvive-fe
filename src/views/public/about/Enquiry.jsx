@@ -10,20 +10,13 @@ import StatusMessage, {
 
 const EnquiryForm = () => {
   const [form] = Form.useForm();
-  const { formData, setFormData } = useEnquiry();
+  const { formData, setFormData, resetFormData } = useEnquiry();
   const [submitting, setSubmitting] = useState(false);
 
   // Watch both checkboxes so the submit button only activates once agreed
   const agreeContact = Form.useWatch("agreeContact", form);
   const agreeTerms = Form.useWatch("agreeTerms", form);
   const canSubmit = agreeContact && agreeTerms;
-
-  const emptyEnquiryData = {
-    name: "",
-    mobile: "",
-    email: "",
-    message: "",
-  };
 
   const handleFinish = async (values) => {
     const updatedFormData = {
@@ -51,10 +44,7 @@ const EnquiryForm = () => {
       form.resetFields();
 
       // Clear the context state too, not just the form UI
-      setFormData((prev) => ({
-        ...prev,
-        ...emptyEnquiryData,
-      }));
+      resetFormData();
     } catch (err) {
       console.error("Error submitting enquiry:", err);
 

@@ -24,7 +24,9 @@ const ProjectCard = ({ listing }) => {
       </div>
 
       <div className="p-4">
-        <h3 className="text-base font-semibold text-gray-900">{listing.title}</h3>
+        <h3 className="text-base font-semibold text-gray-900">
+          {listing.title}
+        </h3>
         <p className="text-secondary text-base font-semibold mt-1">
           {listing.price}
         </p>

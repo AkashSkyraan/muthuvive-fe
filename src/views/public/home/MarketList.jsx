@@ -100,7 +100,7 @@ const MarketListings = () => {
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
             Listing On The Market
           </h2>
-          <p className="text-sm text-gray-500 mt-3 max-w-2xl mx-auto">
+          <p className="text-base text-gray-500 mt-3 max-w-2xl mx-auto">
             Highlight the best of your properties by using the List Category
             shortcode. You can list categories, types, cities, areas and states
             of your choice.
@@ -118,7 +118,7 @@ const MarketListings = () => {
         </div>
 
         <div className="flex justify-center mt-10">
-          <Button type="primary" className="!bg-secondary">
+          <Button type="primary" className="!bg-secondary !text-base">
             Explore All Lands
           </Button>
         </div>

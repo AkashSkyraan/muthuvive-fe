@@ -270,9 +270,9 @@ const PropertySearchResults = () => {
           ============================================================ */}
 
       <Drawer
-        title="Filters"
+        title={<span className="text-base">Filters</span>}
         placement="left"
-        size="85%"
+        size="90%"
         open={isFilterOpen}
         onClose={() => setIsFilterOpen(false)}
         styles={{
@@ -297,7 +297,7 @@ const PropertySearchResults = () => {
         <Button
           type="primary"
           block
-          className="!mt-5 !h-10 !rounded-md"
+          className="!mt-5 !h-10 !rounded-md !text-base"
           onClick={() => setIsFilterOpen(false)}
         >
           Apply Filters

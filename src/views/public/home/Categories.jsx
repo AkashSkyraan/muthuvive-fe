@@ -16,14 +16,14 @@ const Categories = ({ services = [] }) => {
             We Have The Service You Need
           </h2>
 
-          <p className="text-sm text-gray-500 mt-4 leading-relaxed">
+          <p className="text-base text-gray-500 mt-4 leading-relaxed">
             Highlight the best of your properties by using the List Category
             shortcode. You can list categories, types, cities, areas and states
             of your choice.Highlight the best of your properties by using the
             List Category shortcode.
           </p>
 
-          <Button type="primary" className="!bg-secondary mt-6">
+          <Button type="primary" className="!bg-secondary mt-6 !text-base">
             Explore All Services
           </Button>
         </div>
@@ -38,15 +38,15 @@ const Categories = ({ services = [] }) => {
                 <img
                   src={service.icon}
                   alt={service.title}
-                  className="w-5 h-5"
+                  className="w-7 h-7"
                 />
               </div>
 
-              <h3 className="text-sm font-semibold text-gray-900 mt-4">
+              <h3 className="text-base font-semibold text-gray-900 mt-4">
                 {service.title}
               </h3>
 
-              <p className="text-xs text-gray-500 mt-2 leading-relaxed">
+              <p className="text-sm text-gray-500 mt-2 leading-relaxed">
                 {service.desc}
               </p>
             </div>

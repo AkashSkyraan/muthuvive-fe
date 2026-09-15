@@ -296,7 +296,7 @@ const PropertyDetails = () => {
             {/* ========================================================
                 RIGHT SIDE - 35%
                 ======================================================== */}
-            <aside className="w-full lg:w-[35%] flex flex-col gap-4 items-end">
+            <aside className="w-full lg:w-[45%] xl:w-[35%] flex flex-col gap-4 items-end">
               {/* Enquiry Form */}
               <Enquiry />
 

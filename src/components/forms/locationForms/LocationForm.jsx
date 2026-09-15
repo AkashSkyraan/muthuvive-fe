@@ -198,7 +198,7 @@ const LocationForm = () => {
 
   const fieldLabel = (text, enabled) => (
     <span
-      className={`text-sm font-semibold ${
+      className={`text-base font-semibold ${
         enabled ? "text-gray-900" : "text-gray-400"
       }`}
     >
@@ -228,7 +228,12 @@ const LocationForm = () => {
           <Select
             placeholder="Select your Category"
             suffixIcon={<DownOutlined className="text-gray-700" />}
-            className={`w-full bg-[#f3f3f3]! ${selectClassName}`}
+            className={`w-full bg-[#f3f3f3]! !text-base ${selectClassName}`}
+            classNames={{
+              popup: {
+                root: "property-category-dropdown",
+              },
+            }}
             options={countries}
             onChange={handleCountryChange}
           />
@@ -246,8 +251,13 @@ const LocationForm = () => {
                 className={isStateEnabled ? "text-gray-700" : "text-gray-400"}
               />
             }
+            classNames={{
+              popup: {
+                root: "property-category-dropdown",
+              },
+            }}
             disabled={!isStateEnabled}
-            className={`w-full bg-[#f3f3f3]! ${selectClassName}`}
+            className={`w-full bg-[#f3f3f3]! !text-base ${selectClassName}`}
             options={stateOptions}
             onChange={handleStateChange}
             fieldNames={{
@@ -272,7 +282,12 @@ const LocationForm = () => {
               />
             }
             disabled={!isDistrictEnabled}
-            className={`w-full bg-[#f3f3f3]! ${selectClassName}`}
+            className={`w-full bg-[#f3f3f3]! !text-base ${selectClassName}`}
+            classNames={{
+              popup: {
+                root: "property-category-dropdown",
+              },
+            }}
             options={districtOptions}
             onChange={handleDistrictChange}
             fieldNames={{
@@ -304,7 +319,12 @@ const LocationForm = () => {
               />
             }
             disabled={!isCityEnabled}
-            className={`w-full bg-[#f3f3f3]! ${selectClassName}`}
+            className={`w-full bg-[#f3f3f3]! !text-base ${selectClassName}`}
+            classNames={{
+              popup: {
+                root: "property-category-dropdown",
+              },
+            }}
             options={filteredCityOptions}
             fieldNames={{
               label: "city",

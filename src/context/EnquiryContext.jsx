@@ -12,11 +12,22 @@ export const EnquiryProvider = ({ children }) => {
     status: "pending",
   });
 
+  const resetFormData = () => {
+    setFormData({
+      property_id: "",
+      regarding: "",
+      name: "",
+      mobile: "",
+      email: "",
+      message: "",
+    });
+  };
   return (
     <EnquiryContext.Provider
       value={{
         formData,
         setFormData,
+        resetFormData,
       }}
     >
       {children}

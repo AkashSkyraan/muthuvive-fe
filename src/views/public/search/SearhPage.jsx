@@ -186,7 +186,7 @@ function SearchPage() {
                   setPropertyType(type);
                   setOpenPropertyType(false);
                 }}
-                className={`block w-full px-5 py-3 text-left text-sm transition hover:bg-gray-50 ${
+                className={`block w-full px-5 py-3 text-left text-base transition hover:bg-gray-50 ${
                   propertyType === type
                     ? "bg-gray-50 font-medium text-blue-600"
                     : "text-gray-800"

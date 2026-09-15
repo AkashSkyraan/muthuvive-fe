@@ -47,7 +47,7 @@ const ToggleGrid = ({ options, selectedValues, onToggle }) => (
           key={option.value}
           type="button"
           onClick={() => onToggle(option.value)}
-          className={`px-3 py-2 rounded-lg border text-xs font-semibold text-center transition-colors cursor-pointer ${
+          className={`px-3 py-2 rounded-lg border text-sm font-semibold text-center transition-colors cursor-pointer ${
             isActive
               ? "bg-blue-50 border-secondary text-secondary"
               : "bg-white border-[#3e3e3e] text-gray-600"
@@ -129,7 +129,7 @@ const PropertyFilters = ({
           <button
             type="button"
             onClick={onClearAll}
-            className="text-xs font-medium text-[#d41010]"
+            className="text-sm font-medium text-[#d41010]"
           >
             Clear All
           </button>
@@ -141,7 +141,7 @@ const PropertyFilters = ({
           {activeChips.map((chip) => (
             <span
               key={`${chip.key}-${chip.value}`}
-              className="inline-flex items-center gap-x-1.5 bg-white border border-gray-500 text-xs text-gray-700 pl-3 pr-2 py-2 rounded-md font-semibold"
+              className="inline-flex items-center gap-x-1.5 bg-white border border-gray-500 text-sm text-gray-700 pl-3 pr-2 py-2 rounded-md font-semibold"
             >
               {chip.label}
               <button
@@ -149,7 +149,7 @@ const PropertyFilters = ({
                 onClick={() => handleRemoveChip(chip.key, chip.value)}
                 className="text-gray-400 hover:text-gray-600"
               >
-                <CloseOutlined className="text-[10px]" />
+                <CloseOutlined className="text-[12px]" />
               </button>
             </span>
           ))}
@@ -179,7 +179,7 @@ const PropertyFilters = ({
           <div className="grid grid-cols-2 gap-2">
             <Select
               placeholder="Min"
-              suffixIcon={<DownOutlined className="text-gray-400 text-xs" />}
+              suffixIcon={<DownOutlined className="text-gray-400 text-sm" />}
               value={filters.priceMin ?? undefined}
               onChange={(value) => onPriceChange(value, filters.priceMax)}
               options={priceOptions}
@@ -187,7 +187,7 @@ const PropertyFilters = ({
             />
             <Select
               placeholder="Max"
-              suffixIcon={<DownOutlined className="text-gray-400 text-xs" />}
+              suffixIcon={<DownOutlined className="text-gray-400 text-sm" />}
               value={filters.priceMax ?? undefined}
               onChange={(value) => onPriceChange(filters.priceMin, value)}
               options={priceOptions}

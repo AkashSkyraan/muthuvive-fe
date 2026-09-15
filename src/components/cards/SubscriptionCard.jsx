@@ -20,7 +20,7 @@ const SubscriptionCard = ({ plans = [] }) => {
         >
           {/* Card Header */}
           <div className="border-b border-secondary px-5 py-3">
-            <h3 className="text-sm font-semibold text-gray-900">
+            <h3 className="text-base font-semibold text-gray-900">
               Plan Details
             </h3>
           </div>
@@ -40,7 +40,7 @@ const SubscriptionCard = ({ plans = [] }) => {
                 </span>
               </div>
 
-              <span className="rounded-sm border border-secondary px-2 py-1 text-xs font-medium text-secondary transition-colors hover:bg-secondary hover:text-primary sm:px-3">
+              <span className="rounded-sm border border-secondary px-2 py-1 text-sm font-medium text-secondary transition-colors hover:bg-secondary hover:text-primary sm:px-3">
                 {plan.duration} Plan
               </span>
             </div>
@@ -54,7 +54,7 @@ const SubscriptionCard = ({ plans = [] }) => {
                 >
                   <img src={icons.checkIcon} alt="check" className="h-4 w-4" />
 
-                  <span className="text-sm text-gray-700">{feature}</span>
+                  <span className="text-base text-gray-700">{feature}</span>
                 </li>
               ))}
             </ul>

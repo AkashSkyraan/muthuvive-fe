@@ -729,11 +729,11 @@ const MediaUploadForm = () => {
             TITLE
         ==================================================== */}
 
-        <h2 className="text-lg font-semibold text-gray-900">
+        <h2 className="text-xl font-semibold text-gray-900">
           Add Photos / Videos of Property
         </h2>
 
-        <p className="text-sm text-gray-500 mt-1">
+        <p className="text-base text-gray-500 mt-1">
           Upload Photos minimum(10) per photo within 3 mb &amp; Video Minimum(2)
           Per video within 20 mb &amp; document within 5 mb.
         </p>
@@ -778,7 +778,7 @@ const MediaUploadForm = () => {
         <div className="mt-6">
           <p
             className="
-              text-sm
+              text-base
               font-semibold
               text-gray-900
               mb-2
@@ -909,7 +909,7 @@ const MediaUploadForm = () => {
                 Upload Photos
               </span>
 
-              <span className="text-xs text-gray-400">
+              <span className="text-xs text-gray-400 font-semibold">
                 Support format jpeg, Png
               </span>
             </button>
@@ -934,7 +934,7 @@ const MediaUploadForm = () => {
         <div className="mt-6">
           <p
             className="
-              text-sm
+              text-base
               font-semibold
               text-gray-900
               mb-2
@@ -1005,7 +1005,7 @@ const MediaUploadForm = () => {
                 Upload Photos
               </span>
 
-              <span className="text-xs text-gray-400">
+              <span className="text-xs text-gray-400 font-semibold">
                 Support format jpeg, Png
               </span>
             </button>
@@ -1046,7 +1046,7 @@ const MediaUploadForm = () => {
                 Upload Videos
               </span>
 
-              <span className="text-xs text-gray-400">Support format mp4</span>
+              <span className="text-xs text-gray-400 font-semibold">Support format mp4</span>
             </button>
           </div>
         </div>

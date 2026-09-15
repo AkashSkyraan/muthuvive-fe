@@ -268,6 +268,11 @@ const CommercialPropertyDetailsForm = ({ onPrevious, onNext }) => {
                 placeholder="Select your floor"
                 suffixIcon={<DownOutlined className="text-gray-700" />}
                 className={`w-full ${selectSelectorClassName}`}
+                classNames={{
+                  popup: {
+                    root: "property-category-dropdown",
+                  },
+                }}
                 options={floorOptions}
                 notFoundContent="Enter total floors first"
               />
@@ -339,6 +344,11 @@ const CommercialPropertyDetailsForm = ({ onPrevious, onNext }) => {
             placeholder="Select facing"
             suffixIcon={<DownOutlined className="text-gray-700" />}
             className={`w-full py-2.5! bg-[#f3f3f3]! ${selectSelectorClassName}`}
+            classNames={{
+              popup: {
+                root: "property-category-dropdown",
+              },
+            }}
             options={facingOptions}
           />
         </Form.Item>

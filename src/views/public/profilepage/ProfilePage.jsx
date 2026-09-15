@@ -83,7 +83,7 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="w-[60%] mx-auto my-1.5 px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
+    <div className="w-full md:w-[90%] lg:w-[60%] mx-auto my-1.5 px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
       <div className="w-full max-w-[965px] max-h-fit mx-auto rounded-xl border border-gray-200 bg-white text-start">
         {/* Header */}
         <div className="border-b border-gray-200 px-5 py-4 sm:px-6 lg:px-7">
@@ -96,7 +96,7 @@ const ProfilePage = () => {
         <div className="flex flex-col gap-8 px-5 py-6 sm:px-6 lg:px-7 lg:py-7">
           {/* Full Name */}
           <div>
-            <p className="mb-2 text-sm font-semibold text-gray-900">
+            <p className="mb-2 text-base font-semibold text-gray-900">
               Full Name
             </p>
 
@@ -105,7 +105,7 @@ const ProfilePage = () => {
                 <Input
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="!rounded-full !px-5 !py-2.5 !text-sm"
+                  className="!rounded-full !px-5 !py-2.5 !text-base"
                   autoFocus
                 />
 
@@ -128,7 +128,7 @@ const ProfilePage = () => {
                 </div>
               </>
             ) : (
-              <div className="flex flex-col items-stretch overflow-hidden rounded-lg border border-gray-200 sm:flex-row">
+              <div className="flex flex-row items-stretch overflow-hidden rounded-lg border border-gray-200">
                 <span className="min-w-0 flex-1 truncate px-5 py-2.5 text-sm text-gray-800">
                   {savedFullName}
                 </span>
@@ -136,7 +136,7 @@ const ProfilePage = () => {
                 <button
                   type="button"
                   onClick={handleEditName}
-                  className="shrink-0 bg-secondary px-6 py-3 text-sm font-medium text-white transition-colors"
+                  className="shrink-0 bg-secondary px-4 sm:px-6 py-3 text-sm font-medium text-white transition-colors"
                 >
                   Change
                 </button>
@@ -146,33 +146,37 @@ const ProfilePage = () => {
 
           {/* Mobile Number */}
           <div>
-            <p className="mb-2 text-sm font-semibold text-gray-900">
+            <p className="mb-2 text-base font-semibold text-gray-900">
               Mobile Number
             </p>
 
-            <div className="flex flex-col items-stretch overflow-hidden rounded-lg border border-gray-200 sm:flex-row">
-              <span className="flex shrink-0 items-center justify-center bg-[#10182b] px-4 py-2.5 text-sm font-medium text-white">
-                +91
-              </span>
+            <div className="flex flex-row overflow-hidden rounded-lg border border-gray-200">
+              {/* +91 + Mobile Number */}
+              <div className="flex min-w-0 flex-1">
+                <span className="flex shrink-0 items-center justify-center bg-[#10182b] px-4 py-2.5 text-sm font-medium text-white">
+                  +91
+                </span>
 
-              <Input
-                value={mobileNumber}
-                onChange={(e) => setMobileNumber(e.target.value)}
-                variant="borderless"
-                className="!flex-1 !rounded-none !px-4 !py-2.5 !text-sm"
-              />
+                <Input
+                  value={mobileNumber}
+                  onChange={(e) => setMobileNumber(e.target.value)}
+                  variant="borderless"
+                  className="!min-w-0 !flex-1 !rounded-none !px-4 !py-2.5 !text-sm"
+                />
+              </div>
 
+              {/* Change Button */}
               <button
                 type="button"
                 onClick={handleChangeMobile}
                 disabled={isChangingMobile}
-                className="shrink-0 bg-secondary px-6 py-3 text-sm font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+                className="shrink-0 bg-secondary px-4 sm:px-6 py-3 text-sm font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isChangingMobile ? "Changing..." : "Change"}
               </button>
             </div>
 
-            <p className="mt-1.5 flex items-center gap-x-2 text-xs text-gray-700">
+            <p className="mt-1.5 flex items-center gap-x-2 text-sm text-gray-700">
               <InfoCircleOutlined />
               Mobile number can be changed only once every 30 days.
             </p>
@@ -180,27 +184,27 @@ const ProfilePage = () => {
 
           {/* Email */}
           <div>
-            <p className="mb-2 text-sm font-semibold text-gray-900">Email</p>
+            <p className="mb-2 text-base font-semibold text-gray-900">Email</p>
 
-            <div className="flex flex-col items-stretch overflow-hidden rounded-lg border border-gray-200 sm:flex-row">
+            <div className="flex flex-row items-stretch overflow-hidden rounded-lg border border-gray-200">
               <Input
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 variant="borderless"
-                className="!flex-1 !rounded-none !px-4 !py-2.5 !text-sm"
+                className="!min-w-0 !flex-1 !rounded-none !px-4 !py-2.5 !text-sm"
               />
 
               <button
                 type="button"
                 onClick={handleChangeEmail}
                 disabled={isChangingEmail}
-                className="shrink-0 bg-secondary px-6 py-3 text-sm font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+                className="shrink-0 bg-secondary px-4 sm:px-6 py-3 text-sm font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isChangingEmail ? "Changing..." : "Change"}
               </button>
             </div>
 
-            <p className="mt-1.5 flex items-center gap-x-2 text-xs text-gray-700">
+            <p className="mt-1.5 flex items-center gap-x-2 text-sm text-gray-700">
               <InfoCircleOutlined />
               Email ID can be changed only once every 30 days.
             </p>

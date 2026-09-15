@@ -73,12 +73,12 @@ const PropertyPostInfo = ({
         onClick={() => setIsOpen((prev) => !prev)}
         className="w-full flex items-center justify-between gap-2 bg-[#fbe6a2] px-4 py-3 sm:px-5 sm:py-4 text-left"
       >
-        <span className="flex items-center gap-2 text-sm sm:text-base font-semibold text-gray-900">
+        <span className="flex items-center gap-2 text-base sm:text-base font-semibold text-gray-900">
           <InfoCircleOutlined className="text-gray-900" />
           {title}
         </span>
         <DownOutlined
-          className={`text-gray-800 text-xs shrink-0 transition-transform ${
+          className={`text-gray-800 text-sm shrink-0 transition-transform ${
             isOpen ? "rotate-180" : ""
           }`}
         />
@@ -86,7 +86,7 @@ const PropertyPostInfo = ({
 
       {isOpen && (
         <div className="bg-[#fff8db] px-4 py-4 sm:px-5 sm:py-5">
-          <p className="text-sm font-semibold text-gray-900 mb-3">{intro}</p>
+          <p className="text-base font-semibold text-gray-900 mb-3">{intro}</p>
           <ol className="space-y-3">
             {steps.map((step, index) => (
               <li key={step.label} className="text-sm leading-relaxed">

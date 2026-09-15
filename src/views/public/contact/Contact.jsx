@@ -10,16 +10,10 @@ import StatusMessage, {
 
 // Empty shape used to reset the context after a successful submit -
 // keep this in sync with whatever fields EnquiryContext actually stores.
-const emptyEnquiryData = {
-  name: "",
-  mobile: "",
-  email: "",
-  message: "",
-};
 
 const GetInTouch = () => {
   const { aboutUs, loading, error } = useAboutUs();
-  const { formData, setFormData } = useEnquiry();
+  const { formData, setFormData, resetFormData } = useEnquiry();
 
   const [form] = Form.useForm();
   const [submitting, setSubmitting] = useState(false);
@@ -51,10 +45,7 @@ const GetInTouch = () => {
       form.resetFields();
 
       // Clear the context state too, not just the form UI
-      setFormData((prev) => ({
-        ...prev,
-        ...emptyEnquiryData,
-      }));
+      resetFormData();
     } catch (err) {
       console.error("Error submitting enquiry:", err);
 

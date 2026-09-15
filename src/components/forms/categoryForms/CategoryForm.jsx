@@ -109,7 +109,7 @@ const PropertyCategoryForm = ({ onPrevious }) => {
       <Form form={form} layout="vertical" requiredMark={false}>
         <Form.Item
           label={
-            <span className="text-sm font-semibold text-gray-900">
+            <span className="text-base font-semibold text-gray-900">
               Select Property Category
             </span>
           }
@@ -124,8 +124,13 @@ const PropertyCategoryForm = ({ onPrevious }) => {
           <Select
             placeholder="Select your Category"
             suffixIcon={<DownOutlined className="text-gray-900!" />}
-            className={`w-full bg-[#f3f3f3]!
+            className={`w-full bg-[#f3f3f3]! !text-base
              ${selectClassName}`}
+            classNames={{
+              popup: {
+                root: "property-category-dropdown",
+              },
+            }}
             options={propertyCategories}
             fieldNames={{
               label: "name",
@@ -145,7 +150,7 @@ const PropertyCategoryForm = ({ onPrevious }) => {
         {isCategoryTypeEnabled && (
           <Form.Item
             label={
-              <span className="text-sm font-semibold text-gray-900">
+              <span className="text-base font-semibold text-gray-900">
                 Select Property Category type
               </span>
             }
@@ -160,7 +165,12 @@ const PropertyCategoryForm = ({ onPrevious }) => {
             <Select
               placeholder="Select your Category"
               suffixIcon={<DownOutlined className="text-gray-400" />}
-              className={`w-full bg-[#f3f3f3]! ${selectClassName}`}
+              className={`w-full bg-[#f3f3f3]! !text-base ${selectClassName}`}
+              classNames={{
+                popup: {
+                  root: "property-category-dropdown",
+                },
+              }}
               options={subPropertyCategories}
               fieldNames={{
                 label: "sub_name",

@@ -276,7 +276,7 @@ const Gallery = () => {
             <button
               key={category.key}
               onClick={() => setActiveTab(category.key)}
-              className={`text-base md:text-sm pb-3 -mb-[13px] border-b-2 transition-colors shrink-0 ${
+              className={`text-base pb-3 -mb-[13px] border-b-2 transition-colors shrink-0 ${
                 activeTab === category.key
                   ? "border-secondary text-secondary font-medium"
                   : "border-transparent text-gray-600 hover:text-secondary"

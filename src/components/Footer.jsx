@@ -50,7 +50,7 @@ const Footer = () => {
                 <img
                   src={images.logo}
                   alt="Logo"
-                  className="h-6 xs:h-7 sm:h-9 md:h-10 lg:h-11 w-auto"
+                  className="h-9 xs:h-9 sm:h-9 md:h-10 lg:h-11 w-auto"
                 />
               </Link>
             </div>

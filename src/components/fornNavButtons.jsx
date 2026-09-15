@@ -10,14 +10,14 @@ const FormNavigationButtons = ({
 }) => {
   return (
     <div className="flex justify-end gap-x-5 mt-6">
-      <Button onClick={onPrevious} className="rounded-full px-6">
+      <Button onClick={onPrevious} className="rounded-full px-6 !text-base">
         Previous
       </Button>
       <Button
         type="primary"
         onClick={onNext}
         disabled={disableNext}
-        className="rounded-full px-6"
+        className="rounded-full px-6 !text-base"
       >
         {nextLabel}
       </Button>

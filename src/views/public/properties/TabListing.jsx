@@ -8,42 +8,99 @@ const CategoryTabs = ({ categories = [], onChange }) => {
     categories[0]?.key || "",
   );
 
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
-  const updateScrollState = () => {
+  /*
+   * Find which category is currently closest
+   * to the left edge of the scroll container.
+   */
+  const checkCurrentSlide = () => {
     const el = scrollRef.current;
 
     if (!el) return;
 
-    setCanScrollLeft(el.scrollLeft > 0);
+    const items = Array.from(el.children);
 
-    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
+    if (!items.length) return;
+
+    let closestIndex = 0;
+    let closestDistance = Infinity;
+
+    items.forEach((item, index) => {
+      const distance = Math.abs(item.offsetLeft - el.scrollLeft);
+
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestIndex = index;
+      }
+    });
+
+    setCurrentSlide(closestIndex);
   };
 
   useEffect(() => {
     setActiveCategory(categories[0]?.key || "");
-
-    updateScrollState();
+    setCurrentSlide(0);
 
     const el = scrollRef.current;
 
     if (!el) return;
 
-    el.addEventListener("scroll", updateScrollState);
-    window.addEventListener("resize", updateScrollState);
+    /*
+     * Wait until categories have been rendered
+     * before checking the scroll position.
+     */
+    requestAnimationFrame(() => {
+      checkCurrentSlide();
+    });
+
+    el.addEventListener("scroll", checkCurrentSlide);
+    window.addEventListener("resize", checkCurrentSlide);
 
     return () => {
-      el.removeEventListener("scroll", updateScrollState);
-      window.removeEventListener("resize", updateScrollState);
+      el.removeEventListener("scroll", checkCurrentSlide);
+      window.removeEventListener("resize", checkCurrentSlide);
     };
+
+    // checkCurrentSlide intentionally excluded because
+    // it is a component-local function.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categories]);
 
-  const scrollBy = (amount) => {
-    scrollRef.current?.scrollBy({
-      left: amount,
+  /*
+   * Scroll directly to a specific category.
+   */
+  const scrollToCategory = (index) => {
+    const el = scrollRef.current;
+
+    if (!el) return;
+
+    const items = el.children;
+
+    if (!items[index]) return;
+
+    const targetItem = items[index];
+
+    el.scrollTo({
+      left: targetItem.offsetLeft,
       behavior: "smooth",
     });
+
+    setCurrentSlide(index);
+  };
+
+  /*
+   * Move exactly one category at a time.
+   */
+  const scrollBy = (direction) => {
+    const nextIndex =
+      direction === "left" ? currentSlide - 1 : currentSlide + 1;
+
+    if (nextIndex < 0 || nextIndex >= categories.length) {
+      return;
+    }
+
+    scrollToCategory(nextIndex);
   };
 
   const handleTabClick = (category) => {
@@ -53,12 +110,19 @@ const CategoryTabs = ({ categories = [], onChange }) => {
     onChange?.(category.key);
   };
 
+  /*
+   * Button states are now based on the actual
+   * first/last category position.
+   */
+  const canScrollLeft = currentSlide > 0;
+  const canScrollRight = currentSlide < categories.length - 1;
+
   return (
     <div className={`flex w-full items-center gap-2 sm:gap-3`}>
       {/* Previous */}
       <button
         type="button"
-        onClick={() => scrollBy(-200)}
+        onClick={() => scrollBy("left")}
         disabled={!canScrollLeft}
         className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-full bg-gray-100 text-gray-400 transition-colors disabled:cursor-not-allowed disabled:opacity-60 enabled:text-gray-700 enabled:hover:bg-gray-200"
       >
@@ -98,9 +162,9 @@ const CategoryTabs = ({ categories = [], onChange }) => {
       {/* Next */}
       <button
         type="button"
-        onClick={() => scrollBy(200)}
+        onClick={() => scrollBy("right")}
         disabled={!canScrollRight}
-        className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-full bg-[#1557e8] text-white transition-colors disabled:cursor-not-allowed disabled:opacity-40 enabled:hover:bg-[#1148c4]"
+        className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-full bg-[#1557e8] text-white transition-colors enabled:hover:bg-[#1148c4]"
       >
         <RightOutlined className="text-xs" />
       </button>

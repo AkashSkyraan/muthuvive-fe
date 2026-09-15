@@ -6,11 +6,6 @@ import Pagination from "../../../components/common/pagination/Pagination";
 import CategoryFilter from "../myProperties/CategoryFilter";
 import images from "../../../config/Images";
 
-// ============================================================
-// API Service
-// ============================================================
-// import { getMyProperties } from "../../../services/propertyService";
-
 const MyProperties = () => {
   const filterOptions = [
     {
@@ -123,6 +118,7 @@ const MyProperties = () => {
     { label: "Rejected", value: "rejected" },
   ];
 
+  console.log("properties", mockProperties);
   // Selected property categories
   const [selectedFilters, setSelectedFilters] = useState([]);
 

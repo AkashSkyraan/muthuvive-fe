@@ -120,7 +120,7 @@ const ExpandableMultiSelect = ({ options, value = [], onChange }) => {
 };
 
 const sectionLabel = (text) => (
-  <span className="text-sm font-semibold text-gray-900">{text}</span>
+  <span className="text-base font-semibold text-gray-900">{text}</span>
 );
 
 const CommercialPropertyFeaturesForm = () => {
