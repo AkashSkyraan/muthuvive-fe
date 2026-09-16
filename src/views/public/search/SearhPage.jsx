@@ -203,7 +203,7 @@ function SearchPage() {
         type="primary"
         htmlType="button"
         onClick={search}
-        className="!h-10 w-full shrink-0 rounded-lg px-11 text-[18px] font-medium text-white transition !bg-blue hover:!bg-blue min-[850px]:!w-25"
+        className="!h-10 w-full shrink-0 rounded-lg px-11 !text-base font-medium text-white transition !bg-blue hover:!bg-blue min-[850px]:!w-25"
       >
         Search
       </Button>

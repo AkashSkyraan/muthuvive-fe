@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Steps } from "antd";
 
 import "./SellPropertyStepper.css";
@@ -19,29 +19,30 @@ const StepCircle = ({ index, current }) => {
   return (
     <div
       className={`
-        flex
-        items-center
-        justify-center
-        shrink-0
+        flex 
+        items-center 
+        justify-center 
+        shrink-0 
 
-        w-11
-        h-11
+        w-11 
+        h-11 
 
-        rounded-full
-        border-2
+        rounded-full 
+        border-2 
 
-        text-base
-        font-medium
+        text-base 
+        font-medium 
 
-        transition-all
-        duration-300
+        transition-all 
+        duration-400
+        ease-in-out
 
         ${
           isCompleted
-            ? "bg-blue-600 border-blue-600 text-white shadow-md" // ✅ completed step → solid blue
+            ? "bg-blue-600 border-blue-600 text-white shadow-md"
             : isActive
-              ? "bg-blue-100 border-blue-600 text-blue-600 shadow-md" // ✅ current step → slight blue
-              : "bg-white border-gray-300 text-gray-800 shadow-sm" // ✅ upcoming step → white
+              ? "bg-blue-100 border-blue-600 text-blue-600 shadow-md"
+              : "bg-white border-gray-300 text-gray-800 shadow-sm"
         }
       `}
     >
@@ -65,6 +66,7 @@ const PropertyStepper = () => {
             : location.pathname === "/sell-property/media"
               ? 4
               : 0;
+
   const [isDesktop, setIsDesktop] = useState(() => {
     if (typeof window === "undefined") {
       return true;
@@ -72,6 +74,36 @@ const PropertyStepper = () => {
 
     return window.matchMedia("(min-width: 1024px)").matches;
   });
+
+  // Added: reference to the mobile stepper container
+  const mobileStepperRef = useRef(null);
+
+  // Added: automatically move horizontal stepper to current step
+  useEffect(() => {
+    if (isDesktop) {
+      return;
+    }
+
+    const stepper = mobileStepperRef.current;
+
+    if (!stepper) {
+      return;
+    }
+
+    const stepItems = stepper.querySelectorAll(".ant-steps-item");
+
+    const currentItem = stepItems[currentStep];
+
+    if (!currentItem) {
+      return;
+    }
+
+    currentItem.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "center",
+    });
+  }, [currentStep, isDesktop]);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(min-width: 1024px)");
@@ -97,10 +129,11 @@ const PropertyStepper = () => {
       title: (
         <span
           className={`
-            text-base
-            leading-5
-            transition-colors
-            duration-300
+            text-base 
+            leading-5 
+            transition-colors 
+            duration-400
+            ease-in-out
 
             ${
               isCompleted
@@ -111,7 +144,7 @@ const PropertyStepper = () => {
                isActive
                  ? "text-secondary font-medium"
                  : "text-gray-800 font-medium"
-             }
+             } 
           `}
         >
           {label}
@@ -139,6 +172,7 @@ const PropertyStepper = () => {
 
       {!isDesktop && (
         <div
+          ref={mobileStepperRef}
           className="
             overflow-x-auto
             [&::-webkit-scrollbar]:hidden

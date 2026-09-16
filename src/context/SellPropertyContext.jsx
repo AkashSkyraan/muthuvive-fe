@@ -3,12 +3,12 @@ import React, { createContext, useContext, useState } from "react";
 const SellPropertyContext = createContext(null);
 
 export const SellPropertyProvider = ({ children }) => {
-  
   const [category, setCategory] = useState(null);
 
   const [currentStep, setCurrentStep] = useState(0);
 
   const [formData, setFormData] = useState({
+    category: {},
     location: {},
     propertyDetails: {},
     propertyFeatures: {},

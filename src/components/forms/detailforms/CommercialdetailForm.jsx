@@ -101,12 +101,12 @@ const UnitField = ({
           className={`flex-1 ${inputClassName}`}
         />
       </Form.Item>
-      <div className="w-px h-6 bg-gray-300 shrink-0" />
+      <div className="w-px h-6 bg-gray-500 shrink-0" />
       <Form.Item name={unitName} noStyle initialValue={defaultUnit}>
         <Select
           variant="borderless"
-          suffixIcon={<DownOutlined className="text-gray-500 text-xs" />}
-          className="!w-24 shrink-0"
+          suffixIcon={<DownOutlined className="!text-gray-500 text-sm" />}
+          className="!w-24 shrink-0 small-unit-select"
           options={unitOptions}
         />
       </Form.Item>

@@ -1046,7 +1046,9 @@ const MediaUploadForm = () => {
                 Upload Videos
               </span>
 
-              <span className="text-xs text-gray-400 font-semibold">Support format mp4</span>
+              <span className="text-xs text-gray-400 font-semibold">
+                Support format mp4
+              </span>
             </button>
           </div>
         </div>
@@ -1059,7 +1061,7 @@ const MediaUploadForm = () => {
           <div className="mt-6">
             <p
               className="
-                text-sm
+                text-base
                 font-semibold
                 text-gray-900
                 mb-3
@@ -1232,7 +1234,7 @@ const MediaUploadForm = () => {
           <div className="mt-6">
             <p
               className="
-                text-sm
+                text-base
                 font-semibold
                 text-gray-900
                 mb-3
@@ -1427,7 +1429,7 @@ const MediaUploadForm = () => {
         <div className="mt-6">
           <p
             className="
-              text-sm
+              text-base
               font-semibold
               text-gray-900
               mb-2
@@ -1483,7 +1485,7 @@ const MediaUploadForm = () => {
               Upload Document
             </span>
 
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-gray-400 font-semibold">
               Support format PDF, PPT
             </span>
           </button>

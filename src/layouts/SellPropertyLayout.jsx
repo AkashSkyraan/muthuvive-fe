@@ -116,7 +116,7 @@ const SellPropertyLayout = () => {
             onCancel={handleCancelBack}
             centered
             footer={null}
-            width={420}
+            // width={420}
             styles={{
               content: {
                 width: "80%", // fallback for mobile

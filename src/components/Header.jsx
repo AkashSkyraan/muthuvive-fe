@@ -6,9 +6,11 @@ import icons from "../config/Icons.jsx";
 import { Link } from "react-router-dom";
 import useScrollLock from "../hooks/UseScrollLock.jsx";
 import { useAboutUs } from "../context/AboutusContext.jsx";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
   const { aboutUs, loading, error } = useAboutUs();
+  const navigate = useNavigate();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -102,7 +104,10 @@ const Header = () => {
       <div className="flex items-center gap-x-3 mt-3">
         <Button
           className="!border-secondary !text-secondary flex-1 !text-sm"
-          onClick={closeAccountPopover}
+          onClick={() => {
+            closeAccountPopover;
+            navigate("/login");
+          }}
         >
           Login
         </Button>
@@ -110,7 +115,10 @@ const Header = () => {
         <Button
           type="primary"
           className="!bg-secondary flex-1 !text-sm"
-          onClick={closeAccountPopover}
+          onClick={() => {
+            closeAccountPopover;
+            navigate("/signup");
+          }}
         >
           Sign Up
         </Button>
@@ -268,7 +276,7 @@ const Header = () => {
   // ---------------------------------------------------------
   const accountPopoverContent = isLoggedIn
     ? loggedInPopoverContent
-    : loggedInPopoverContent;
+    : loggedOutPopoverContent;
 
   // ---------------------------------------------------------
   // Properties Popover Content

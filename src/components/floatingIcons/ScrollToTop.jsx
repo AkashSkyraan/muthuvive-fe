@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { ArrowUpOutlined } from "@ant-design/icons";
 
 const ScrollToTop = () => {
   const [showButton, setShowButton] = useState(false);
@@ -45,7 +46,8 @@ const ScrollToTop = () => {
         }
       `}
     >
-      <span className="text-white text-2xl sm:text-lg">↑</span>
+      {/* <span className="text-white text-2xl sm:text-lg">↑</span> */}
+      <ArrowUpOutlined className="!text-white !text-lg" />
     </button>
   );
 };

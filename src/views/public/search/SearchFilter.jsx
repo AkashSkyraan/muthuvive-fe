@@ -47,7 +47,7 @@ const ToggleGrid = ({ options, selectedValues, onToggle }) => (
           key={option.value}
           type="button"
           onClick={() => onToggle(option.value)}
-          className={`px-3 py-2 rounded-lg border text-sm font-semibold text-center transition-colors cursor-pointer ${
+          className={`px-3 py-2 rounded-lg border text-sm text-center transition-colors cursor-pointer ${
             isActive
               ? "bg-blue-50 border-secondary text-secondary"
               : "bg-white border-[#3e3e3e] text-gray-600"
@@ -141,7 +141,7 @@ const PropertyFilters = ({
           {activeChips.map((chip) => (
             <span
               key={`${chip.key}-${chip.value}`}
-              className="inline-flex items-center gap-x-1.5 bg-white border border-gray-500 text-sm text-gray-700 pl-3 pr-2 py-2 rounded-md font-semibold"
+              className="inline-flex items-center gap-x-1.5 bg-white border border-gray-500 text-sm text-gray-700 pl-3 pr-2 py-2 rounded-md"
             >
               {chip.label}
               <button

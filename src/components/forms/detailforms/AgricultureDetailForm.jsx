@@ -104,21 +104,13 @@ const UnitField = ({
           className={`flex-1 ${inputClassName}`}
         />
       </Form.Item>
-      <div className="w-px bg-gray-300 shrink-0" />
+      <div className="w-px h-6 self-center !bg-gray-500 shrink-0" />
       <Form.Item name={unitName} noStyle initialValue={defaultUnit}>
         <Select
-          variant="outlined"
-          suffixIcon={<DownOutlined className="text-gray-500 text-sm" />}
-          className="!w-24 shrink-0 !h-auto
-            [&_.ant-select-selector]:!bg-white
-            [&_.ant-select-selector]:!h-full
-            [&_.ant-select-selector]:!rounded-none
-            [&_.ant-select-selector]:!flex
-            [&_.ant-select-selector]:!items-center
-            [&_.ant-select-selector]:!mx-0
-            [&_.ant-select-selector]:!my-0"
+          variant="borderless"
+          suffixIcon={<DownOutlined className="!text-gray-500 text-sm" />}
+          className="!w-24 shrink-0 !h-auto small-unit-select"
           options={unitOptions}
-          style={{ backgroundColor: "#FFFFFF" }}
         />
       </Form.Item>
     </div>
@@ -258,7 +250,7 @@ const PropertyDetailsForm = () => {
 
             {showPathwayDimension && (
               <>
-                <p className="text-sm font-semibold text-gray-900 -mb-4">
+                <p className="text-base font-semibold text-gray-900 -mb-4">
                   Pathway Dimension
                 </p>
                 <UnitField
