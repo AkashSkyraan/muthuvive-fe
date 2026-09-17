@@ -1,8 +1,11 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { message } from "antd";
 import { images } from "../../config/Images";
 import Button from "../../components/common/Button";
 import { preventInvalidSpaces } from "../../utils/helper";
+import { requestOTP } from "../../api/auth.api";
+import EmailOtpModal from "../../components/modals/email.modal";
 
 function EyeIcon({ visible }) {
   return visible ? (
@@ -34,30 +37,205 @@ function EyeIcon({ visible }) {
 }
 
 function Signup() {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [identifier, setIdentifier] = useState("");
 
-  const isMobile = /^\d+$/.test(identifier) && identifier.length > 0;
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    mobile: "",
+    password: "",
+  });
 
-  const handleIdentifierChange = (e) => {
-    setIdentifier(e.target.value);
+  const [emailVerified, setEmailVerified] = useState(false);
+  const [mobileVerified, setMobileVerified] = useState(false);
+
+  const [verifyingEmail, setVerifyingEmail] = useState(false);
+  const [verifyingMobile, setVerifyingMobile] = useState(false);
+
+  const [emailError, setEmailError] = useState("");
+  const [mobileError, setMobileError] = useState("");
+
+  // email
+  const isValidEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+  };
+
+  const isValidMobile = (mobile) => {
+    return /^[6-9]\d{9}$/.test(mobile);
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    if (name === "email") {
+      const email = value.trim();
+
+      if (emailVerified) return;
+
+      setFormData((prev) => ({
+        ...prev,
+        email,
+      }));
+
+      // Clear error while typing
+      if (!email) {
+        setEmailError("");
+        return;
+      }
+
+      if (!isValidEmail(email)) {
+        setEmailError("Please enter a valid email address");
+      } else {
+        setEmailError("");
+      }
+
+      return;
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+  const handleEmailVerify = async () => {
+    const email = formData.email.trim();
+
+    if (!email) {
+      setEmailError("Email is required");
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      setEmailError("Please enter a valid email address");
+      return;
+    }
+
+    if (emailVerified || verifyingEmail) {
+      return;
+    }
+
+    try {
+      setEmailError("");
+      setVerifyingEmail(true);
+
+      const response = await requestOTP({
+        type: "email",
+        purpose: 1,
+        email,
+      });
+
+      if (response?.success === 1) {
+        message.success("OTP sent to your email");
+
+        navigate("/verify-otp", {
+          state: {
+            identifier: email,
+            type: "email",
+            purpose: 1,
+          },
+        });
+      } else {
+        setEmailError(response?.data?.message || "Unable to send OTP");
+      }
+    } catch (error) {
+      console.error("Email OTP Error:", error);
+
+      setEmailError(
+        error?.response?.data?.message ||
+          "Something went wrong. Please try again.",
+      );
+    } finally {
+      setVerifyingEmail(false);
+    }
+  };
+
+  // mobile
+
+  const handleMobileVerify = async () => {
+    const mobile = formData.mobile.trim();
+
+    if (!mobile) {
+      setMobileError("Mobile number is required");
+      return;
+    }
+
+    if (!isValidMobile(mobile)) {
+      setMobileError("Please enter a valid mobile number");
+      return;
+    }
+
+    if (mobileVerified || verifyingMobile) {
+      return;
+    }
+
+    try {
+      setMobileError("");
+      setVerifyingMobile(true);
+
+      const response = await requestOTP({
+        type: "mobile",
+        purpose: 1,
+        mobile: `+91${mobile}`,
+      });
+
+      if (response?.success === 1) {
+        message.success("OTP sent to your mobile");
+
+        navigate("/verify-otp", {
+          state: {
+            identifier: `+91 ${mobile}`,
+            mobile,
+            type: "mobile",
+            purpose: 1,
+          },
+        });
+      } else {
+        setMobileError(
+          response?.message || response?.data?.message || "Unable to send OTP",
+        );
+      }
+    } catch (error) {
+      console.error("Mobile OTP Error:", error);
+
+      setMobileError(
+        error?.response?.data?.message ||
+          "Something went wrong. Please try again.",
+      );
+    } finally {
+      setVerifyingMobile(false);
+    }
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log("Login submitted");
+
+    if (!emailVerified) {
+      setEmailError("Please verify your email");
+      return;
+    }
+
+    if (!mobileVerified) {
+      setMobileError("Please verify your mobile number");
+      return;
+    }
+
+    console.log("Signup Data:", formData);
   };
 
   return (
     <>
+      {/* Logo */}
       <div className="flex h-[10px] w-full items-center justify-center">
-        <img src={images.logo} alt="Logo" className="w-[180px]" />
+        <img src={images.logo} alt="Logo" className="w-[150px]" />
       </div>
 
-      <h4 className="mt-8 text-4xl font-bold tracking-tight text-gray-900">
+      {/* Title */}
+      <h5 className="mt-8 text-4xl font-bold tracking-tight text-gray-900">
         Sign up
-      </h4>
+      </h5>
 
+      {/* Description */}
       <p className="mt-3 text-sm leading-5 text-gray-500">
         Highlight the best of your properties by using the List
         <br className="hidden sm:block" />
@@ -65,36 +243,156 @@ function Signup() {
       </p>
 
       <form onSubmit={handleSubmit} className="mt-9 text-left">
-        {/* Email / Mobile */}
+        {/* Full Name */}
         <div>
           <label
-            htmlFor="identifier"
+            htmlFor="name"
             className="mb-2 block text-sm font-medium text-gray-800"
           >
-            Email / Mobile number
+            Full Name
           </label>
 
-          <div className="flex h-10 w-full overflow-hidden rounded-lg border border-gray-200 bg-white">
-            {isMobile && (
-              <div className="flex h-full w-[65px] shrink-0 items-center justify-center bg-[#165BEF] text-sm font-medium text-white">
-                +91
-              </div>
-            )}
+          <input
+            id="name"
+            name="name"
+            type="text"
+            value={formData.name}
+            onChange={handleChange}
+            onKeyDown={preventInvalidSpaces}
+            placeholder="Enter your Full name"
+            autoComplete="name"
+            required
+            maxLength={50}
+            className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-900 outline-none placeholder:text-gray-400 focus:border-gray-300"
+          />
+        </div>
+
+        {/* Email */}
+        <div className="mt-5">
+          <label
+            htmlFor="email"
+            className="mb-2 block text-sm font-medium text-gray-800"
+          >
+            Email
+          </label>
+
+          <div
+            className={`flex h-10 w-full overflow-hidden rounded-lg border bg-white ${
+              emailError ? "border-red-500" : "border-gray-200"
+            }`}
+          >
+            <input
+              id="email"
+              name="email"
+              type="email"
+              maxLength={50}
+              value={formData.email}
+              onChange={handleChange}
+              onKeyDown={preventInvalidSpaces}
+              placeholder="Enter your email"
+              autoComplete="email"
+              required
+              disabled={emailVerified}
+              className="min-w-0 flex-1 bg-transparent px-3 text-sm text-gray-900 outline-none placeholder:text-gray-400 disabled:bg-gray-50"
+            />
+
+            <button
+              type="button"
+              onClick={handleEmailVerify}
+              disabled={
+                !formData.email ||
+                !isValidEmail(formData.email) ||
+                emailVerified ||
+                verifyingEmail
+              }
+              className="w-[88px] shrink-0 bg-[#A5A5A5] text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {verifyingEmail
+                ? "Sending..."
+                : emailVerified
+                  ? "Verified"
+                  : "Verify"}
+            </button>
+          </div>
+
+          {emailError && (
+            <p className="mt-1.5 text-xs text-red-500">{emailError}</p>
+          )}
+        </div>
+
+        {/* Mobile */}
+        <div className="mt-5">
+          <label
+            htmlFor="mobile"
+            className="mb-2 block text-sm font-medium text-gray-800"
+          >
+            Mobile Number
+          </label>
+
+          <div
+            className={`flex h-10 w-full overflow-hidden rounded-lg border bg-white ${
+              mobileError ? "border-red-500" : "border-gray-200"
+            }`}
+          >
+            <div className="flex h-full w-[65px] shrink-0 items-center justify-center bg-black text-sm font-medium text-white">
+              +91
+            </div>
 
             <input
-              id="identifier"
-              type="text"
-              value={identifier}
-              onChange={handleIdentifierChange}
-              onKeyDown={preventInvalidSpaces}
-              placeholder={
-                isMobile ? "Enter phone number" : "Enter your Email or Mobile"
-              }
-              autoComplete="username"
+              id="mobile"
+              name="mobile"
+              type="tel"
+              inputMode="numeric"
+              maxLength={10}
+              value={formData.mobile}
+              onChange={(e) => {
+                const value = e.target.value.replace(/\D/g, "");
+
+                if (value.length <= 10) {
+                  setFormData((prev) => ({
+                    ...prev,
+                    mobile: value,
+                  }));
+
+                  setMobileVerified(false);
+
+                  if (!value) {
+                    setMobileError("");
+                  } else if (!isValidMobile(value)) {
+                    setMobileError("Please enter a valid mobile number");
+                  } else {
+                    setMobileError("");
+                  }
+                }
+              }}
+              placeholder="Enter your mobile number"
+              autoComplete="tel"
               required
-              className="min-w-0 flex-1 bg-transparent px-3 text-sm text-gray-900 !outline-none placeholder:text-gray-400"
+              disabled={mobileVerified}
+              className="min-w-0 flex-1 bg-transparent px-3 text-sm text-gray-900 outline-none placeholder:text-gray-400 disabled:bg-gray-50"
             />
+
+            <button
+              type="button"
+              onClick={handleMobileVerify}
+              disabled={
+                !isValidMobile(formData.mobile) ||
+                mobileVerified ||
+                verifyingMobile
+              }
+              className="w-[88px] shrink-0 bg-[#A5A5A5] text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {verifyingMobile
+                ? "Sending..."
+                : mobileVerified
+                  ? "Verified"
+                  : "Verify"}
+            </button>
           </div>
+
+          {mobileError && (
+            <p className="mt-1.5 text-xs text-red-500">{mobileError}</p>
+          )}
         </div>
 
         {/* Password */}
@@ -109,50 +407,57 @@ function Signup() {
           <div className="relative">
             <input
               id="password"
+              name="password"
               type={showPassword ? "text" : "password"}
-              placeholder="Enter your Password"
-              autoComplete="current-password"
-              required
+              maxLength={50}
+              value={formData.password}
+              onChange={handleChange}
               onKeyDown={preventInvalidSpaces}
-              className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 pr-11 text-sm text-gray-900 outline-none transition placeholder:text-gray-400"
+              placeholder="Enter your Password"
+              autoComplete="new-password"
+              required
+              className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 pr-11 text-sm text-gray-900 outline-none placeholder:text-gray-400 focus:border-gray-300"
             />
 
             <Button
               type="text"
               onClick={() => setShowPassword((prev) => !prev)}
               ariaLabel={showPassword ? "Hide password" : "Show password"}
-              className="!absolute !right-1 !top-1/2 !m-0 !flex !h-8 !w-8 !-translate-y-1/2 !items-center !justify-center !p-0 !text-gray-400 hover:!text-gray-700"
+              className="!absolute !right-1 !top-1/2 !m-0 !flex !h-8 !w-8 !-translate-y-1/2 !items-center !justify-center !p-0 !text-gray-400"
             >
               <EyeIcon visible={showPassword} />
             </Button>
           </div>
-
-          <div className="mt-2 text-right">
-            <Link
-              to="/forgot-password"
-              className="text-sm font-medium text-blue-600 transition hover:text-blue-700 hover:underline"
-            >
-              Forgot Password?
-            </Link>
-          </div>
         </div>
 
+        {/* Sign Up */}
         <Button
           htmlType="submit"
           type="primary"
-          className="mt-6 !h-12 w-full rounded-lg bg-[#165BEF] text-md font-semibold text-white shadow-sm transition hover:bg-[#0f4ed8] hover:shadow-md active:scale-[0.99]"
+          className="mt-6 !h-10 w-full rounded-lg bg-[#165BEF] text-md font-semibold text-white"
         >
-          Login
+          Sign Up
+        </Button>
+
+        {/* Back */}
+        <Button
+          htmlType="button"
+          type="default"
+          onClick={() => window.history.back()}
+          className="mt-4 !h-10 w-full rounded-lg border border-gray-300 bg-white text-md font-medium text-gray-900"
+        >
+          Back
         </Button>
       </form>
 
+      {/* Login */}
       <p className="mt-7 text-center text-sm text-gray-500">
-        You don’t have Account?{" "}
+        You Already have Account ?{" "}
         <Link
-          to="/signup"
+          to="/login"
           className="font-semibold text-blue-600 hover:underline"
         >
-          Sign Up
+          Login
         </Link>
       </p>
     </>

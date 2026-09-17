@@ -139,7 +139,7 @@ function VerifyOTP() {
 
         <button
           type="button"
-          onClick={() => navigate("/forgot-password")}
+          onClick={() => navigate("/signup")}
           aria-label="Edit email"
           className="flex h-6 w-6 items-center justify-center text-gray-500 transition hover:text-gray-800"
         >

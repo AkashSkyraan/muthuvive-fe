@@ -31,10 +31,10 @@ const features = [
 
 function AuthLayout() {
   return (
-    <main className="flex min-h-screen w-full flex-col bg-white lg:flex-row">
-      {/* LEFT SIDE - COMMON */}
+    <main className="flex h-screen w-full overflow-hidden bg-white lg:flex-row">
+      {/* LEFT SIDE - FIXED */}
       <section
-        className="relative hidden min-h-[650px] w-full items-center overflow-hidden bg-cover bg-center lg:flex lg:min-h-screen lg:w-[55%]"
+        className="relative hidden h-full w-full items-center overflow-hidden bg-cover bg-center lg:flex lg:w-[55%]"
         style={{
           backgroundImage: `url(${images.park})`,
         }}
@@ -95,10 +95,12 @@ function AuthLayout() {
         </div>
       </section>
 
-      {/* RIGHT SIDE - DYNAMIC */}
-      <section className="flex min-h-screen w-full items-center justify-center bg-white px-6 py-12 lg:w-[45%] lg:px-12 xl:px-20">
-        <div className="w-full max-w-[480px]">
-          <Outlet />
+      {/* RIGHT SIDE - ONLY THIS SCROLLS */}
+      <section className="h-full w-full overflow-y-auto bg-white lg:w-[45%]">
+        <div className="flex min-h-full w-full items-center justify-center px-6 py-12 lg:px-12 xl:px-20">
+          <div className="w-full max-w-[480px]">
+            <Outlet />
+          </div>
         </div>
       </section>
     </main>
