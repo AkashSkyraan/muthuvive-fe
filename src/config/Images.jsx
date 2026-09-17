@@ -65,10 +65,7 @@ export const images = {
   missio2_img,
   mission1_sub_img,
   mission2_sub_img,
-<<<<<<< HEAD
-=======
   worker,
->>>>>>> cf0066869a199779f6178c8e14faef49decdb297
 };
 
 export default images;

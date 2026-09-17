@@ -1,12 +1,9 @@
 import { Route } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
 
-<<<<<<< HEAD
 // import Home from "../views/public/home/Hero.jsx";
-import SearchPage from "../views/public/search/SearhPage.jsx";
-=======
+// import SearchPage from "../views/public/search/SearhPage.jsx";
 import SearchPage from "../views/public/search/index.jsx";
->>>>>>> cf0066869a199779f6178c8e14faef49decdb297
 import Pagination from "../components/common/pagination/Pagination.jsx";
 import Home from "../views/public/home/Index.jsx";
 import About from "../views/public/about/index";
