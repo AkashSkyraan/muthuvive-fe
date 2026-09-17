@@ -91,7 +91,7 @@ function VerifyOTP() {
       return;
     }
 
-    console.log("OTP:", otpValue);
+    // console.log("OTP:", otpValue);
 
     // Example:
     // navigate("/reset-password", {
@@ -102,7 +102,7 @@ function VerifyOTP() {
   const handleResend = () => {
     if (timer > 0) return;
 
-    console.log("Resend OTP");
+    // console.log("Resend OTP");
 
     setOtp(["", "", "", "", "", ""]);
     setTimer(131);

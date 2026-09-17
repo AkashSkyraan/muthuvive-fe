@@ -113,9 +113,9 @@ function SearchPage() {
   }, []);
 
   return (
-    <div className="flex w-full items-center gap-8 py-5 px-5">
+    <div className="flex w-full flex-col items-stretch gap-3 py-4 px-4 sm:px-3 min-[850px]:flex-row md:items-center md:gap-8 md:py-3">
       {/* Location */}
-      <div className="flex h-[45px] flex-1 items-center rounded-sm border border-[#999999] bg-white px-5">
+      <div className="flex min-h-[45px] w-full items-center rounded-sm border border-[#999999] bg-white px-5 md:flex-1">
         <div className="flex shrink-0 items-center text-[#17213D]">
           <LocationIcon />
         </div>
@@ -125,7 +125,7 @@ function SearchPage() {
           value={location}
           onChange={(e) => setLocation(e.target.value)}
           placeholder="Enter location"
-          className="ml-3 min-w-0 flex-1 bg-transparent text-[16px] text-[#111827] outline-none placeholder:text-[#777] "
+          className="ml-3 min-w-0 flex-1 bg-transparent text-[16px] text-[#111827] outline-none placeholder:text-[#777]"
         />
 
         {location && (
@@ -140,7 +140,7 @@ function SearchPage() {
       </div>
 
       {/* Property Type */}
-      <div className="relative flex-1" ref={propertyTypeRef}>
+      <div className="relative w-full md:flex-1" ref={propertyTypeRef}>
         <div className="flex h-[45px] items-center rounded-sm border border-[#999999] bg-white px-5">
           <div className="flex shrink-0 items-center text-[#17213D]">
             <PropertyIcon />
@@ -186,7 +186,7 @@ function SearchPage() {
                   setPropertyType(type);
                   setOpenPropertyType(false);
                 }}
-                className={`block w-full px-5 py-3 text-left text-sm transition hover:bg-gray-50 ${
+                className={`block w-full px-5 py-3 text-left text-base transition hover:bg-gray-50 ${
                   propertyType === type
                     ? "bg-gray-50 font-medium text-blue-600"
                     : "text-gray-800"
@@ -203,7 +203,7 @@ function SearchPage() {
         type="primary"
         htmlType="button"
         onClick={search}
-        className="!h-10 !w-25 shrink-0 rounded-lg px-11 text-[18px] font-medium text-white transition !bg-blue hover:!bg-blue"
+        className="!h-10 w-full shrink-0 rounded-lg px-11 !text-base font-medium text-white transition !bg-blue hover:!bg-blue min-[850px]:!w-25"
       >
         Search
       </Button>

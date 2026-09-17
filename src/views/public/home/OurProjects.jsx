@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Segmented } from "antd";
 import images from "../../../config/Images.jsx";
+import TabSection from "../properties/TabSection.jsx";
 
 const tabOptions = [
   {
@@ -11,10 +12,10 @@ const tabOptions = [
     key: 1,
     label: "Upcoming",
   },
-  {
-    key: 2,
-    label: "Sold Projects",
-  },
+  // {
+  //   key: 2,
+  //   label: "Sold Projects",
+  // },
 ];
 
 // Dynamic data - replace with API response
@@ -68,7 +69,7 @@ const projects = [
 
 const ProjectCard = ({ project }) => {
   return (
-    <div className="relative rounded-lg overflow-hidden h-64 shrink-0 w-[calc(50%-8px)] sm:w-[calc(33.33%-11px)] lg:w-[calc(20%-13px)]">
+    <div className="relative rounded-lg overflow-hidden h-64 shrink-0 w-full sm:w-[calc(50%-11px)] md:w-[calc(33.33%-11px)] lg:w-[calc(20%-13px)]">
       <img
         src={project.image}
         alt={project.title}
@@ -102,20 +103,20 @@ const DTCPProjects = () => {
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
             Our DTCP Projects
           </h2>
-          <p className="text-sm text-gray-500 mt-3 max-w-2xl mx-auto">
+          <p className="text-base text-gray-500 mt-3 max-w-2xl mx-auto">
             Highlight the best of your properties by using the List Category
             shortcode. You can list categories, types, cities, areas and states
             of your choice.
           </p>
         </div>
 
-        <div className="flex w-[90%] md:w-[55%] mx-auto mt-6 rounded-lg bg-[#E6E6E6]">
-          {tabOptions.map((tab) => (
+        <div className="mt-6">
+          {/* {tabOptions.map((tab) => (
             <button
               key={tab.key}
               type="button"
               onClick={() => setActiveTab(tab.key)}
-              className={`flex-1 rounded-xs py-2 md:py-2 text-xs md:text-sm transition-colors duration-400 ${
+              className={`flex-1 rounded-xs py-2 md:py-2 text-sm md:text-base transition-colors duration-400 ${
                 activeTab === tab.key
                   ? "bg-secondary text-primary"
                   : "text-black"
@@ -124,10 +125,11 @@ const DTCPProjects = () => {
             >
               {tab.label}
             </button>
-          ))}
+          ))} */}
+          <TabSection tabs={tabOptions} alignment="center" />
         </div>
-        
-        <div className="flex flex-wrap gap-4 mt-10">
+
+        <div className="flex flex-wrap gap-4 mt-12">
           {projects.map((project) => (
             <ProjectCard key={project.id} project={project} />
           ))}

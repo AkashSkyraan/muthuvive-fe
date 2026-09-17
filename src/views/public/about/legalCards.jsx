@@ -1,5 +1,5 @@
 import React from "react";
-import icons from "../config/Icons.jsx";
+import icons from "../../../config/Icons.jsx";
 
 // Dynamic data - replace with API response
 const features = [
@@ -47,16 +47,16 @@ const Features = () => {
             className="bg-gradient-to-br from-[#fdeeea] to-[#eef0fa] rounded-xl p-5 sm:p-6 flex items-start gap-x-4"
           >
             <div
-              className={`w-12 h-12 sm:w-14 sm:h-14 rounded-lg flex items-center justify-center shrink-0 ${feature.iconBg}`}
+              className={`w-12 h-12 sm:w-16 sm:h-16 rounded-lg flex items-center justify-center shrink-0 ${feature.iconBg} self-center`}
             >
               <img src={feature.icon} alt={feature.title} className="w-6 h-6" />
             </div>
 
-            <div>
-              <h3 className="text-sm sm:text-base font-semibold text-gray-900">
+            <div className="text-start">
+              <h3 className="text-lg font-semibold text-gray-900">
                 {feature.title}
               </h3>
-              <p className="text-xs sm:text-sm text-gray-500 mt-2 leading-relaxed">
+              <p className="text-base text-gray-500 mt-2 leading-relaxed">
                 {feature.description}
               </p>
             </div>

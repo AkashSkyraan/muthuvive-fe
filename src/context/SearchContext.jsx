@@ -112,7 +112,7 @@ export const SearchProvider = ({ children }) => {
       longitude,
     };
 
-    console.log("Search:", searchData);
+    // console.log("Search:", searchData);
 
     // API call / navigation here
   };

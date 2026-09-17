@@ -13,12 +13,12 @@ import verifiedDocsIcon from "../assets/icons/verifiedDocs.png";
 import dtcpIcon from "../assets/icons/dtcp.png";
 import legalIcon from "../assets/icons/legal.png";
 import siteVisitIcon from "../assets/icons/siteVisit.png";
-import farmlandIcon from "../assets/icons/farmland.png";
-import dtcpApprovedIcon from "../assets/icons/dtcpland.png";
-import constructionIcon from "../assets/icons/constructionland.png";
-import agriculturalLandsIcon from "../assets/icons/agricultureland.png";
-import commercialLandIcon from "../assets/icons/commercialland.png";
-import investmentLandIcon from "../assets/icons/investmentland.png";
+import farmlandIcon from "../assets/icons/farmland.svg";
+import dtcpApprovedIcon from "../assets/icons/dtcpland.svg";
+import constructionIcon from "../assets/icons/constructionland.svg";
+import agriculturalLandsIcon from "../assets/icons/agricultureland.svg";
+import commercialLandIcon from "../assets/icons/commercialland.svg";
+import investmentLandIcon from "../assets/icons/investmentland.svg";
 import bookmarkIcon from "../assets/icons/bookmark.svg";
 import areaIcon from "../assets/icons/area.png";
 import hospitalIcon from "../assets/icons/hospital.png";
@@ -27,8 +27,33 @@ import checkIcon from "../assets/icons/checkmark.png";
 import starIcon from "../assets/icons/Star.svg";
 import targetIcon from "../assets/icons/target.png";
 import viewIcon from "../assets/icons/view.png";
+import mailBlackIcon from "../assets/icons/mail-black.png";
+import mailBlueIcon from "../assets/icons/mail-blue.png";
+import callBlueIcon from "../assets/icons/call-blue.png";
+import locationBlueIcon from "../assets/icons/location-blue.png";
+import investmentIcon from "../assets/icons/investment.png";
+import commercialResidentialIcon from "../assets/icons/commercial-residential.png";
+import { Icon } from "@iconify/react";
+import qualityIcon from "../assets/icons/quality.png";
+import safetyIcon from "../assets/icons/safety.png";
+import deliveryIcon from "../assets/icons/delivery.png";
+import solutionsIcon from "../assets/icons/solutions.png";
+import bookmarkIcon2 from "../assets/icons/bookmark-2.png";
+import sentIcon from "../assets/icons/sent.png";
+import copyIcon from "../assets/icons/copy.png";
+import diamondIcon from "../assets/icons/diamond.png";
 
 export const icons = {
+  diamondIcon,
+  bookmarkIcon2,
+  copyIcon,
+  sentIcon,
+  qualityIcon,
+  safetyIcon,
+  deliveryIcon,
+  solutionsIcon,
+  investmentIcon,
+  commercialResidentialIcon,
   callBlackIcon,
   callWhiteIcon,
   userAvatarHolder,
@@ -58,6 +83,10 @@ export const icons = {
   starIcon,
   targetIcon,
   viewIcon,
+  mailBlackIcon,
+  mailBlueIcon,
+  callBlueIcon,
+  locationBlueIcon,
 };
 
 export default icons;

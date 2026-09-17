@@ -22,7 +22,7 @@ const PropertiesByArea = () => {
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
             Properties By Area
           </h2>
-          <p className="text-sm text-gray-500 mt-3 max-w-2xl mx-auto">
+          <p className="text-base text-gray-500 mt-3 max-w-2xl mx-auto">
             Highlight the best of your properties by using the List Category
             shortcode. You can list categories, types, cities, areas and states
             of your choice.
@@ -38,14 +38,14 @@ const PropertiesByArea = () => {
               <img
                 src={area.image}
                 alt={area.name}
-                className="w-17 h-17 rounded-sm object-cover shrink-0"
+                className="w-20 h-20 rounded-sm object-cover shrink-0"
               />
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-900">
+                <h3 className="text-base font-semibold text-gray-900">
                   {area.name}
                 </h3>
-                <p className="text-xs text-gray-500 mt-0.5">{area.count}</p>
+                <p className="text-sm text-gray-500 mt-0.5">{area.count}</p>
               </div>
             </div>
           ))}
