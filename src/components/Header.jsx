@@ -276,7 +276,7 @@ const Header = () => {
   // ---------------------------------------------------------
   const accountPopoverContent = isLoggedIn
     ? loggedInPopoverContent
-    : loggedOutPopoverContent;
+    : loggedInPopoverContent;
 
   // ---------------------------------------------------------
   // Properties Popover Content

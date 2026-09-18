@@ -38,7 +38,7 @@ const SellPropertyLayout = () => {
       <SellPropertyProvider>
         <div className="min-h-screen flex flex-col">
           {/* ==================== Header ==================== */}
-          <Header />
+          {/* <Header /> */}
 
           {/* ==================== Page Content ==================== */}
           <main className="flex-1 w-[90%] md:w-[80%] mx-auto">
@@ -108,7 +108,7 @@ const SellPropertyLayout = () => {
           </main>
 
           {/* ==================== Footer ==================== */}
-          <Footer />
+          {/* <Footer /> */}
 
           {/* ==================== Back Confirmation Modal ==================== */}
           <Modal

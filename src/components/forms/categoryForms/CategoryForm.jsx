@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Form, Select } from "antd";
+import { Form, Select, Modal } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 import FormNavigationButtons from "../../fornNavButtons";
 import { useNavigate } from "react-router-dom";
@@ -7,7 +7,8 @@ import { useSellProperty } from "../../../context/SellPropertyContext";
 import {
   getPropertyCategories,
   getSubPropertyCategories,
-} from "../../../api/propertyForm.api";
+} from "../../../api/propertyFormDropdown.api";
+// import { deleteProperty } from "../../../api/property.api";
 
 const selectClassName =
   "!h-12 [&_.ant-select-selector]:!rounded-full [&_.ant-select-selector]:!bg-gray-500 [&_.ant-select-selector]:!px-5 [&_.ant-select-selector]:!h-12 [&_.ant-select-selection-item]:!leading-[48px] [&_.ant-select-selection-placeholder]:!leading-[48px] [&_.ant-select-selection-item]:!text-white [&_.ant-select-selection-placeholder]:!text-white";
@@ -16,7 +17,15 @@ const PropertyCategoryForm = ({ onPrevious }) => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
 
-  const { setCategory } = useSellProperty();
+  const {
+    category,
+    setCategory,
+    formData,
+    updateFormData,
+    propertyId,
+    setPropertyId,
+    resetCategoryDependentData,
+  } = useSellProperty();
 
   // State
   const [propertyCategories, setPropertyCategories] = useState([]);
@@ -24,17 +33,39 @@ const PropertyCategoryForm = ({ onPrevious }) => {
   const [loadingCategories, setLoadingCategories] = useState(false);
 
   // Watched form values
-  const propertyCategory = Form.useWatch("propertyCategory", form);
-  const propertyCategoryType = Form.useWatch("propertyCategoryType", form);
+  const categoryValue = Form.useWatch("category", form);
+  const subCategory = Form.useWatch("sub_category", form);
 
   // Derived values
   const selectedCategory = propertyCategories.find(
-    (category) => category.id === propertyCategory,
+    (category) => category.id === categoryValue,
   );
 
   const isCategoryTypeEnabled = selectedCategory?.has_subcat === 1;
 
+  // ============================================================
+  // Restore previously entered values from Context
+  // ============================================================
+
+  useEffect(() => {
+    const savedCategory = formData.category;
+
+    if (!savedCategory) {
+      return;
+    }
+
+    if (savedCategory.category || savedCategory.sub_category) {
+      form.setFieldsValue({
+        category: savedCategory.category,
+        sub_category: savedCategory.sub_category,
+      });
+    }
+  }, [formData.category, form]);
+
+  // ============================================================
   // Fetch main property categories
+  // ============================================================
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -53,7 +84,10 @@ const PropertyCategoryForm = ({ onPrevious }) => {
     fetchCategories();
   }, []);
 
+  // ============================================================
   // Fetch subcategories when selected category requires them
+  // ============================================================
+
   useEffect(() => {
     if (selectedCategory?.has_subcat !== 1) {
       setSubPropertyCategories([]);
@@ -80,29 +114,148 @@ const PropertyCategoryForm = ({ onPrevious }) => {
     fetchSubCategories();
   }, [selectedCategory]);
 
+  // ============================================================
   // Handle category selection
+  // ============================================================
+
   const handleCategoryChange = (value) => {
     const selectedCategory = propertyCategories.find(
       (category) => category.id === value,
     );
 
-    if (selectedCategory?.has_subcat !== 1) {
-      form.setFieldValue("propertyCategoryType", undefined);
+    // Existing saved category
+    const savedCategory = formData.category?.category;
+
+    // ==========================================================
+    // If propertyId does NOT exist:
+    // No need to show confirmation modal.
+    // ==========================================================
+
+    if (!propertyId) {
+      if (selectedCategory?.has_subcat !== 1) {
+        form.setFieldValue("sub_category", undefined);
+
+        updateFormData("category", "sub_category", undefined);
+      }
+
+      setCategory(value);
+
+      updateFormData("category", "category", value);
+
+      return;
     }
+
+    // ==========================================================
+    // If selected category is the same as existing category:
+    // No modal required.
+    // ==========================================================
+
+    if (savedCategory === value) {
+      return;
+    }
+
+    // ==========================================================
+    // Existing property + category changed
+    // Show confirmation modal.
+    // ==========================================================
+
+    // Put the old category back in the Form immediately.
+    // This prevents the UI from changing before confirmation.
+    form.setFieldValue("category", savedCategory);
+
+    Modal.confirm({
+      title: "Change Property Category ?",
+      content: (
+        <p className="mt-2 text-base leading-6 text-gray-500">
+          Changing the property category will erase the previously entered
+          property details and features. Do you want to continue?
+        </p>
+      ),
+      centered: true,
+      okText: "Yes",
+      cancelText: "No",
+
+      onOk: async () => {
+        try {
+          // ======================================================
+          // Delete existing property
+          // ======================================================
+
+          // Replace this with your actual delete API.
+          //
+          // await deleteProperty({
+          //   property_id: propertyId,
+          // });
+
+          // ======================================================
+          // Clear category-dependent frontend data
+          // ======================================================
+
+          resetCategoryDependentData();
+
+          // Clear old property ID
+          setPropertyId(null);
+
+          // ======================================================
+          // Set newly selected category
+          // ======================================================
+
+          if (selectedCategory?.has_subcat !== 1) {
+            form.setFieldValue("sub_category", undefined);
+
+            updateFormData("category", "sub_category", undefined);
+          }
+
+          form.setFieldValue("category", value);
+
+          setCategory(value);
+
+          updateFormData("category", "category", value);
+        } catch (error) {
+          console.error("Failed to change property category:", error);
+
+          // Restore old category if delete failed
+          form.setFieldValue("category", savedCategory);
+        }
+      },
+    });
   };
 
+  // ============================================================
+  // Handle sub category selection
+  // ============================================================
+
+  const handleCategoryTypeChange = (value) => {
+    updateFormData("category", "sub_category", value);
+  };
+
+  // ============================================================
   // Handle next
+  // ============================================================
+
   const handleNext = async () => {
     const values = await form.validateFields();
 
-    setCategory(values.propertyCategory);
+    // Keep the category state because you are using it
+    // to determine which next form should be rendered.
+    setCategory(values.category);
 
+    // Save the complete Step 1 data into Context
+    updateFormData("category", "category", values.category);
+
+    updateFormData("category", "sub_category", values.sub_category);
+
+    // No API call here.
+    // Step 1 only saves data and moves to Step 2.
     navigate("/sell-property/location");
   };
 
+  // ============================================================
   // Button state
+  // ============================================================
+
   const isNextDisabled =
-    !propertyCategory || (isCategoryTypeEnabled && !propertyCategoryType);
+    !categoryValue || (isCategoryTypeEnabled && !subCategory);
 
   return (
     <div className="w-full max-w-xl">
@@ -110,10 +263,10 @@ const PropertyCategoryForm = ({ onPrevious }) => {
         <Form.Item
           label={
             <span className="text-base font-semibold text-gray-900">
-              Select Property Category
+              Select Category
             </span>
           }
-          name="propertyCategory"
+          name="category"
           rules={[
             {
               required: true,
@@ -124,7 +277,7 @@ const PropertyCategoryForm = ({ onPrevious }) => {
           <Select
             placeholder="Select your Category"
             suffixIcon={<DownOutlined className="text-gray-900!" />}
-            className={`w-full bg-[#f3f3f3]! !text-base
+            className={`w-full bg-[#f3f3f3]! !text-base   
              ${selectClassName}`}
             classNames={{
               popup: {
@@ -140,25 +293,18 @@ const PropertyCategoryForm = ({ onPrevious }) => {
           />
         </Form.Item>
 
-        {/* =====================================================
-            PROPERTY CATEGORY TYPE
-
-            Only render this Form.Item when the selected
-            category has sub_cat === 1.
-            ===================================================== */}
-
         {isCategoryTypeEnabled && (
           <Form.Item
             label={
               <span className="text-base font-semibold text-gray-900">
-                Select Property Category type
+                Select Sub Category
               </span>
             }
-            name="propertyCategoryType"
+            name="sub_category"
             rules={[
               {
                 required: true,
-                message: "Please select a category type",
+                message: "Please select a sub category",
               },
             ]}
           >
@@ -176,6 +322,7 @@ const PropertyCategoryForm = ({ onPrevious }) => {
                 label: "sub_name",
                 value: "id",
               }}
+              onChange={handleCategoryTypeChange}
             />
           </Form.Item>
         )}
