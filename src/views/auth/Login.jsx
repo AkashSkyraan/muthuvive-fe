@@ -1,8 +1,11 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { images } from "../../config/Images";
 import Button from "../../components/common/Button";
 import { preventInvalidSpaces } from "../../utils/helper";
+
+import { message } from "antd";
+import { LoginRequest } from "../../api/auth.api";
 
 function EyeIcon({ visible }) {
   return visible ? (
@@ -34,8 +37,15 @@ function EyeIcon({ visible }) {
 }
 
 function Login() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [showPassword, setShowPassword] = useState(false);
-  const [identifier, setIdentifier] = useState("");
+  const [identifier, setIdentifier] = useState(
+    location.state?.identifier || "",
+  );
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const isMobile = /^\d+$/.test(identifier) && identifier.length > 0;
 
@@ -43,9 +53,40 @@ function Login() {
     setIdentifier(e.target.value);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    // console.log("Login submitted");
+
+    if (!identifier.trim()) {
+      message.error("Please enter your email or mobile number");
+      return;
+    }
+
+    if (!password) {
+      message.error("Please enter your password");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const response = await LoginRequest({
+        identifier: identifier.trim(),
+        password,
+      });
+
+      if (response?.success === true || response?.success === 1) {
+        message.success(response?.message || "Login successful");
+
+        navigate("/");
+        return;
+      }
+
+      message.error(response?.message || "Login failed");
+    } catch (error) {
+      message.error("Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -110,6 +151,8 @@ function Login() {
             <input
               id="password"
               type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your Password"
               autoComplete="current-password"
               required
@@ -130,6 +173,7 @@ function Login() {
           <div className="mt-2 text-right">
             <Link
               to="/forgot-password"
+              state={{ identifier }}
               className="text-sm font-medium text-blue-600 transition hover:text-blue-700 hover:underline"
             >
               Forgot Password?
@@ -140,6 +184,8 @@ function Login() {
         <Button
           htmlType="submit"
           type="primary"
+          loading={loading}
+          disabled={loading}
           className="mt-6 !h-12 w-full rounded-lg bg-[#165BEF] text-md font-semibold text-white shadow-sm transition hover:bg-[#0f4ed8] hover:shadow-md active:scale-[0.99]"
         >
           Login

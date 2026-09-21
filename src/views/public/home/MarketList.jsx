@@ -111,8 +111,11 @@ const MarketListings = () => {
             10 listings = 10 cards, laid out in this responsive grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10 text-start">
           {listings.map((listing) => (
-            <Link to={`/properties/${listing.category}/${listing.id}`}>
-              <ProjectCard key={listing.id} listing={listing} />
+            <Link
+              to={`/properties/${listing.category}/${listing.id}`}
+              key={listing.id}
+            >
+              <ProjectCard listing={listing} />
             </Link>
           ))}
         </div>

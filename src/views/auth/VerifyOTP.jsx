@@ -1,25 +1,53 @@
 import React, { useEffect, useRef, useState } from "react";
+
 import { useNavigate, useLocation } from "react-router-dom";
+
+import { message } from "antd";
+
 import { images } from "../../config/Images";
 import Button from "../../components/common/Button";
+
+import { requestOTP, verifyOTP } from "../../api/auth.api";
+
+import { useSignup } from "../../context/SignupContext";
 
 function VerifyOTP() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const {
+    verifyEmail,
+    verifyMobile,
+    resetEmailVerification,
+    resetMobileVerification,
+  } = useSignup();
+
+  const { identifier, type, purpose, from } = location.state || {};
+
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  const [timer, setTimer] = useState(131);
+
+  const [timer, setTimer] = useState(20);
+
+  const [loading, setLoading] = useState(false);
+
+  const [resendLoading, setResendLoading] = useState(false);
 
   const inputRefs = useRef([]);
 
-  const identifier = location.state?.identifier || "muthuvive's@gmail.com";
-
-  // OTP timer
   useEffect(() => {
-    if (timer <= 0) return;
+    if (timer <= 0) {
+      return;
+    }
 
     const interval = setInterval(() => {
-      setTimer((prev) => prev - 1);
+      setTimer((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+
+        return prev - 1;
+      });
     }, 1000);
 
     return () => clearInterval(interval);
@@ -27,33 +55,32 @@ function VerifyOTP() {
 
   const formatTimer = () => {
     const minutes = Math.floor(timer / 60);
+
     const seconds = timer % 60;
 
-    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(
+    return `${String(minutes).padStart(
       2,
       "0",
-    )}`;
+    )}:${String(seconds).padStart(2, "0")}`;
   };
 
   const handleOtpChange = (index, value) => {
-    // Only numbers
-    if (!/^\d*$/.test(value)) return;
+    if (!/^\d*$/.test(value)) {
+      return;
+    }
 
     const newOtp = [...otp];
 
-    // Only keep one digit
     newOtp[index] = value.slice(-1);
 
     setOtp(newOtp);
 
-    // Move to next input
     if (value && index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
   };
 
   const handleKeyDown = (index, e) => {
-    // Backspace → move to previous input
     if (e.key === "Backspace" && !otp[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
@@ -67,9 +94,11 @@ function VerifyOTP() {
       .replace(/\D/g, "")
       .slice(0, 6);
 
-    if (!pastedData) return;
+    if (!pastedData) {
+      return;
+    }
 
-    const newOtp = [...otp];
+    const newOtp = ["", "", "", "", "", ""];
 
     pastedData.split("").forEach((digit, index) => {
       newOtp[index] = digit;
@@ -82,8 +111,95 @@ function VerifyOTP() {
     inputRefs.current[nextIndex]?.focus();
   };
 
-  const handleVerify = (event) => {
-    event.preventDefault();
+  const handleBack = () => {
+    if (from === "signup" || purpose === 1) {
+      if (type === "email") {
+        resetEmailVerification();
+      }
+
+      if (type === "mobile") {
+        resetMobileVerification();
+      }
+
+      navigate("/signup", {
+        state: {
+          editing: true,
+          type,
+          identifier,
+        },
+      });
+
+      return;
+    }
+
+    if (from === "forgot-password") {
+      navigate("/forgot-password", {
+        state: {
+          identifier,
+          type,
+        },
+      });
+
+      return;
+    }
+
+    navigate("/forgot-password", {
+      state: {
+        identifier,
+        type,
+      },
+    });
+  };
+  const handleEdit = () => {
+    handleBack();
+  };
+
+  const handleResend = async () => {
+    if (timer > 0 || resendLoading) {
+      return;
+    }
+
+    try {
+      setResendLoading(true);
+
+      const payload = {
+        type,
+        purpose,
+      };
+
+      if (type === "email") {
+        payload.email = identifier;
+      } else if (type === "mobile") {
+        payload.mobile = identifier;
+      }
+
+      const response = await requestOTP(payload);
+
+      if (response?.success === 1) {
+        message.success("OTP sent successfully");
+
+        setOtp(["", "", "", "", "", ""]);
+
+        // Restart timer
+        setTimer(180);
+
+        setTimeout(() => {
+          inputRefs.current[0]?.focus();
+        }, 100);
+      } else {
+        message.error(response?.message || "Failed to resend OTP");
+      }
+    } catch (error) {
+      console.error("Resend OTP Error:", error);
+
+      message.error(error?.response?.data?.message || "Failed to resend OTP");
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
+  const handleVerify = async (event) => {
+    event?.preventDefault();
 
     const otpValue = otp.join("");
 
@@ -91,32 +207,105 @@ function VerifyOTP() {
       return;
     }
 
-    // console.log("OTP:", otpValue);
+    try {
+      setLoading(true);
 
-    // Example:
-    // navigate("/reset-password", {
-    //   state: { identifier, otp: otpValue },
-    // });
-  };
+      const response = await verifyOTP({
+        type,
+        purpose,
+        otp: otpValue,
 
-  const handleResend = () => {
-    if (timer > 0) return;
+        ...(type === "email"
+          ? {
+              email: identifier,
+            }
+          : {
+              mobile: identifier,
+            }),
+      });
 
-    // console.log("Resend OTP");
+      if (response?.success === 1) {
+        message.success("OTP verified successfully");
 
-    setOtp(["", "", "", "", "", ""]);
-    setTimer(131);
+        // Signup OTP
+        if (purpose === 1) {
+          if (type === "email") {
+            verifyEmail(identifier);
 
-    inputRefs.current[0]?.focus();
-  };
+            navigate("/signup", {
+              replace: true,
+            });
 
-  const handleBack = () => {
-    navigate("/forgot-password");
+            return;
+          }
+
+          if (type === "mobile") {
+            const cleanMobile = identifier
+              .replace("+91", "")
+              .replace(/\s/g, "");
+
+            verifyMobile(cleanMobile);
+
+            navigate("/signup", {
+              replace: true,
+            });
+
+            return;
+          }
+        }
+
+        // Forgot Password OTP
+        if (purpose === 2) {
+          navigate("/reset-password", {
+            replace: true,
+            state: {
+              passwordResetVerified: true,
+              identifier,
+              type,
+            },
+          });
+
+          return;
+        }
+
+        // Login email verification
+        if (from === "login-email") {
+          navigate("/login", {
+            replace: true,
+            state: {
+              emailVerified: true,
+              verifiedEmail: identifier,
+            },
+          });
+
+          return;
+        }
+
+       
+        navigate("/forgot-password", {
+          replace: true,
+          state: {
+            identifier,
+            type,
+          },
+        });
+      } else {
+        message.error(response?.message || "OTP verification failed");
+      }
+    } catch (error) {
+      console.error("Verify OTP Error:", error);
+
+      message.error(
+        error?.response?.data?.message ||
+          "Something went wrong. Please try again.",
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <>
-      {/* Logo */}
       <div className="flex h-[10px] w-full items-center justify-center">
         <img src={images.logo} alt="Logo" className="w-[180px]" />
       </div>
@@ -133,13 +322,13 @@ function VerifyOTP() {
         sent to your registered Email Address
       </p>
 
-      {/* Email */}
+      {/* Identifier */}
       <div className="mt-6 flex items-center justify-center gap-3">
         <span className="text-sm font-medium text-gray-700">{identifier}</span>
 
         <button
           type="button"
-          onClick={() => navigate("/signup")}
+          onClick={handleEdit}
           aria-label="Edit email"
           className="flex h-6 w-6 items-center justify-center text-gray-500 transition hover:text-gray-800"
         >
@@ -151,6 +340,7 @@ function VerifyOTP() {
               strokeLinecap="round"
               strokeLinejoin="round"
             />
+
             <path
               d="m14 8 2 2"
               stroke="currentColor"
@@ -169,6 +359,7 @@ function VerifyOTP() {
         >
           Email / Mobile number
         </label>
+
         <div className="flex justify-start gap-4">
           {otp.map((digit, index) => (
             <input
@@ -189,19 +380,24 @@ function VerifyOTP() {
           ))}
         </div>
 
-        {/* Timer */}
-        <div className="mt-8 text-center">
+        {/* Resend */}
+        <div className="mt-8 flex h-5 justify-center">
           {timer > 0 ? (
-            <p className="text-sm font-medium text-gray-500">
-              Resend OTP in {formatTimer()}
-            </p>
+            <div className="flex items-center text-sm font-medium text-gray-500">
+              <span className="w-[100px] text-right">Resend OTP in</span>
+
+              <span className="ml-2 w-[45px] text-left tabular-nums">
+                {formatTimer()}
+              </span>
+            </div>
           ) : (
             <button
               type="button"
               onClick={handleResend}
-              className="text-sm font-semibold text-[#165BEF] hover:underline"
+              disabled={resendLoading}
+              className="w-[147px] text-left text-sm font-semibold text-[#165BEF] hover:underline disabled:opacity-50"
             >
-              Resend OTP
+              {resendLoading ? "Sending..." : "Resend OTP"}
             </button>
           )}
         </div>
@@ -210,10 +406,10 @@ function VerifyOTP() {
         <Button
           htmlType="submit"
           type="primary"
-          disabled={otp.join("").length !== 6}
+          disabled={otp.join("").length !== 6 || loading || timer === 0}
           className="mt-8 !h-12 w-full rounded-lg bg-[#165BEF] text-md font-semibold text-white shadow-sm transition hover:bg-[#0f4ed8] hover:shadow-md active:scale-[0.99]"
         >
-          Verify
+          {loading ? "Verifying..." : "Verify"}
         </Button>
 
         {/* Back */}

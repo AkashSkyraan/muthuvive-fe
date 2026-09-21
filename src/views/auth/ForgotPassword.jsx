@@ -1,42 +1,20 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { images } from "../../config/Images";
 import Button from "../../components/common/Button";
 import { preventInvalidSpaces } from "../../utils/helper";
-
-function EyeIcon({ visible }) {
-  return visible ? (
-    <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
-      <path
-        d="M2.5 12s3.5-5.5 9.5-5.5 9.5 5.5 9.5 5.5-3.5 5.5-9.5 5.5S2.5 12 2.5 12Z"
-        stroke="currentColor"
-        strokeWidth="1.6"
-      />
-      <circle cx="12" cy="12" r="2.5" stroke="currentColor" strokeWidth="1.6" />
-    </svg>
-  ) : (
-    <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
-      <path
-        d="M3 3l18 18"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-      />
-      <path
-        d="M10.6 6.7A10.4 10.4 0 0 1 12 6.5c6 0 9.5 5.5 9.5 5.5a17 17 0 0 1-3.1 3.5M6.1 6.9C3.8 8.5 2.5 12 2.5 12s3.5 5.5 9.5 5.5c.8 0 1.5-.1 2.2-.3"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
+import { requestOTP } from "../../api/auth.api";
+import { message } from "antd";
 
 function ForgotPassword() {
   const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(false);
-  const [identifier, setIdentifier] = useState("");
+  const location = useLocation();
+
+  const [identifier, setIdentifier] = useState(
+    location.state?.identifier || "",
+  );
+
+  const [loading, setLoading] = useState(false);
 
   const isMobile = /^\d+$/.test(identifier) && identifier.length > 0;
 
@@ -44,13 +22,57 @@ function ForgotPassword() {
     setIdentifier(e.target.value);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    // console.log("Login submitted");
+
+    if (!identifier.trim()) {
+      message.error("Please enter your email or mobile number");
+      return;
+    }
+
+    await handleOTPGenerate();
   };
 
-  const handleOTPGenerate = () => {
-    navigate("/verify-otp");
+  const handleOTPGenerate = async () => {
+    const value = identifier.trim();
+
+    if (!value) {
+      message.error("Please enter your email or mobile number");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const type = /^\d+$/.test(value) ? "mobile" : "email";
+
+      const response = await requestOTP({
+        type,
+        purpose: 2,
+        ...(type === "email" ? { email: value } : { mobile: value }),
+      });
+
+      if (response?.success === true || response?.success === 1) {
+        message.success(response?.message || "OTP sent successfully");
+
+        navigate("/verify-otp", {
+          state: {
+            identifier: value,
+            from: "forgot-password",
+            type,
+            purpose: 2,
+          },
+        });
+
+        return;
+      }
+
+      message.error(response?.message || "Failed to send OTP");
+    } catch (error) {
+      message.error(error?.response?.data?.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -102,22 +124,18 @@ function ForgotPassword() {
           </div>
         </div>
 
-        {/* Password */}
-
         <Button
           htmlType="submit"
           type="primary"
+          loading={loading}
+          disabled={loading}
           className="mt-6 !h-11 w-full rounded-lg bg-[#165BEF] text-md font-semibold text-white shadow-sm transition hover:bg-[#0f4ed8] hover:shadow-md active:scale-[0.99]"
-          onClick={handleOTPGenerate}
         >
           Send OTP
         </Button>
 
         <Link to="/login">
-          <Button
-            // htmlType="submit"
-            className="mt-6 !h-11 w-full rounded-lg bg-[#165BEF] text-md font-semibold text-white shadow-sm transition hover:bg-[#0f4ed8] hover:shadow-md active:scale-[0.99]"
-          >
+          <Button className="mt-6 !h-11 w-full rounded-lg bg-[#165BEF] text-md font-semibold text-white shadow-sm transition hover:bg-[#0f4ed8] hover:shadow-md active:scale-[0.99]">
             Back
           </Button>
         </Link>

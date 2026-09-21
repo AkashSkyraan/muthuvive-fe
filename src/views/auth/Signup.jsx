@@ -1,11 +1,13 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { message } from "antd";
+
 import { images } from "../../config/Images";
 import Button from "../../components/common/Button";
 import { preventInvalidSpaces } from "../../utils/helper";
-import { requestOTP } from "../../api/auth.api";
-import EmailOtpModal from "../../components/modals/email.modal";
+import { requestOTP, signup } from "../../api/auth.api";
+
+import { useSignup } from "../../context/SignupContext";
 
 function EyeIcon({ visible }) {
   return visible ? (
@@ -15,6 +17,7 @@ function EyeIcon({ visible }) {
         stroke="currentColor"
         strokeWidth="1.6"
       />
+
       <circle cx="12" cy="12" r="2.5" stroke="currentColor" strokeWidth="1.6" />
     </svg>
   ) : (
@@ -25,6 +28,7 @@ function EyeIcon({ visible }) {
         strokeWidth="1.7"
         strokeLinecap="round"
       />
+
       <path
         d="M10.6 6.7A10.4 10.4 0 0 1 12 6.5c6 0 9.5 5.5 9.5 5.5a17 17 0 0 1-3.1 3.5M6.1 6.9C3.8 8.5 2.5 12 2.5 12s3.5 5.5 9.5 5.5c.8 0 1.5-.1 2.2-.3"
         stroke="currentColor"
@@ -38,25 +42,52 @@ function EyeIcon({ visible }) {
 
 function Signup() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const {
+    signupData,
+    resetEmailVerification,
+    resetMobileVerification,
+    clearSignupData,
+  } = useSignup();
+
+  const { emailVerified, mobileVerified } = signupData;
+
   const [showPassword, setShowPassword] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
-    mobile: "",
+    email: signupData.email || "",
+    mobile: signupData.mobile || "",
     password: "",
   });
 
-  const [emailVerified, setEmailVerified] = useState(false);
-  const [mobileVerified, setMobileVerified] = useState(false);
-
   const [verifyingEmail, setVerifyingEmail] = useState(false);
+
   const [verifyingMobile, setVerifyingMobile] = useState(false);
 
   const [emailError, setEmailError] = useState("");
+
   const [mobileError, setMobileError] = useState("");
 
-  // email
+  const [loading, setLoading] = useState(false);
+
+  /*
+   * OTP verify செய்து signup page-க்கு வந்த பிறகு
+   * Context value formData-க்கு sync ஆகும்.
+   */
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      email: signupData.email || prev.email,
+      mobile: signupData.mobile || prev.mobile,
+    }));
+  }, [signupData.email, signupData.mobile]);
+
+  // =========================================================
+  // VALIDATIONS
+  // =========================================================
+
   const isValidEmail = (email) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
   };
@@ -71,14 +102,20 @@ function Signup() {
     if (name === "email") {
       const email = value.trim();
 
-      if (emailVerified) return;
+      if (emailVerified) {
+        return;
+      }
 
       setFormData((prev) => ({
         ...prev,
         email,
       }));
 
-      // Clear error while typing
+      // Email changed => old verification invalid
+      if (email !== signupData.email) {
+        resetEmailVerification();
+      }
+
       if (!email) {
         setEmailError("");
         return;
@@ -98,6 +135,7 @@ function Signup() {
       [name]: value,
     }));
   };
+
   const handleEmailVerify = async () => {
     const email = formData.email.trim();
 
@@ -133,10 +171,13 @@ function Signup() {
             identifier: email,
             type: "email",
             purpose: 1,
+            from: "signup",
           },
         });
       } else {
-        setEmailError(response?.data?.message || "Unable to send OTP");
+        setEmailError(
+          response?.data?.message || response?.message || "Unable to send OTP",
+        );
       }
     } catch (error) {
       console.error("Email OTP Error:", error);
@@ -149,8 +190,6 @@ function Signup() {
       setVerifyingEmail(false);
     }
   };
-
-  // mobile
 
   const handleMobileVerify = async () => {
     const mobile = formData.mobile.trim();
@@ -184,10 +223,10 @@ function Signup() {
 
         navigate("/verify-otp", {
           state: {
-            identifier: `+91 ${mobile}`,
-            mobile,
+            identifier: `+91${mobile}`,
             type: "mobile",
             purpose: 1,
+            from: "signup",
           },
         });
       } else {
@@ -207,21 +246,96 @@ function Signup() {
     }
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!emailVerified) {
+    setEmailError("");
+    setMobileError("");
+
+    if (!emailVerified && !mobileVerified) {
+      message.error("Please verify either your email or mobile number");
+      return;
+    }
+
+    if (formData.email && !emailVerified) {
       setEmailError("Please verify your email");
       return;
     }
 
-    if (!mobileVerified) {
+    if (formData.mobile && !mobileVerified) {
       setMobileError("Please verify your mobile number");
       return;
     }
 
-    console.log("Signup Data:", formData);
+    const payload = {
+      user_name: formData.name,
+      password: formData.password,
+      ...(emailVerified && formData.email ? { email: formData.email } : {}),
+
+      ...(mobileVerified && formData.mobile ? { mobile: formData.mobile } : {}),
+    };
+
+    try {
+      setLoading(true);
+
+      const response = await signup(payload);
+
+      console.log("SIGNUP RESPONSE:", response);
+
+      if (response?.success === 1 || response?.success === true) {
+        message.success(response?.message || "Signup successful");
+
+        // Clear Context after successful signup
+        clearSignupData();
+
+        navigate("/", {
+          replace: true,
+        });
+
+        return;
+      }
+
+      message.error(response?.message || "Signup failed");
+    } catch (error) {
+      console.error("Signup Error:", error);
+
+      message.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Something went wrong. Please try again.",
+      );
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    const state = location.state;
+
+    if (!state?.editing || !state?.identifier) {
+      return;
+    }
+
+    const identifier = state.identifier;
+
+    if (state.type === "email") {
+      setFormData((prev) => ({
+        ...prev,
+        email: identifier,
+      }));
+
+      return;
+    }
+
+    if (state.type === "mobile") {
+      const cleanMobile = identifier.replace("+91", "").replace(/\s/g, "");
+
+      setFormData((prev) => ({
+        ...prev,
+        mobile: cleanMobile,
+      }));
+    }
+  }, [location.state]);
 
   return (
     <>
@@ -243,7 +357,10 @@ function Signup() {
       </p>
 
       <form onSubmit={handleSubmit} className="mt-9 text-left">
-        {/* Full Name */}
+        {/* =====================================================
+            FULL NAME
+        ====================================================== */}
+
         <div>
           <label
             htmlFor="name"
@@ -267,7 +384,10 @@ function Signup() {
           />
         </div>
 
-        {/* Email */}
+        {/* =====================================================
+            EMAIL
+        ====================================================== */}
+
         <div className="mt-5">
           <label
             htmlFor="email"
@@ -291,7 +411,6 @@ function Signup() {
               onKeyDown={preventInvalidSpaces}
               placeholder="Enter your email"
               autoComplete="email"
-              required
               disabled={emailVerified}
               className="min-w-0 flex-1 bg-transparent px-3 text-sm text-gray-900 outline-none placeholder:text-gray-400 disabled:bg-gray-50"
             />
@@ -320,7 +439,10 @@ function Signup() {
           )}
         </div>
 
-        {/* Mobile */}
+        {/* =====================================================
+            MOBILE
+        ====================================================== */}
+
         <div className="mt-5">
           <label
             htmlFor="mobile"
@@ -354,7 +476,10 @@ function Signup() {
                     mobile: value,
                   }));
 
-                  setMobileVerified(false);
+                  // New mobile = not verified
+                  if (value !== signupData.mobile) {
+                    resetMobileVerification();
+                  }
 
                   if (!value) {
                     setMobileError("");
@@ -367,7 +492,6 @@ function Signup() {
               }}
               placeholder="Enter your mobile number"
               autoComplete="tel"
-              required
               disabled={mobileVerified}
               className="min-w-0 flex-1 bg-transparent px-3 text-sm text-gray-900 outline-none placeholder:text-gray-400 disabled:bg-gray-50"
             />
@@ -395,7 +519,10 @@ function Signup() {
           )}
         </div>
 
-        {/* Password */}
+        {/* =====================================================
+            PASSWORD
+        ====================================================== */}
+
         <div className="mt-5">
           <label
             htmlFor="password"
@@ -409,7 +536,7 @@ function Signup() {
               id="password"
               name="password"
               type={showPassword ? "text" : "password"}
-              maxLength={50}
+              maxLength={25}
               value={formData.password}
               onChange={handleChange}
               onKeyDown={preventInvalidSpaces}
@@ -430,16 +557,23 @@ function Signup() {
           </div>
         </div>
 
-        {/* Sign Up */}
+        {/* =====================================================
+            SIGN UP
+        ====================================================== */}
+
         <Button
           htmlType="submit"
           type="primary"
+          disabled={loading}
           className="mt-6 !h-10 w-full rounded-lg bg-[#165BEF] text-md font-semibold text-white"
         >
-          Sign Up
+          {loading ? "Signing Up..." : "Sign Up"}
         </Button>
 
-        {/* Back */}
+        {/* =====================================================
+            BACK
+        ====================================================== */}
+
         <Button
           htmlType="button"
           type="default"
@@ -450,7 +584,10 @@ function Signup() {
         </Button>
       </form>
 
-      {/* Login */}
+      {/* =====================================================
+          LOGIN
+      ====================================================== */}
+
       <p className="mt-7 text-center text-sm text-gray-500">
         You Already have Account ?{" "}
         <Link

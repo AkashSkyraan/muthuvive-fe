@@ -14,24 +14,18 @@ const Header = () => {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // ---------------------------------------------------------
-  // Desktop and Mobile Account Popover states
-  // ---------------------------------------------------------
+  
   const [isDesktopAccountOpen, setIsDesktopAccountOpen] = useState(false);
 
   const [isMobileAccountOpen, setIsMobileAccountOpen] = useState(false);
 
-  // ---------------------------------------------------------
-  // Mobile Properties Popover state
-  // ---------------------------------------------------------
+
   const [isMobilePropertiesOpen, setIsMobilePropertiesOpen] = useState(false);
 
   // Lock scroll if account Popover is open
   useScrollLock(isDesktopAccountOpen || isMobileAccountOpen);
 
-  // ---------------------------------------------------------
-  // Authentication
-  // ---------------------------------------------------------
+ 
   const isLoggedIn = !!localStorage.getItem("authToken");
 
   const handleLogout = () => {
@@ -39,17 +33,13 @@ const Header = () => {
     window.location.reload();
   };
 
-  // ---------------------------------------------------------
-  // Close Account Popover
-  // ---------------------------------------------------------
+  
   const closeAccountPopover = () => {
     setIsDesktopAccountOpen(false);
     setIsMobileAccountOpen(false);
   };
 
-  // ---------------------------------------------------------
-  // Property Categories
-  // ---------------------------------------------------------
+  
   const propertyCategories = [
     {
       key: "farmland",
@@ -88,9 +78,7 @@ const Header = () => {
     },
   ];
 
-  // ---------------------------------------------------------
-  // Logged Out Account Popover
-  // ---------------------------------------------------------
+  
   const loggedOutPopoverContent = (
     <div className="w-75 p-1 z-40">
       <div className="flex items-center gap-x-2">

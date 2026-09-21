@@ -20,7 +20,7 @@ const Testimonials = () => {
   useEffect(() => {
     const fetchTestimonials = async () => {
       const data = await getTestimonials();
-      setTestimonials(data);
+      setTestimonials([data]);
     };
 
     fetchTestimonials();
@@ -86,47 +86,50 @@ const Testimonials = () => {
             ref={scrollRef}
             className="flex items-stretch gap-x-5 overflow-x-auto scroll-smooth snap-x snap-mandatory px-12 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
           >
-            {testimonials.map((testimonial) => (
-              <div
-                key={testimonial.id}
-                data-card
-                className="bg-white border border-gray-100 rounded-lg p-5 w-full sm:w-[240px] lg:w-[calc(33.33%-14px)] shrink-0 snap-center md:snap-start text-start flex flex-col"
-              >
-                <div className="flex items-center gap-x-3">
-                  <img
-                    src={testimonial.image}
-                    alt={testimonial.name}
-                    className="w-14 h-14 rounded-full object-cover shrink-0"
-                  />
+            {testimonials
+              ?.filter((testimonial) => testimonial)
+              .map((testimonial) => (
+                <div
+                  key={testimonial.id}
+                  data-card
+                  className="bg-white border border-gray-100 rounded-lg p-5 w-full sm:w-[240px] lg:w-[calc(33.33%-14px)] shrink-0 snap-center md:snap-start text-start flex flex-col"
+                >
+                  <div className="flex items-center gap-x-3">
+                    <img
+                      src={testimonial.image}
+                      alt={testimonial.name}
+                      className="w-14 h-14 rounded-full object-cover shrink-0"
+                    />
 
-                  <div>
-                    <h3 className="text-base font-semibold text-gray-900">
-                      {testimonial.name}
-                    </h3>
-                    <p className="text-sm text-gray-500 mt-0.5">
-                      {testimonial.location}
-                    </p>
+                    <div>
+                      <h3 className="text-base font-semibold text-gray-900">
+                        {testimonial.name}
+                      </h3>
+
+                      <p className="text-sm text-gray-500 mt-0.5">
+                        {testimonial.location}
+                      </p>
+                    </div>
+                  </div>
+
+                  <p className="text-sm text-gray-500 mt-4 leading-relaxed">
+                    {testimonial.content}
+                  </p>
+
+                  <div className="flex items-center gap-x-1 mt-auto pt-4">
+                    {Array.from({ length: testimonial.rating || 0 }).map(
+                      (_, index) => (
+                        <img
+                          key={index}
+                          src={icons.starIcon}
+                          alt="star"
+                          className="w-5 h-5"
+                        />
+                      ),
+                    )}
                   </div>
                 </div>
-
-                <p className="text-sm text-gray-500 mt-4 leading-relaxed">
-                  {testimonial.content}
-                </p>
-
-                <div className="flex items-center gap-x-1 mt-auto pt-4">
-                  {Array.from({ length: testimonial.rating }).map(
-                    (_, index) => (
-                      <img
-                        key={index}
-                        src={icons.starIcon}
-                        alt="star"
-                        className="w-5 h-5"
-                      />
-                    ),
-                  )}
-                </div>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
       </div>
