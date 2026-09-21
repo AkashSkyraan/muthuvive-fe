@@ -121,9 +121,11 @@ const MarketListings = () => {
         </div>
 
         <div className="flex justify-center mt-10">
-          <Button type="primary" className="!bg-secondary !text-base">
-            Explore All Lands
-          </Button>
+          <Link to="search">
+            <Button type="primary" className="!bg-secondary !text-base">
+              Explore All Lands
+            </Button>
+          </Link>
         </div>
       </div>
     </div>

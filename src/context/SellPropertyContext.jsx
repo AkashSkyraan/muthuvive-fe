@@ -3,10 +3,13 @@ import React, { createContext, useContext, useState } from "react";
 const SellPropertyContext = createContext(null);
 
 export const SellPropertyProvider = ({ children }) => {
+  // Used for deciding which property form should be rendered
   const [category, setCategory] = useState(null);
 
-  const [currentStep, setCurrentStep] = useState(0);
+  // Stores the backend property ID after the property is created
+  const [propertyId, setPropertyId] = useState(null);
 
+  // Step-wise form data
   const [formData, setFormData] = useState({
     category: {},
     location: {},
@@ -15,10 +18,39 @@ export const SellPropertyProvider = ({ children }) => {
     media: {},
   });
 
-  const updateFormData = (section, values) => {
-    setFormData((previous) => ({
-      ...previous,
-      [section]: values,
+  // Update a single field inside a section
+  const updateFormData = (section, key, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      [section]: {
+        ...prev[section],
+        [key]: value,
+      },
+    }));
+  };
+
+  // Reset the complete sell-property form
+  const resetFormData = () => {
+    setFormData({
+      category: {},
+      location: {},
+      propertyDetails: {},
+      propertyFeatures: {},
+      media: {},
+    });
+
+    setCategory(null);
+    setPropertyId(null);
+  };
+
+  // Reset only the data that depends on the selected category
+  const resetCategoryDependentData = () => {
+    setFormData((prev) => ({
+      ...prev,
+      location: {},
+      propertyDetails: {},
+      propertyFeatures: {},
+      media: {},
     }));
   };
 
@@ -26,11 +58,14 @@ export const SellPropertyProvider = ({ children }) => {
     category,
     setCategory,
 
-    // currentStep,
-    // setCurrentStep,
+    propertyId,
+    setPropertyId,
 
     formData,
+    setFormData,
     updateFormData,
+    resetFormData,
+    resetCategoryDependentData,
   };
 
   return (

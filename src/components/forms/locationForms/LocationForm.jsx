@@ -3,33 +3,13 @@ import { Form, Select } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 import FormNavigationButtons from "../../fornNavButtons";
 import { useNavigate } from "react-router-dom";
-import { getLocationCategories } from "../../../api/propertyForm.api";
+import { getLocationCategories } from "../../../api/propertyFormDropdown.api";
+import { useSellProperty } from "../../../context/SellPropertyContext";
+
+import { postSellPropertyForm } from "../../../api/sellPropertyForm.api";
 
 // Dynamic data - replace with API response
 const countries = [{ value: "india", label: "India" }];
-
-// Dynamic data - replace with API response
-const states = [
-  { value: "tamil-nadu", label: "Tamil Nadu" },
-  { value: "kerala", label: "Kerala" },
-  { value: "karnataka", label: "Karnataka" },
-  { value: "andhra-pradesh", label: "Andhra Pradesh" },
-];
-
-// Dynamic data - replace with API response
-const districts = [
-  { value: "coimbatore", label: "Coimbatore" },
-  { value: "chennai", label: "Chennai" },
-  { value: "madurai", label: "Madurai" },
-  { value: "tirupur", label: "Tirupur" },
-];
-
-// Dynamic data - replace with API response
-const cities = [
-  { value: "peelamedu", label: "Peelamedu" },
-  { value: "gandhipuram", label: "Gandhipuram" },
-  { value: "saibaba-colony", label: "Saibaba Colony" },
-];
 
 const selectClassName =
   "!h-12 [&_.ant-select-selector]:!rounded-xl [&_.ant-select-selector]:!bg-gray-100 [&_.ant-select-selector]:!border-gray-200 [&_.ant-select-selector]:!px-5 [&_.ant-select-selector]:!h-12 [&_.ant-select-selection-item]:!leading-[48px] [&_.ant-select-selection-placeholder]:!leading-[48px]";
@@ -38,9 +18,15 @@ const LocationForm = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
 
+  const { formData, updateFormData, propertyId, setPropertyId } =
+    useSellProperty();
+
   const [stateOptions, setStateOptions] = useState([]);
   const [districtOptions, setDistrictOptions] = useState([]);
   const [cityOptions, setCityOptions] = useState([]);
+
+  const [stateSearchText, setStateSearchText] = useState("");
+  const [districtSearchText, setDistrictSearchText] = useState("");
   const [citySearchText, setCitySearchText] = useState("");
 
   const [locationParams, setLocationParams] = useState({
@@ -48,6 +34,31 @@ const LocationForm = () => {
     state: "",
     district: "",
   });
+
+  // ============================================================
+  // Restore saved location data from Context
+  // ============================================================
+
+  useEffect(() => {
+    const savedLocation = formData.location;
+
+    if (!savedLocation) {
+      return;
+    }
+
+    form.setFieldsValue({
+      country: savedLocation.country || "india",
+      state: savedLocation.state || undefined,
+      district: savedLocation.district || undefined,
+      city: savedLocation.city || undefined,
+    });
+
+    setLocationParams({
+      country: savedLocation.country || "india",
+      state: savedLocation.state || "",
+      district: savedLocation.district || "",
+    });
+  }, [formData.location, form]);
 
   const country = Form.useWatch("country", form);
   const state = Form.useWatch("state", form);
@@ -58,15 +69,39 @@ const LocationForm = () => {
   const isDistrictEnabled = Boolean(state);
   const isCityEnabled = Boolean(district);
 
-  // Next only enables once every field actually has a value - touched
-  // alone (the old check) doesn't guarantee filled, e.g. clicking into
-  // a field and back out counts as touched but leaves it empty.
+  // Next only enables once every field actually has a value
   const isAllFieldsFilled = Boolean(country && state && district && city);
 
-  // Only show city options once the user has typed at least 3 letters -
-  // filters the already-fetched cityOptions client-side, no extra API
-  // calls needed since the full list for the district is already in
-  // memory.
+  // ============================================================
+  // Filter State Options
+  // ============================================================
+
+  const filteredStateOptions =
+    stateSearchText.trim().length >= 3
+      ? stateOptions.filter((option) =>
+          option.state
+            ?.toLowerCase()
+            .includes(stateSearchText.trim().toLowerCase()),
+        )
+      : [];
+
+  // ============================================================
+  // Filter District Options
+  // ============================================================
+
+  const filteredDistrictOptions =
+    districtSearchText.trim().length >= 3
+      ? districtOptions.filter((option) =>
+          option.district
+            ?.toLowerCase()
+            .includes(districtSearchText.trim().toLowerCase()),
+        )
+      : [];
+
+  // ============================================================
+  // Filter City Options
+  // ============================================================
+
   const filteredCityOptions =
     citySearchText.trim().length >= 3
       ? cityOptions.filter((option) =>
@@ -76,7 +111,10 @@ const LocationForm = () => {
         )
       : [];
 
+  // ============================================================
   // Fetch states when country changes
+  // ============================================================
+
   useEffect(() => {
     if (!locationParams.country) {
       setStateOptions([]);
@@ -99,7 +137,10 @@ const LocationForm = () => {
     fetchStates();
   }, [locationParams.country]);
 
+  // ============================================================
   // Fetch districts when state changes
+  // ============================================================
+
   useEffect(() => {
     if (!locationParams.state) {
       setDistrictOptions([]);
@@ -123,7 +164,10 @@ const LocationForm = () => {
     fetchDistricts();
   }, [locationParams.country, locationParams.state]);
 
+  // ============================================================
   // Fetch cities when district changes
+  // ============================================================
+
   useEffect(() => {
     if (!locationParams.district) {
       setCityOptions([]);
@@ -148,6 +192,10 @@ const LocationForm = () => {
     fetchCities();
   }, [locationParams.country, locationParams.state, locationParams.district]);
 
+  // ============================================================
+  // Handle country change
+  // ============================================================
+
   const handleCountryChange = (value) => {
     form.setFieldsValue({
       state: undefined,
@@ -158,6 +206,9 @@ const LocationForm = () => {
     setStateOptions([]);
     setDistrictOptions([]);
     setCityOptions([]);
+
+    setStateSearchText("");
+    setDistrictSearchText("");
     setCitySearchText("");
 
     setLocationParams({
@@ -165,7 +216,21 @@ const LocationForm = () => {
       state: "",
       district: "",
     });
+
+    // Save country to Context
+    updateFormData("location", "country", value);
+
+    // Clear dependent values from Context
+    updateFormData("location", "state", undefined);
+
+    updateFormData("location", "district", undefined);
+
+    updateFormData("location", "city", undefined);
   };
+
+  // ============================================================
+  // Handle state change
+  // ============================================================
 
   const handleStateChange = (value) => {
     form.setFieldsValue({
@@ -175,6 +240,8 @@ const LocationForm = () => {
 
     setDistrictOptions([]);
     setCityOptions([]);
+
+    setDistrictSearchText("");
     setCitySearchText("");
 
     setLocationParams((prev) => ({
@@ -182,7 +249,19 @@ const LocationForm = () => {
       state: value,
       district: "",
     }));
+
+    // Save state
+    updateFormData("location", "state", value);
+
+    // Clear dependent values
+    updateFormData("location", "district", undefined);
+
+    updateFormData("location", "city", undefined);
   };
+
+  // ============================================================
+  // Handle district change
+  // ============================================================
 
   const handleDistrictChange = (value) => {
     form.setFieldValue("city", undefined);
@@ -194,6 +273,20 @@ const LocationForm = () => {
       ...prev,
       district: value,
     }));
+
+    // Save district
+    updateFormData("location", "district", value);
+
+    // Clear dependent city
+    updateFormData("location", "city", undefined);
+  };
+
+  // ============================================================
+  // Handle city change
+  // ============================================================
+
+  const handleCityChange = (value) => {
+    updateFormData("location", "city", value);
   };
 
   const fieldLabel = (text, enabled) => (
@@ -206,11 +299,64 @@ const LocationForm = () => {
     </span>
   );
 
+  // ============================================================
+  // Handle Next
+  // ============================================================
+
   const handleNext = async () => {
     const values = await form.validateFields();
 
-    navigate("/sell-property/details");
+    // Make sure the latest values are stored in Context
+    updateFormData("location", "country", values.country);
+    updateFormData("location", "state", values.state);
+    updateFormData("location", "district", values.district);
+    updateFormData("location", "city", values.city);
+
+    // ============================================================
+    // Prepare payload
+    // ============================================================
+
+    const payload = {
+      step: 1,
+      user_id: 1,
+      ...formData.category,
+      ...formData.location,
+
+      // Add property_id only when propertyId already exists
+      ...(propertyId !== null && {
+        prop_id: propertyId,
+      }),
+    };
+
+    try {
+      const response = await postSellPropertyForm(payload);
+
+      // If creating a new property, store the returned property ID
+      if (propertyId === null) {
+        setPropertyId(response?.data?.prop_id);
+      }
+
+      if (response.success === 0) {
+        throw new Error("Failed to save property location");
+      }
+
+      // Move to next step only after successful API call
+      navigate("/sell-property/details");
+    } catch (error) {
+      console.error("Failed to save property:", error);
+
+      // Add your existing status message here if you want:
+      //
+      // showStatusMessage({
+      //   type: "error",
+      //   text: "Failed to save property",
+      // });
+    }
   };
+
+  // ============================================================
+  // Handle Previous
+  // ============================================================
 
   const handlePrevious = async () => {
     navigate("/sell-property");
@@ -224,10 +370,14 @@ const LocationForm = () => {
         requiredMark={false}
         initialValues={{ country: "india" }}
       >
+        {/* ======================================================
+            COUNTRY
+        ====================================================== */}
+
         <Form.Item label={fieldLabel("Country", true)} name="country">
           <Select
             placeholder="Select your Category"
-            suffixIcon={<DownOutlined className="text-gray-700" />}
+            suffixIcon={<DownOutlined className="text-gray-400" />}
             className={`w-full bg-[#f3f3f3]! !text-base ${selectClassName}`}
             classNames={{
               popup: {
@@ -235,45 +385,82 @@ const LocationForm = () => {
               },
             }}
             options={countries}
-            onChange={handleCountryChange}
+            value="india"
+            disabled
           />
         </Form.Item>
+
+        {/* ======================================================
+            STATE
+        ====================================================== */}
 
         <Form.Item
           label={fieldLabel("State", isStateEnabled)}
           name="state"
-          rules={[{ required: true, message: "Please select a state" }]}
+          rules={[
+            {
+              required: true,
+              message: "Please select a state",
+            },
+          ]}
         >
           <Select
-            placeholder="Select your State"
+            placeholder="Type at least 3 letters to search"
+            showSearch
+            filterOption={false}
+            searchValue={stateSearchText}
+            onSearch={setStateSearchText}
+            notFoundContent={
+              stateSearchText.trim().length < 3
+                ? "Type at least 3 letters"
+                : "No matching states"
+            }
             suffixIcon={
               <DownOutlined
                 className={isStateEnabled ? "text-gray-700" : "text-gray-400"}
               />
             }
+            disabled={!isStateEnabled}
+            className={`w-full bg-[#f3f3f3]! !text-base ${selectClassName}`}
             classNames={{
               popup: {
                 root: "property-category-dropdown",
               },
             }}
-            disabled={!isStateEnabled}
-            className={`w-full bg-[#f3f3f3]! !text-base ${selectClassName}`}
-            options={stateOptions}
-            onChange={handleStateChange}
+            options={filteredStateOptions}
             fieldNames={{
               label: "state",
               value: "state",
             }}
+            onChange={handleStateChange}
           />
         </Form.Item>
+
+        {/* ======================================================
+            DISTRICT
+        ====================================================== */}
 
         <Form.Item
           label={fieldLabel("District", isDistrictEnabled)}
           name="district"
-          rules={[{ required: true, message: "Please select a district" }]}
+          rules={[
+            {
+              required: true,
+              message: "Please select a district",
+            },
+          ]}
         >
           <Select
-            placeholder="Select your District"
+            placeholder="Type at least 3 letters to search"
+            showSearch
+            filterOption={false}
+            searchValue={districtSearchText}
+            onSearch={setDistrictSearchText}
+            notFoundContent={
+              districtSearchText.trim().length < 3
+                ? "Type at least 3 letters"
+                : "No matching districts"
+            }
             suffixIcon={
               <DownOutlined
                 className={
@@ -288,19 +475,28 @@ const LocationForm = () => {
                 root: "property-category-dropdown",
               },
             }}
-            options={districtOptions}
-            onChange={handleDistrictChange}
+            options={filteredDistrictOptions}
             fieldNames={{
               label: "district",
               value: "district",
             }}
+            onChange={handleDistrictChange}
           />
         </Form.Item>
+
+        {/* ======================================================
+            CITY
+        ====================================================== */}
 
         <Form.Item
           label={fieldLabel("City", isCityEnabled)}
           name="city"
-          rules={[{ required: true, message: "Please select a city" }]}
+          rules={[
+            {
+              required: true,
+              message: "Please select a city",
+            },
+          ]}
         >
           <Select
             placeholder="Type at least 3 letters to search"
@@ -330,8 +526,10 @@ const LocationForm = () => {
               label: "city",
               value: "city",
             }}
+            onChange={handleCityChange}
           />
         </Form.Item>
+
         <FormNavigationButtons
           onPrevious={handlePrevious}
           onNext={handleNext}

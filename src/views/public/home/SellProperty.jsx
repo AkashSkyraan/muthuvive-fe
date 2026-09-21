@@ -31,14 +31,16 @@ const SellProperty = () => {
               shortcode. You can list categories, types, cities, areas and
               states of your choice.
             </p>
-            <Link to="/sell-property">
-              <Button
-                type="primary"
-                className="!bg-secondary mt-6 w-[55%] sm:w-[45%] !text-base !py-4.5"
-              >
-                Sell my property
-              </Button>
-            </Link>
+            <div>
+              <Link to="/sell-property">
+                <Button
+                  type="primary"
+                  className="!bg-secondary mt-6 w-[55%] sm:w-[45%] !text-base !py-4.5"
+                >
+                  Sell my property
+                </Button>
+              </Link>
+            </div>
           </div>
 
           {/* Right plan card */}

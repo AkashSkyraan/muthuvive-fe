@@ -1,57 +1,34 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form } from "antd";
 import FormNavigationButtons from "../../fornNavButtons";
 import { useNavigate } from "react-router-dom";
+import { useSellProperty } from "../../../context/SellPropertyContext";
+import {
+  getAmenity,
+  getPropertyHighlight,
+} from "../../../api/propertyFormDropdown.api";
+import { postSellPropertyForm } from "../../../api/sellPropertyForm.api";
 
 const roomCountOptions = [
   { value: "1", label: "1" },
   { value: "2", label: "2" },
   { value: "3", label: "3" },
-  { value: "4+", label: "4+" },
+  { value: "4", label: "4+" },
 ];
 
 const availabilityOptions = [
-  { value: "available", label: "Available" },
-  { value: "not-available", label: "Not Available" },
-];
-
-// Dynamic data - replace with API response
-const amenitiesOptions = [
-  { value: "borewell-tank", label: "Borewell/Tank" },
-  { value: "24x7-water", label: "24x7 Water" },
-  { value: "swimming-pool", label: "Swimming Pool" },
-  { value: "well", label: "Well" },
-  { value: "rainwater-harvesting", label: "Rainwater Harvesting" },
-  { value: "electricity", label: "Electricity" },
-  { value: "garden", label: "Garden" },
-  { value: "security-alarm", label: "Security / Firm Alarm" },
-  { value: "power-backup", label: "Power Backup" },
-  { value: "club-house", label: "Club House" },
-  { value: "gymnasium", label: "Gymnasium" },
-  { value: "childrens-play-area", label: "Children's Play Area" },
-];
-
-// Dynamic data - replace with API response
-const propertyHighlightsOptions = [
-  { value: "next-to-hospital", label: "Next to Hospital" },
-  { value: "next-to-school", label: "Next to School" },
-  { value: "next-to-college", label: "Next to College" },
-  { value: "next-to-metro", label: "Next to Metro" },
-  { value: "next-to-shopping-mall", label: "Next to Shopping Mall" },
-  { value: "next-to-highway", label: "Next to Highway" },
-  { value: "next-to-airport", label: "Next to Airport" },
-  { value: "next-to-beach-lake", label: "Next to Beach / Lake" },
-  { value: "next-to-park", label: "Next to Park" },
-  { value: "next-to-temple", label: "Next to Temple" },
+  { value: 1, label: "Available" },
+  { value: 0, label: "Not Available" },
 ];
 
 const VISIBLE_COUNT = 7;
 
-// Single-select pill group (e.g. Number of Rooms, Lift, Washroom Available)
+// Single-select pill group
 const ToggleGroup = ({ options, value, onChange }) => (
   <div className="flex flex-wrap gap-3">
     {options.map((option) => {
       const isSelected = value === option.value;
+
       return (
         <button
           key={option.value}
@@ -70,19 +47,21 @@ const ToggleGroup = ({ options, value, onChange }) => (
   </div>
 );
 
-// Multi-select pill group that only shows the first VISIBLE_COUNT options
-// until "View More" is clicked, then reveals the rest ("View Less" to collapse).
+// Multi-select pill group
 const ExpandableMultiSelect = ({ options, value = [], onChange }) => {
   const [expanded, setExpanded] = useState(false);
 
   const hasMore = options.length > VISIBLE_COUNT;
+
   const visibleOptions = expanded ? options : options.slice(0, VISIBLE_COUNT);
 
   const toggleOption = (optionValue) => {
     const isSelected = value.includes(optionValue);
+
     const nextValue = isSelected
       ? value.filter((item) => item !== optionValue)
       : [...value, optionValue];
+
     onChange?.(nextValue);
   };
 
@@ -90,6 +69,7 @@ const ExpandableMultiSelect = ({ options, value = [], onChange }) => {
     <div className="flex flex-wrap items-center gap-3">
       {visibleOptions.map((option) => {
         const isSelected = value.includes(option.value);
+
         return (
           <button
             key={option.value}
@@ -126,11 +106,242 @@ const sectionLabel = (text) => (
 const CommercialPropertyFeaturesForm = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
-  const handleNext = async () => {
-    // const values = await form.validateFields();
 
-    // setCategory(values.propertyCategory);
-    navigate("/sell-property/media");
+  const { formData, propertyId, updateFormData } = useSellProperty();
+
+  const [amenitiesOptions, setAmenitiesOptions] = useState([]);
+  const [propertyHighlightsOptions, setPropertyHighlightsOptions] = useState(
+    [],
+  );
+
+  // const [selectedAmenities, setSelectedAmenities] = useState([]);
+  // const [selectedPropertyHighlights, setSelectedPropertyHighlights] = useState(
+  //   [],
+  // );
+
+  /*
+   * Next Button Disabled State
+   */
+  const numberOfRooms = Form.useWatch("numberOfRooms", form);
+  const lift = Form.useWatch("lift", form);
+  const washroomAvailable = Form.useWatch("washroomAvailable", form);
+  const amenities = Form.useWatch("amenities", form);
+  const propertyHighlights = Form.useWatch("propertyHighlights", form);
+
+  const isNextDisabled =
+    numberOfRooms === undefined ||
+    numberOfRooms === null ||
+    numberOfRooms === "" ||
+    lift === undefined ||
+    lift === null ||
+    washroomAvailable === undefined ||
+    washroomAvailable === null ||
+    !amenities ||
+    amenities.length === 0 ||
+    !propertyHighlights ||
+    propertyHighlights.length === 0;
+
+  /*
+   * Get Amenities
+   */
+  useEffect(() => {
+    const fetchAmenities = async () => {
+      try {
+        const response = await getAmenity();
+
+        if (response?.success === 0) {
+          console.error("Failed to fetch amenities:", response?.error);
+          return;
+        }
+
+        const amenities = response || [];
+
+        const formattedAmenities = amenities.map((item) => ({
+          value: item.id,
+          label: item.name,
+        }));
+
+        setAmenitiesOptions(formattedAmenities);
+      } catch (error) {
+        console.error("Error fetching amenities:", error);
+      }
+    };
+
+    fetchAmenities();
+  }, []);
+
+  /*
+   * Get Property Highlights
+   */
+  useEffect(() => {
+    const fetchPropertyHighlights = async () => {
+      try {
+        const response = await getPropertyHighlight();
+
+        if (response?.success === 0) {
+          console.error(
+            "Failed to fetch property highlights:",
+            response?.error,
+          );
+          return;
+        }
+
+        const propertyHighlights = response || [];
+
+        const formattedPropertyHighlights = propertyHighlights.map((item) => ({
+          value: item.id,
+          label: item.name,
+        }));
+
+        setPropertyHighlightsOptions(formattedPropertyHighlights);
+      } catch (error) {
+        console.error("Error fetching property highlights:", error);
+      }
+    };
+
+    fetchPropertyHighlights();
+  }, []);
+
+  /*
+   * Restore saved Context data
+   */
+  useEffect(() => {
+    const savedFeatures = formData.propertyFeatures;
+
+    if (!savedFeatures || Object.keys(savedFeatures).length === 0) {
+      return;
+    }
+
+    const savedAmenities = savedFeatures.amenities || [];
+
+    const savedPropertyHighlights = savedFeatures["prop_highs"] || [];
+
+    // setSelectedAmenities(savedAmenities);
+
+    // setSelectedPropertyHighlights(savedPropertyHighlights);
+
+    form.setFieldsValue({
+      numberOfRooms:
+        savedFeatures.rooms !== undefined
+          ? String(savedFeatures.rooms)
+          : undefined,
+
+      lift: savedFeatures.lift !== undefined ? savedFeatures.lift : undefined,
+
+      washroomAvailable:
+        savedFeatures.washroom !== undefined
+          ? savedFeatures.washroom
+          : undefined,
+
+      amenities: savedAmenities,
+
+      propertyHighlights: savedPropertyHighlights,
+    });
+  }, [formData.propertyFeatures, form]);
+
+  const handleValuesChange = (changedValues, allValues) => {
+    if (changedValues.numberOfRooms !== undefined) {
+      const rooms =
+        allValues.numberOfRooms === "4" ? 4 : Number(allValues.numberOfRooms);
+
+      updateFormData("propertyFeatures", "rooms", rooms);
+    }
+
+    if (changedValues.lift !== undefined) {
+      updateFormData("propertyFeatures", "lift", allValues.lift);
+    }
+
+    if (changedValues.washroomAvailable !== undefined) {
+      updateFormData(
+        "propertyFeatures",
+        "washroom",
+        allValues.washroomAvailable,
+      );
+    }
+
+    if (changedValues.amenities !== undefined) {
+      updateFormData(
+        "propertyFeatures",
+        "amenities",
+        allValues.amenities || [],
+      );
+    }
+
+    if (changedValues.propertyHighlights !== undefined) {
+      updateFormData(
+        "propertyFeatures",
+        "prop_highs",
+        allValues.propertyHighlights || [],
+      );
+    }
+  };
+
+  /*
+   * Next
+   */
+  const handleNext = async () => {
+    try {
+      const values = await form.validateFields();
+
+      const latestFeatures = {
+        rooms:
+          values.numberOfRooms === undefined || values.numberOfRooms === ""
+            ? values.numberOfRooms
+            : values.numberOfRooms === "4"
+              ? 4
+              : Number(values.numberOfRooms),
+
+        lift: values.lift,
+
+        washroom: values.washroomAvailable,
+
+        amenities: values.amenities || [],
+
+        prop_highs: values.propertyHighlights || [],
+      };
+
+      /*
+       * Store everything in Context
+       */
+      Object.entries(latestFeatures).forEach(([key, value]) => {
+        updateFormData("propertyFeatures", key, value);
+      });
+
+      /*
+       * Payload
+       */
+      const payload = {
+        step: 3,
+        user_id: 1,
+        prop_id: propertyId,
+
+        rooms: latestFeatures.rooms,
+        lift: latestFeatures.lift,
+        washroom: latestFeatures.washroom,
+
+        amenities: latestFeatures.amenities,
+
+        prop_highs: latestFeatures["prop_highs"],
+      };
+
+      console.log("Commercial property features payload:", payload);
+      console.log("payload", payload);
+
+      const response = await postSellPropertyForm(payload);
+
+      if (response?.success === 0) {
+        console.error("Failed to update property features:", response?.error);
+        return;
+      }
+
+      navigate("/sell-property/media");
+    } catch (error) {
+      console.error("Commercial property features validation failed:", error);
+    }
+  };
+
+  const handlePrevious = async () => {
+    navigate("/sell-property/details");
   };
 
   return (
@@ -140,6 +351,7 @@ const CommercialPropertyFeaturesForm = () => {
         layout="vertical"
         requiredMark={false}
         className="flex flex-col gap-6"
+        onValuesChange={handleValuesChange}
       >
         <Form.Item
           label={sectionLabel("Number of Rooms")}
@@ -176,10 +388,11 @@ const CommercialPropertyFeaturesForm = () => {
         >
           <ExpandableMultiSelect options={propertyHighlightsOptions} />
         </Form.Item>
+
         <FormNavigationButtons
-          // onPrevious={onPrevious}
           onNext={handleNext}
-          // disableNext={isNextDisabled}
+          onPrevious={handlePrevious}
+          disableNext={isNextDisabled}
         />
       </Form>
     </div>

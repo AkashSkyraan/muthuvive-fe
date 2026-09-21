@@ -20,3 +20,17 @@ export const getLocationCategories = async (filters = {}) => {
   });
   return response.data.data;
 };
+
+export const getAmenity = async (filters = {}) => {
+  const response = await axiosInstance.get("/src/get-amenities", {
+    params: filters,
+  });
+  return response.data.data;
+};
+
+export const getPropertyHighlight = async (filters = {}) => {
+  const response = await axiosInstance.get("/src/get-prop-highlights", {
+    params: filters,
+  });
+  return response.data.data;
+};

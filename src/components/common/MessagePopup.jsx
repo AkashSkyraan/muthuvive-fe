@@ -64,7 +64,7 @@ const StatusMessage = ({ placement = "top-right" }) => {
           rounded-lg
           px-5
           py-2.5
-          text-sm
+          text-base
           font-medium
           whitespace-nowrap
           ${
@@ -82,6 +82,7 @@ const StatusMessage = ({ placement = "top-right" }) => {
 
 export const showStatusMessage = ({ type = "success", text }) => {
   if (!showMessage) return;
+  // console.log("message triggered");
 
   showMessage({
     type,

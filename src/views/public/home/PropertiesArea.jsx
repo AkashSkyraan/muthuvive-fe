@@ -1,20 +1,32 @@
-import React from "react";
-import images from "../../../config/Images.jsx";
-// Dynamic data - replace with API response
-const areas = [
-  { id: 1, image: images.thanjavur, name: "Tirupur", count: "8 Projects" },
-  { id: 2, image: images.thanjavur, name: "Chennai", count: "8 Projects" },
-  { id: 3, image: images.thanjavur, name: "Coimbatore", count: "8 Projects" },
-  { id: 4, image: images.thanjavur, name: "Pollachi", count: "8 Projects" },
-  { id: 5, image: images.thanjavur, name: "Tirupur", count: "8 Projects" },
-  { id: 6, image: images.thanjavur, name: "Madurai", count: "8 Projects" },
-  { id: 7, image: images.thanjavur, name: "Dindigul", count: "8 Projects" },
-  { id: 8, image: images.thanjavur, name: "Thanjavur", count: "8 Projects" },
-  { id: 9, image: images.thanjavur, name: "Udumalai", count: "8 Projects" },
-  { id: 10, image: images.thanjavur, name: "Dindigul", count: "8 Projects" },
-];
+import React, { useEffect, useState } from "react";
+import { getPropertiesByArea } from "../../../api/home.api.js";
 
 const PropertiesByArea = () => {
+  const [areas, setAreas] = useState([]);
+
+  useEffect(() => {
+    const fetchAreas = async () => {
+      try {
+        const response = await getPropertiesByArea();
+
+        // Map the actual API response here
+        const formattedAreas = (response || []).map((item) => ({
+          id: item.id,
+          image: item.image,
+          name: item.name,
+          count: item.property_count,
+        }));
+
+        setAreas(formattedAreas);
+      } catch (error) {
+        console.error("Failed to fetch properties by area:", error);
+        setAreas([]);
+      }
+    };
+
+    fetchAreas();
+  }, []);
+
   return (
     <div className="w-full bg-[#eef2fd] py-16">
       <div className="w-[90%] mx-auto">
@@ -22,6 +34,7 @@ const PropertiesByArea = () => {
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
             Properties By Area
           </h2>
+
           <p className="text-base text-gray-500 mt-3 max-w-2xl mx-auto">
             Highlight the best of your properties by using the List Category
             shortcode. You can list categories, types, cities, areas and states
@@ -45,6 +58,7 @@ const PropertiesByArea = () => {
                 <h3 className="text-base font-semibold text-gray-900">
                   {area.name}
                 </h3>
+
                 <p className="text-sm text-gray-500 mt-0.5">{area.count}</p>
               </div>
             </div>
