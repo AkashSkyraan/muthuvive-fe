@@ -24,6 +24,9 @@ const LocationForm = () => {
   const [stateOptions, setStateOptions] = useState([]);
   const [districtOptions, setDistrictOptions] = useState([]);
   const [cityOptions, setCityOptions] = useState([]);
+
+  const [stateSearchText, setStateSearchText] = useState("");
+  const [districtSearchText, setDistrictSearchText] = useState("");
   const [citySearchText, setCitySearchText] = useState("");
 
   const [locationParams, setLocationParams] = useState({
@@ -69,7 +72,36 @@ const LocationForm = () => {
   // Next only enables once every field actually has a value
   const isAllFieldsFilled = Boolean(country && state && district && city);
 
-  // Only show city options once the user has typed at least 3 letters
+  // ============================================================
+  // Filter State Options
+  // ============================================================
+
+  const filteredStateOptions =
+    stateSearchText.trim().length >= 3
+      ? stateOptions.filter((option) =>
+          option.state
+            ?.toLowerCase()
+            .includes(stateSearchText.trim().toLowerCase()),
+        )
+      : [];
+
+  // ============================================================
+  // Filter District Options
+  // ============================================================
+
+  const filteredDistrictOptions =
+    districtSearchText.trim().length >= 3
+      ? districtOptions.filter((option) =>
+          option.district
+            ?.toLowerCase()
+            .includes(districtSearchText.trim().toLowerCase()),
+        )
+      : [];
+
+  // ============================================================
+  // Filter City Options
+  // ============================================================
+
   const filteredCityOptions =
     citySearchText.trim().length >= 3
       ? cityOptions.filter((option) =>
@@ -174,6 +206,9 @@ const LocationForm = () => {
     setStateOptions([]);
     setDistrictOptions([]);
     setCityOptions([]);
+
+    setStateSearchText("");
+    setDistrictSearchText("");
     setCitySearchText("");
 
     setLocationParams({
@@ -205,6 +240,8 @@ const LocationForm = () => {
 
     setDistrictOptions([]);
     setCityOptions([]);
+
+    setDistrictSearchText("");
     setCitySearchText("");
 
     setLocationParams((prev) => ({
@@ -333,10 +370,14 @@ const LocationForm = () => {
         requiredMark={false}
         initialValues={{ country: "india" }}
       >
+        {/* ======================================================
+            COUNTRY
+        ====================================================== */}
+
         <Form.Item label={fieldLabel("Country", true)} name="country">
           <Select
             placeholder="Select your Category"
-            suffixIcon={<DownOutlined className="text-gray-700" />}
+            suffixIcon={<DownOutlined className="text-gray-400" />}
             className={`w-full bg-[#f3f3f3]! !text-base ${selectClassName}`}
             classNames={{
               popup: {
@@ -344,9 +385,14 @@ const LocationForm = () => {
               },
             }}
             options={countries}
-            onChange={handleCountryChange}
+            value="india"
+            disabled
           />
         </Form.Item>
+
+        {/* ======================================================
+            STATE
+        ====================================================== */}
 
         <Form.Item
           label={fieldLabel("State", isStateEnabled)}
@@ -359,27 +405,40 @@ const LocationForm = () => {
           ]}
         >
           <Select
-            placeholder="Select your State"
+            placeholder="Type at least 3 letters to search"
+            showSearch
+            filterOption={false}
+            searchValue={stateSearchText}
+            onSearch={setStateSearchText}
+            notFoundContent={
+              stateSearchText.trim().length < 3
+                ? "Type at least 3 letters"
+                : "No matching states"
+            }
             suffixIcon={
               <DownOutlined
                 className={isStateEnabled ? "text-gray-700" : "text-gray-400"}
               />
             }
+            disabled={!isStateEnabled}
+            className={`w-full bg-[#f3f3f3]! !text-base ${selectClassName}`}
             classNames={{
               popup: {
                 root: "property-category-dropdown",
               },
             }}
-            disabled={!isStateEnabled}
-            className={`w-full bg-[#f3f3f3]! !text-base ${selectClassName}`}
-            options={stateOptions}
-            onChange={handleStateChange}
+            options={filteredStateOptions}
             fieldNames={{
               label: "state",
               value: "state",
             }}
+            onChange={handleStateChange}
           />
         </Form.Item>
+
+        {/* ======================================================
+            DISTRICT
+        ====================================================== */}
 
         <Form.Item
           label={fieldLabel("District", isDistrictEnabled)}
@@ -392,7 +451,16 @@ const LocationForm = () => {
           ]}
         >
           <Select
-            placeholder="Select your District"
+            placeholder="Type at least 3 letters to search"
+            showSearch
+            filterOption={false}
+            searchValue={districtSearchText}
+            onSearch={setDistrictSearchText}
+            notFoundContent={
+              districtSearchText.trim().length < 3
+                ? "Type at least 3 letters"
+                : "No matching districts"
+            }
             suffixIcon={
               <DownOutlined
                 className={
@@ -407,14 +475,18 @@ const LocationForm = () => {
                 root: "property-category-dropdown",
               },
             }}
-            options={districtOptions}
-            onChange={handleDistrictChange}
+            options={filteredDistrictOptions}
             fieldNames={{
               label: "district",
               value: "district",
             }}
+            onChange={handleDistrictChange}
           />
         </Form.Item>
+
+        {/* ======================================================
+            CITY
+        ====================================================== */}
 
         <Form.Item
           label={fieldLabel("City", isCityEnabled)}

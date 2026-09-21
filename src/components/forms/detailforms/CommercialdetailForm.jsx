@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Form, Input, Select, Button } from "antd";
+import React, { useEffect, useState } from "react";
+import { Form, Input, Select } from "antd";
 import {
   DownOutlined,
   MinusCircleOutlined,
@@ -7,31 +7,37 @@ import {
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import FormNavigationButtons from "../../fornNavButtons";
+import { useSellProperty } from "../../../context/SellPropertyContext";
+import { postSellPropertyForm } from "../../../api/sellPropertyForm.api";
+
+// ---------------------------------------------------------
+// Options
+// ---------------------------------------------------------
 
 const roadPlanOptions = [
-  { value: "on-road", label: "On road" },
-  { value: "interior", label: "Interior" },
+  { value: "on", label: "On road" },
+  { value: "off", label: "Interior" },
 ];
 
 const yesNoOptions = [
-  { value: "yes", label: "Yes" },
-  { value: "no", label: "No" },
+  { value: 1, label: "Yes" },
+  { value: 0, label: "No" },
 ];
 
 const facingOptions = [
-  { value: "north", label: "North" },
-  { value: "south", label: "South" },
-  { value: "east", label: "East" },
-  { value: "west", label: "West" },
-  { value: "north-east", label: "North East" },
-  { value: "north-west", label: "North West" },
-  { value: "south-east", label: "South East" },
-  { value: "south-west", label: "South West" },
+  { value: 1, label: "North" },
+  { value: 2, label: "South" },
+  { value: 3, label: "East" },
+  { value: 4, label: "West" },
+  { value: 5, label: "North East" },
+  { value: 6, label: "North West" },
+  { value: 7, label: "South East" },
+  { value: 8, label: "South West" },
 ];
 
 const availabilityStatusOptions = [
-  { value: "ready-to-move", label: "Ready to move" },
-  { value: "under-construction", label: "Under Construction" },
+  { value: 1, label: "Ready to move" },
+  { value: 2, label: "Under Construction" },
 ];
 
 const areaUnitOptions = [
@@ -42,15 +48,43 @@ const areaUnitOptions = [
 
 const lengthUnitOptions = [
   { value: "ft", label: "Ft" },
+  { value: "feet", label: "Feet" },
   { value: "m", label: "M" },
 ];
 
-// A single-select group of pill buttons - controlled via value/onChange so
-// it plugs directly into antd Form.Item like any other form control.
+// ---------------------------------------------------------
+// Whole Number Validator
+// ---------------------------------------------------------
+
+const wholeNumberValidator = (fieldName) => ({
+  validator: (_, value) => {
+    if (value === undefined || value === null || value === "") {
+      return Promise.resolve();
+    }
+
+    if (!/^\d+$/.test(String(value))) {
+      return Promise.reject(
+        new Error(`${fieldName} must contain only whole numbers`),
+      );
+    }
+
+    if (Number(value) < 1) {
+      return Promise.reject(new Error(`${fieldName} must be greater than 0`));
+    }
+
+    return Promise.resolve();
+  },
+});
+
+// ---------------------------------------------------------
+// Toggle Group
+// ---------------------------------------------------------
+
 const ToggleGroup = ({ options, value, onChange }) => (
   <div className="flex flex-wrap gap-3">
     {options.map((option) => {
       const isSelected = value === option.value;
+
       return (
         <button
           key={option.value}
@@ -69,102 +103,468 @@ const ToggleGroup = ({ options, value, onChange }) => (
   </div>
 );
 
+// ---------------------------------------------------------
+// Input styles
+// ---------------------------------------------------------
+
 const inputClassName =
-  "!bg-transparent !border-none !shadow-none !px-5 !py-3 !text-sm";
+  "!bg-transparent !border-none !shadow-none !px-5 !py-3 !text-sm !text-gray-900 [&.ant-input-status-error]:!text-gray-900 [&.ant-input-status-error]:placeholder:!text-gray-400";
 
 const selectSelectorClassName =
   "[&_.ant-select-selector]:!rounded-xl [&_.ant-select-selector]:!bg-gray-100 [&_.ant-select-selector]:!border-gray-200 [&_.ant-select-selector]:!px-5 [&_.ant-select-selector]:!h-12 [&_.ant-select-selection-item]:!leading-[48px] [&_.ant-select-selection-placeholder]:!leading-[48px]";
 
-// A value input + unit dropdown combined into one bordered box (e.g. "200" + "Acres")
+// ---------------------------------------------------------
+// Unit Field
+// ---------------------------------------------------------
+
 const UnitField = ({
   label,
   valueName,
   unitName,
   unitOptions,
   defaultUnit,
+  rules = [],
   onRemove,
-}) => (
-  <div>
-    <div className="flex items-center justify-between mb-2">
-      <p className="text-sm font-semibold text-gray-900">{label}</p>
-      {onRemove && (
-        <button type="button" onClick={onRemove}>
-          <MinusCircleOutlined className="text-gray-400 hover:text-red-500 transition-colors" />
-        </button>
-      )}
-    </div>
-    <div className="flex items-center rounded-xl bg-[#f3f3f3] overflow-hidden">
-      <Form.Item name={valueName} noStyle>
-        <Input
-          placeholder="200"
-          variant="borderless"
-          className={`flex-1 ${inputClassName}`}
-        />
+  onValueChange,
+  onUnitChange,
+}) => {
+  const form = Form.useFormInstance();
+
+  // -------------------------------------------------------
+  // Set default unit
+  // -------------------------------------------------------
+
+  useEffect(() => {
+    const currentUnit = form.getFieldValue(unitName);
+
+    if (
+      currentUnit === undefined ||
+      currentUnit === null ||
+      currentUnit === ""
+    ) {
+      form.setFieldValue(unitName, defaultUnit);
+      onUnitChange?.(defaultUnit);
+    }
+  }, [form, unitName, defaultUnit]);
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-sm font-semibold text-gray-900">{label}</p>
+
+        {onRemove && (
+          <button type="button" onClick={onRemove}>
+            <MinusCircleOutlined className="text-gray-400 hover:text-red-500 transition-colors" />
+          </button>
+        )}
+      </div>
+
+      <Form.Item
+        name={valueName}
+        rules={rules}
+        className="!mb-0"
+        getValueFromEvent={(e) => e.target.value}
+      >
+        <div className="flex items-center rounded-xl bg-[#f3f3f3] overflow-hidden">
+          <Input
+            placeholder="200"
+            variant="borderless"
+            className={`flex-1 ${inputClassName}`}
+            onChange={(e) => {
+              onValueChange?.(e.target.value);
+            }}
+            autoComplete="off"
+          />
+
+          <div className="w-px h-6 bg-gray-500 shrink-0" />
+
+          <Form.Item name={unitName} noStyle>
+            <Select
+              variant="borderless"
+              suffixIcon={<DownOutlined className="!text-gray-500 text-sm" />}
+              className="!w-24 shrink-0 small-unit-select"
+              options={unitOptions}
+              onChange={(value) => {
+                onUnitChange?.(value);
+              }}
+            />
+          </Form.Item>
+        </div>
       </Form.Item>
-      <div className="w-px h-6 bg-gray-500 shrink-0" />
-      <Form.Item name={unitName} noStyle initialValue={defaultUnit}>
-        <Select
-          variant="borderless"
-          suffixIcon={<DownOutlined className="!text-gray-500 text-sm" />}
-          className="!w-24 shrink-0 small-unit-select"
-          options={unitOptions}
-        />
-      </Form.Item>
     </div>
-  </div>
-);
+  );
+};
+
+// ---------------------------------------------------------
+// Label
+// ---------------------------------------------------------
 
 const fieldLabel = (text) => (
   <span className="text-sm font-semibold text-gray-900">{text}</span>
 );
 
-const CommercialPropertyDetailsForm = ({ onPrevious, onNext }) => {
+// ---------------------------------------------------------
+// Commercial Property Details Form
+// ---------------------------------------------------------
+
+const CommercialPropertyDetailsForm = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
+
+  const { formData, updateFormData, propertyId } = useSellProperty();
 
   const [hasBuildUpArea, setHasBuildUpArea] = useState(true);
   const [hasSuperBuildUpArea, setHasSuperBuildUpArea] = useState(true);
 
-  const roadPlan = Form.useWatch("roadPlan", form);
-  const pathwayAvailable = Form.useWatch("pathwayAvailable", form);
-  const totalFloor = Form.useWatch("totalFloor", form);
+  // -------------------------------------------------------
+  // Watch conditional fields
+  // -------------------------------------------------------
 
-  const isOnRoad = roadPlan === "on-road";
-  const isInterior = roadPlan === "interior";
-  const showPathwayDimension = isInterior && pathwayAvailable === "yes";
+  const roadPlan = Form.useWatch("road_plan", form);
+  const pathwayAvailable = Form.useWatch("pathway", form);
+  const totalFloor = Form.useWatch("total_floor", form);
+
+  const isOnRoad = roadPlan === "on";
+  const isInterior = roadPlan === "off";
+
+  const showPathwayDimension = isInterior && pathwayAvailable === 1;
+
+  // -------------------------------------------------------
+  // Next Button Disabled State
+  // -------------------------------------------------------
+
+  const formValues = Form.useWatch([], form);
+
+  const isEmpty = (value) =>
+    value === undefined ||
+    value === null ||
+    value === "" ||
+    (typeof value === "string" && value.trim() === "");
+
+  const isNextDisabled =
+    // Property Name
+    isEmpty(formValues?.prop_name) ||
+    // Carpet Area
+    isEmpty(formValues?.carpet_area) ||
+    // Build-Up Area - required when added
+    (hasBuildUpArea && isEmpty(formValues?.build)) ||
+    // Super Build-Up Area - required when added
+    (hasSuperBuildUpArea && isEmpty(formValues?.super_build)) ||
+    // Total Floor
+    isEmpty(formValues?.total_floor) ||
+    // Road Plan
+    isEmpty(formValues?.road_plan) ||
+    // Road Length - only required when On Road
+    (isOnRoad && isEmpty(formValues?.road_length)) ||
+    // Pathway - only required when Interior
+    (isInterior && isEmpty(formValues?.pathway)) ||
+    // Pathway Length and Width
+    // only required when Interior + Pathway Yes
+    (showPathwayDimension && isEmpty(formValues?.pathway_length)) ||
+    (showPathwayDimension && isEmpty(formValues?.pathway_width)) ||
+    // Property Facing
+    isEmpty(formValues?.facing) ||
+    // Availability Status
+    isEmpty(formValues?.avail_status);
+
+  // -------------------------------------------------------
+  // Floor Options
+  // -------------------------------------------------------
 
   const floorOptions = totalFloor
-    ? Array.from({ length: Number(totalFloor) || 0 }, (_, index) => ({
-        value: String(index + 1),
-        label: String(index + 1),
-      }))
+    ? Array.from(
+        {
+          length: Number(totalFloor) || 0,
+        },
+        (_, index) => ({
+          value: index + 1,
+          label: String(index + 1),
+        }),
+      )
     : [];
+
+  // -------------------------------------------------------
+  // Restore saved Context data
+  // -------------------------------------------------------
+
+  useEffect(() => {
+    const savedDetails = formData.propertyDetails;
+
+    if (!savedDetails || Object.keys(savedDetails).length === 0) {
+      return;
+    }
+
+    form.setFieldsValue(savedDetails);
+  }, [formData.propertyDetails, form]);
+
+  // -------------------------------------------------------
+  // Save field into Context
+  // -------------------------------------------------------
+
+  const handleFieldChange = (key, value) => {
+    updateFormData("propertyDetails", key, value);
+  };
+
+  // -------------------------------------------------------
+  // Road Plan Change
+  // -------------------------------------------------------
 
   const handleRoadPlanChange = (value) => {
     form.setFieldsValue({
-      roadPlan: value,
-      pathwayAvailable: undefined,
-      pathwayLengthValue: undefined,
-      pathwayWidthValue: undefined,
-      roadLengthValue: undefined,
+      road_plan: value,
+      pathway: undefined,
+      pathway_length: undefined,
+      pathway_length_unit: undefined,
+      pathway_width: undefined,
+      pathway_width_unit: undefined,
+      road_length: undefined,
+      road_length_unit: undefined,
     });
+
+    updateFormData("propertyDetails", "road_plan", value);
+
+    updateFormData("propertyDetails", "pathway", undefined);
+
+    updateFormData("propertyDetails", "pathway_length", undefined);
+
+    updateFormData("propertyDetails", "pathway_length_unit", undefined);
+
+    updateFormData("propertyDetails", "pathway_width", undefined);
+
+    updateFormData("propertyDetails", "pathway_width_unit", undefined);
+
+    updateFormData("propertyDetails", "road_length", undefined);
+
+    updateFormData("propertyDetails", "road_length_unit", undefined);
   };
+
+  // -------------------------------------------------------
+  // Pathway Change
+  // -------------------------------------------------------
+
+  const handlePathwayChange = (value) => {
+    form.setFieldsValue({
+      pathway: value,
+
+      pathway_length:
+        value === "yes" ? form.getFieldValue("pathway_length") : undefined,
+
+      pathway_width:
+        value === "yes" ? form.getFieldValue("pathway_width") : undefined,
+    });
+
+    updateFormData("propertyDetails", "pathway", value);
+
+    if (value !== "yes") {
+      updateFormData("propertyDetails", "pathway_length", undefined);
+
+      updateFormData("propertyDetails", "pathway_width", undefined);
+
+      updateFormData("propertyDetails", "pathway_length_unit", undefined);
+
+      updateFormData("propertyDetails", "pathway_width_unit", undefined);
+    }
+  };
+
+  // -------------------------------------------------------
+  // Remove Build-Up Area
+  // -------------------------------------------------------
 
   const handleRemoveBuildUpArea = () => {
     setHasBuildUpArea(false);
-    form.setFieldsValue({ buildUpAreaValue: undefined });
+
+    form.setFieldsValue({
+      build: undefined,
+      build_unit: undefined,
+    });
+
+    updateFormData("propertyDetails", "build", undefined);
+
+    updateFormData("propertyDetails", "build_unit", undefined);
   };
+
+  // -------------------------------------------------------
+  // Add Build-Up Area
+  // -------------------------------------------------------
+
+  const handleAddBuildUpArea = () => {
+    setHasBuildUpArea(true);
+
+    form.setFieldsValue({
+      build_unit: "acres",
+    });
+
+    updateFormData("propertyDetails", "build_unit", "acres");
+  };
+
+  // -------------------------------------------------------
+  // Remove Super Build-Up Area
+  // -------------------------------------------------------
 
   const handleRemoveSuperBuildUpArea = () => {
     setHasSuperBuildUpArea(false);
-    form.setFieldsValue({ superBuildUpAreaValue: undefined });
+
+    form.setFieldsValue({
+      super_build: undefined,
+      super_build_unit: undefined,
+    });
+
+    updateFormData("propertyDetails", "super_build", undefined);
+
+    updateFormData("propertyDetails", "super_build_unit", undefined);
   };
 
-  const handleNext = async () => {
-    // const values = await form.validateFields();
+  // -------------------------------------------------------
+  // Add Super Build-Up Area
+  // -------------------------------------------------------
 
-    // setCategory(values.propertyCategory);
-    navigate("/sell-property/features");
+  const handleAddSuperBuildUpArea = () => {
+    setHasSuperBuildUpArea(true);
+
+    form.setFieldsValue({
+      super_build_unit: "acres",
+    });
+
+    updateFormData("propertyDetails", "super_build_unit", "acres");
+  };
+
+  // -------------------------------------------------------
+  // Next
+  // -------------------------------------------------------
+
+  const handleNext = async () => {
+    try {
+      // ---------------------------------------------------
+      // Validate using AntD
+      // ---------------------------------------------------
+
+      await form.validateFields();
+
+      // ---------------------------------------------------
+      // IMPORTANT:
+      // Use Context as the source of payload.
+      // Do NOT use form values as payload.
+      // ---------------------------------------------------
+
+      const propertyDetails = {
+        ...formData.propertyDetails,
+      };
+
+      // ---------------------------------------------------
+      // Convert numeric fields before API
+      // ---------------------------------------------------
+
+      const convertedPropertyDetails = {
+        ...propertyDetails,
+
+        carpet_area:
+          propertyDetails.carpet_area !== undefined &&
+          propertyDetails.carpet_area !== ""
+            ? Number(propertyDetails.carpet_area)
+            : propertyDetails.carpet_area,
+
+        build:
+          propertyDetails.build !== undefined && propertyDetails.build !== ""
+            ? Number(propertyDetails.build)
+            : propertyDetails.build,
+
+        super_build:
+          propertyDetails.super_build !== undefined &&
+          propertyDetails.super_build !== ""
+            ? Number(propertyDetails.super_build)
+            : propertyDetails.super_build,
+
+        total_floor:
+          propertyDetails.total_floor !== undefined &&
+          propertyDetails.total_floor !== ""
+            ? Number(propertyDetails.total_floor)
+            : propertyDetails.total_floor,
+
+        your_floor:
+          propertyDetails.your_floor !== undefined &&
+          propertyDetails.your_floor !== ""
+            ? Number(propertyDetails.your_floor)
+            : propertyDetails.your_floor,
+
+        road_length:
+          propertyDetails.road_length !== undefined &&
+          propertyDetails.road_length !== ""
+            ? Number(propertyDetails.road_length)
+            : propertyDetails.road_length,
+
+        pathway_length:
+          propertyDetails.pathway_length !== undefined &&
+          propertyDetails.pathway_length !== ""
+            ? Number(propertyDetails.pathway_length)
+            : propertyDetails.pathway_length,
+
+        pathway_width:
+          propertyDetails.pathway_width !== undefined &&
+          propertyDetails.pathway_width !== ""
+            ? Number(propertyDetails.pathway_width)
+            : propertyDetails.pathway_width,
+      };
+
+      // ---------------------------------------------------
+      // Update Context with converted values
+      // ---------------------------------------------------
+
+      Object.entries(convertedPropertyDetails).forEach(([key, value]) => {
+        updateFormData("propertyDetails", key, value);
+      });
+
+      // ---------------------------------------------------
+      // Check Property ID
+      // ---------------------------------------------------
+
+      if (!propertyId) {
+        console.error("Property ID is missing");
+        return;
+      }
+
+      // ---------------------------------------------------
+      // API Payload
+      // ---------------------------------------------------
+
+      const payload = {
+        step: 2,
+        user_id: 1,
+        prop_id: propertyId,
+
+        ...convertedPropertyDetails,
+      };
+
+      console.log("Commercial Step 2 Payload:", payload);
+
+      // ---------------------------------------------------
+      // API Call
+      // ---------------------------------------------------
+
+      const response = await postSellPropertyForm(payload);
+
+      console.log("Commercial Step 2 Response:", response);
+
+      if (response?.success === 0) {
+        console.error(
+          "Failed to update commercial property details:",
+          response?.error,
+        );
+        return;
+      }
+
+      // ---------------------------------------------------
+      // Next Step
+      // ---------------------------------------------------
+
+      navigate("/sell-property/features");
+    } catch (error) {
+      // AntD validation error
+      console.log("Commercial property details validation failed:", error);
+    }
+  };
+
+  const handlePrevious = async () => {
+    navigate("/sell-property/location");
   };
 
   return (
@@ -175,64 +575,129 @@ const CommercialPropertyDetailsForm = ({ onPrevious, onNext }) => {
         requiredMark={false}
         className="flex flex-col gap-6"
       >
+        {/* -------------------------------------------------
+            Property Name
+        ------------------------------------------------- */}
+
         <Form.Item
           label={fieldLabel("Property Name")}
-          name="propertyName"
+          name="prop_name"
           className="!mb-0"
+          rules={[
+            {
+              required: true,
+              message: "Please enter property name",
+            },
+            {
+              type: "string",
+              message: "Property name must be text",
+            },
+          ]}
         >
           <Input
-            placeholder="Muthvive's Agriculture Land for sale"
-            className="!rounded-xl !bg-[#f3f3f3] !border-gray-200 !px-5 !py-3 !text-sm"
+            placeholder="Muthvive's Commercial Property for sale"
+            className="!rounded-xl !bg-[#f3f3f3] !border-gray-200 !px-5 !py-3 !text-sm !text-gray-900"
+            onChange={(e) => handleFieldChange("prop_name", e.target.value)}
+            autoComplete="off"
           />
         </Form.Item>
 
+        {/* -------------------------------------------------
+            Carpet Area
+        ------------------------------------------------- */}
+
         <UnitField
           label="Carpet Area"
-          valueName="carpetAreaValue"
-          unitName="carpetAreaUnit"
+          valueName="carpet_area"
+          unitName="carp_unit"
           unitOptions={areaUnitOptions}
           defaultUnit="acres"
+          rules={[
+            {
+              required: true,
+              message: "Please enter carpet area",
+            },
+            wholeNumberValidator("Carpet area"),
+          ]}
+          onValueChange={(value) => handleFieldChange("carpet_area", value)}
+          onUnitChange={(value) => handleFieldChange("carp_unit", value)}
         />
+
+        {/* -------------------------------------------------
+            Build-Up Area
+        ------------------------------------------------- */}
 
         {hasBuildUpArea && (
           <UnitField
             label="Build-Up Area"
-            valueName="buildUpAreaValue"
-            unitName="buildUpAreaUnit"
+            valueName="build"
+            unitName="build_unit"
             unitOptions={areaUnitOptions}
             defaultUnit="acres"
+            rules={[
+              {
+                required: true,
+                message: "Please enter build-up area",
+              },
+              wholeNumberValidator("Build-up area"),
+            ]}
             onRemove={handleRemoveBuildUpArea}
+            onValueChange={(value) => handleFieldChange("build", value)}
+            onUnitChange={(value) => handleFieldChange("build_unit", value)}
           />
         )}
+
         {!hasBuildUpArea && (
           <button
             type="button"
-            onClick={() => setHasBuildUpArea(true)}
+            onClick={handleAddBuildUpArea}
             className="flex items-center gap-x-1 text-sm text-secondary font-medium self-start"
           >
-            <PlusOutlined /> Add Build-Up Area
+            <PlusOutlined />
+            Add Build-Up Area
           </button>
         )}
+
+        {/* -------------------------------------------------
+            Super Build-Up Area
+        ------------------------------------------------- */}
 
         {hasSuperBuildUpArea && (
           <UnitField
             label="Super Build-Up Area"
-            valueName="superBuildUpAreaValue"
-            unitName="superBuildUpAreaUnit"
+            valueName="super_build"
+            unitName="super_build_unit"
             unitOptions={areaUnitOptions}
             defaultUnit="acres"
+            rules={[
+              {
+                required: true,
+                message: "Please enter super build-up area",
+              },
+              wholeNumberValidator("Super build-up area"),
+            ]}
             onRemove={handleRemoveSuperBuildUpArea}
+            onValueChange={(value) => handleFieldChange("super_build", value)}
+            onUnitChange={(value) =>
+              handleFieldChange("super_build_unit", value)
+            }
           />
         )}
+
         {!hasSuperBuildUpArea && (
           <button
             type="button"
-            onClick={() => setHasSuperBuildUpArea(true)}
+            onClick={handleAddSuperBuildUpArea}
             className="flex items-center gap-x-1 text-sm text-secondary font-medium self-start"
           >
-            <PlusOutlined /> Add Super Build-Up Area
+            <PlusOutlined />
+            Add Super Build-Up Area
           </button>
         )}
+
+        {/* -------------------------------------------------
+            Floor Plan
+        ------------------------------------------------- */}
 
         <div>
           <p className="text-sm text-start font-semibold text-gray-900 mb-3">
@@ -242,16 +707,28 @@ const CommercialPropertyDetailsForm = ({ onPrevious, onNext }) => {
           <div className="flex flex-col gap-4">
             <Form.Item
               label={
-                <span className="text-sm  font-semibold text-gray-700">
+                <span className="text-sm font-semibold text-gray-700">
                   Total Floor
                 </span>
               }
-              name="totalFloor"
+              name="total_floor"
               className="!mb-0"
+              getValueFromEvent={(e) => e.target.value}
+              rules={[
+                {
+                  required: true,
+                  message: "Please enter total floors",
+                },
+                wholeNumberValidator("Total floor"),
+              ]}
             >
               <Input
                 placeholder="20"
-                className="!rounded-xl !bg-gray-100 !border-gray-200 !px-5 !py-3 !text-sm"
+                className="!rounded-xl !bg-gray-100 !border-gray-200 !px-5 !py-3 !text-sm !text-gray-900"
+                onChange={(e) =>
+                  handleFieldChange("total_floor", e.target.value)
+                }
+                autoComplete="off"
               />
             </Form.Item>
 
@@ -261,7 +738,7 @@ const CommercialPropertyDetailsForm = ({ onPrevious, onNext }) => {
                   Your Floor (Optional)
                 </span>
               }
-              name="yourFloor"
+              name="your_floor"
               className="!mb-0"
             >
               <Select
@@ -275,15 +752,26 @@ const CommercialPropertyDetailsForm = ({ onPrevious, onNext }) => {
                 }}
                 options={floorOptions}
                 notFoundContent="Enter total floors first"
+                onChange={(value) => handleFieldChange("your_floor", value)}
               />
             </Form.Item>
           </div>
         </div>
 
+        {/* -------------------------------------------------
+            Road Plan
+        ------------------------------------------------- */}
+
         <Form.Item
           label={fieldLabel("Road Plan")}
-          name="roadPlan"
+          name="road_plan"
           className="!mb-0"
+          rules={[
+            {
+              required: true,
+              message: "Please select road plan",
+            },
+          ]}
         >
           <ToggleGroup
             options={roadPlanOptions}
@@ -291,24 +779,52 @@ const CommercialPropertyDetailsForm = ({ onPrevious, onNext }) => {
           />
         </Form.Item>
 
+        {/* -------------------------------------------------
+            Road Length
+        ------------------------------------------------- */}
+
         {isOnRoad && (
           <UnitField
             label="Road Length"
-            valueName="roadLengthValue"
-            unitName="roadLengthUnit"
+            valueName="road_length"
+            unitName="road_length_unit"
             unitOptions={lengthUnitOptions}
             defaultUnit="ft"
+            rules={[
+              {
+                required: true,
+                message: "Please enter road length",
+              },
+              wholeNumberValidator("Road length"),
+            ]}
+            onValueChange={(value) => handleFieldChange("road_length", value)}
+            onUnitChange={(value) =>
+              handleFieldChange("road_length_unit", value)
+            }
           />
         )}
+
+        {/* -------------------------------------------------
+            Interior Pathway
+        ------------------------------------------------- */}
 
         {isInterior && (
           <>
             <Form.Item
               label={fieldLabel("Pathway Available")}
-              name="pathwayAvailable"
+              name="pathway"
               className="!mb-0"
+              rules={[
+                {
+                  required: true,
+                  message: "Please select pathway availability",
+                },
+              ]}
             >
-              <ToggleGroup options={yesNoOptions} />
+              <ToggleGroup
+                options={yesNoOptions}
+                onChange={handlePathwayChange}
+              />
             </Form.Item>
 
             {showPathwayDimension && (
@@ -316,29 +832,67 @@ const CommercialPropertyDetailsForm = ({ onPrevious, onNext }) => {
                 <p className="text-sm font-semibold text-gray-900 -mb-4">
                   Pathway Dimension
                 </p>
+
                 <UnitField
                   label="Length"
-                  valueName="pathwayLengthValue"
-                  unitName="pathwayLengthUnit"
+                  valueName="pathway_length"
+                  unitName="pathway_length_unit"
                   unitOptions={lengthUnitOptions}
                   defaultUnit="ft"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please enter pathway length",
+                    },
+                    wholeNumberValidator("Pathway length"),
+                  ]}
+                  onValueChange={(value) =>
+                    handleFieldChange("pathway_length", value)
+                  }
+                  onUnitChange={(value) =>
+                    handleFieldChange("pathway_length_unit", value)
+                  }
                 />
+
                 <UnitField
                   label="Width"
-                  valueName="pathwayWidthValue"
-                  unitName="pathwayWidthUnit"
+                  valueName="pathway_width"
+                  unitName="pathway_width_unit"
                   unitOptions={lengthUnitOptions}
                   defaultUnit="ft"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please enter pathway width",
+                    },
+                    wholeNumberValidator("Pathway width"),
+                  ]}
+                  onValueChange={(value) =>
+                    handleFieldChange("pathway_width", value)
+                  }
+                  onUnitChange={(value) =>
+                    handleFieldChange("pathway_width_unit", value)
+                  }
                 />
               </>
             )}
           </>
         )}
 
+        {/* -------------------------------------------------
+            Property Facing
+        ------------------------------------------------- */}
+
         <Form.Item
           label={fieldLabel("Property Facing")}
-          name="propertyFacing"
+          name="facing"
           className="!mb-0"
+          rules={[
+            {
+              required: true,
+              message: "Please select property facing",
+            },
+          ]}
         >
           <Select
             placeholder="Select facing"
@@ -350,40 +904,41 @@ const CommercialPropertyDetailsForm = ({ onPrevious, onNext }) => {
               },
             }}
             options={facingOptions}
+            onChange={(value) => handleFieldChange("facing", value)}
           />
         </Form.Item>
 
+        {/* -------------------------------------------------
+            Availability Status
+        ------------------------------------------------- */}
+
         <Form.Item
           label={fieldLabel("Availability Status ?")}
-          name="availabilityStatus"
+          name="avail_status"
           className="!mb-0"
+          rules={[
+            {
+              required: true,
+              message: "Please select availability status",
+            },
+          ]}
         >
-          <ToggleGroup options={availabilityStatusOptions} />
+          <ToggleGroup
+            options={availabilityStatusOptions}
+            onChange={(value) => handleFieldChange("avail_status", value)}
+          />
         </Form.Item>
 
+        {/* -------------------------------------------------
+            Navigation
+        ------------------------------------------------- */}
+
         <FormNavigationButtons
-          // onPrevious={onPrevious}
           onNext={handleNext}
-          // disableNext={isNextDisabled}
+          onPrevious={handlePrevious}
+          disableNext={isNextDisabled}
         />
       </Form>
-
-      {/* Previous / Next navigation */}
-      {/* <div className="grid grid-cols-2 sm:flex sm:justify-end gap-3 mt-8">
-        <Button
-          onClick={onPrevious}
-          className="!rounded-lg !h-11 !font-medium !border-gray-300 !text-gray-700"
-        >
-          Previous
-        </Button>
-        <Button
-          type="primary"
-          onClick={onNext}
-          className="!rounded-lg !h-11 !font-medium !bg-secondary !border-none"
-        >
-          Next
-        </Button>
-      </div> */}
     </div>
   );
 };

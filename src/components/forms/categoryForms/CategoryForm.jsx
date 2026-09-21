@@ -250,9 +250,9 @@ const PropertyCategoryForm = ({ onPrevious }) => {
     navigate("/sell-property/location");
   };
 
-  // ============================================================
-  // Button state
-  // ============================================================
+  // const handlePrevious = async () => {
+  //   navigate("/");
+  // };
 
   const isNextDisabled =
     !categoryValue || (isCategoryTypeEnabled && !subCategory);
@@ -329,7 +329,7 @@ const PropertyCategoryForm = ({ onPrevious }) => {
 
         {/* Reusable navigation buttons */}
         <FormNavigationButtons
-          onPrevious={onPrevious}
+          // onPrevious={handlePrevious}
           onNext={handleNext}
           disableNext={isNextDisabled}
         />

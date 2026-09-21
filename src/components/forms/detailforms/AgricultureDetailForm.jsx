@@ -169,6 +169,7 @@ const UnitField = ({
             onChange={(e) => {
               onValueChange?.(e.target.value);
             }}
+            autoComplete="off"
           />
         </Form.Item>
 
@@ -252,6 +253,49 @@ const PropertyDetailsForm = () => {
   const showConstructionType = constructionDone === 1;
 
   const showOthersDescription = constructionType === 0;
+
+  // -------------------------------------------------------
+  // Next button disabled state
+  // -------------------------------------------------------
+
+  const formValues = Form.useWatch([], form);
+
+  const isEmpty = (value) =>
+    value === undefined ||
+    value === null ||
+    value === "" ||
+    (typeof value === "string" && value.trim() === "");
+
+  const isNextDisabled =
+    // Property Name
+    isEmpty(formValues?.prop_name) ||
+    // Property Area
+    isEmpty(formValues?.prop_area) ||
+    // Road Plan
+    isEmpty(formValues?.road_plan) ||
+    // Road Length - only required when On Road
+    (isOnRoad && isEmpty(formValues?.road_length)) ||
+    // Pathway - only required when Interior
+    (isInterior && isEmpty(formValues?.pathway)) ||
+    // Pathway dimensions - only required when pathway is available
+    (showPathwayDimension && isEmpty(formValues?.length)) ||
+    (showPathwayDimension && isEmpty(formValues?.width)) ||
+    // Common Well
+    isEmpty(formValues?.c_well) ||
+    // Individual Well
+    isEmpty(formValues?.i_well) ||
+    // Electricity
+    isEmpty(formValues?.electricity) ||
+    // Horsepower - only required when electricity is available
+    (showHorsepower && isEmpty(formValues?.hp)) ||
+    // Facing
+    isEmpty(formValues?.facing) ||
+    // Construction
+    isEmpty(formValues?.construct) ||
+    // Construction Type - only when construction is done
+    (showConstructionType && isEmpty(formValues?.construct_type)) ||
+    // Other Construction Description - only for Others
+    (showOthersDescription && isEmpty(formValues?.other_type));
 
   // -------------------------------------------------------
   // Restore saved Context data
@@ -471,9 +515,9 @@ const PropertyDetailsForm = () => {
     }
   };
 
-  // -------------------------------------------------------
-  // Render
-  // -------------------------------------------------------
+  const handlePrevious = async () => {
+    navigate("/sell-property/location");
+  };
 
   return (
     <div className="w-full max-w-2xl">
@@ -506,6 +550,7 @@ const PropertyDetailsForm = () => {
             placeholder="Muthvive's Agriculture Land for sale"
             className="!rounded-xl bg-[#f3f3f3]! !px-5 !py-3 !text-sm"
             onChange={(e) => handleFieldChange("prop_name", e.target.value)}
+            autoComplete="off"
           />
         </Form.Item>
 
@@ -735,6 +780,7 @@ const PropertyDetailsForm = () => {
               placeholder="200"
               className="!rounded-xl !bg-gray-100 !border-gray-200 !px-5 !py-3 !text-sm"
               onChange={(e) => handleFieldChange("hp", e.target.value)}
+              autoComplete="off"
             />
           </Form.Item>
         )}
@@ -848,6 +894,7 @@ const PropertyDetailsForm = () => {
               rows={4}
               className="!rounded-xl !bg-[#f3f3f3] !border-gray-200 !px-5 !py-3 !text-sm"
               onChange={(e) => handleFieldChange("other_type", e.target.value)}
+              autoComplete="off"
             />
           </Form.Item>
         )}
@@ -856,7 +903,11 @@ const PropertyDetailsForm = () => {
             Navigation
         ------------------------------------------------- */}
 
-        <FormNavigationButtons onNext={handleNext} />
+        <FormNavigationButtons
+          onNext={handleNext}
+          onPrevious={handlePrevious}
+          disableNext={isNextDisabled}
+        />
       </Form>
     </div>
   );

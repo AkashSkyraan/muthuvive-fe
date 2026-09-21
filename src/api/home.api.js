@@ -6,3 +6,10 @@ export const getTestimonials = async (filters = {}) => {
   });
   return response.data.data;
 };
+
+export const getPropertiesByArea = async (filters = {}) => {
+  const response = await axiosInstance.get("/property/property-area", {
+    params: filters,
+  });
+  return response.data.data;
+};

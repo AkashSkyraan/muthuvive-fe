@@ -1,54 +1,31 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form } from "antd";
 import { useNavigate } from "react-router-dom";
 import FormNavigationButtons from "../../fornNavButtons";
-
-// Dynamic data - replace with API response
-const amenitiesOptions = [
-  { value: "borewell-tank", label: "Borewell/Tank" },
-  { value: "24x7-water", label: "24x7 Water" },
-  { value: "swimming-pool", label: "Swimming Pool" },
-  { value: "well", label: "Well" },
-  { value: "rainwater-harvesting", label: "Rainwater Harvesting" },
-  { value: "electricity", label: "Electricity" },
-  { value: "garden", label: "Garden" },
-  { value: "security-alarm", label: "Security / Firm Alarm" },
-  { value: "power-backup", label: "Power Backup" },
-  { value: "club-house", label: "Club House" },
-  { value: "gymnasium", label: "Gymnasium" },
-  { value: "childrens-play-area", label: "Children's Play Area" },
-];
-
-// Dynamic data - replace with API response
-const propertyHighlightsOptions = [
-  { value: "next-to-hospital", label: "Next to Hospital" },
-  { value: "next-to-school", label: "Next to School" },
-  { value: "next-to-college", label: "Next to College" },
-  { value: "next-to-metro", label: "Next to Metro" },
-  { value: "next-to-shopping-mall", label: "Next to Shopping Mall" },
-  { value: "next-to-highway", label: "Next to Highway" },
-  { value: "next-to-airport", label: "Next to Airport" },
-  { value: "next-to-beach-lake", label: "Next to Beach / Lake" },
-  { value: "next-to-park", label: "Next to Park" },
-  { value: "next-to-temple", label: "Next to Temple" },
-];
+import { useSellProperty } from "../../../context/SellPropertyContext";
+import {
+  getAmenity,
+  getPropertyHighlight,
+} from "../../../api/propertyFormDropdown.api";
+import { postSellPropertyForm } from "../../../api/sellPropertyForm.api";
 
 const VISIBLE_COUNT = 7;
 
-// A multi-select group of pill buttons that only shows the first
-// VISIBLE_COUNT options until "View More" is clicked, then reveals the rest
-// (and turns into "View Less" to collapse back).
+// Multi-select group of pill buttons
 const ExpandableMultiSelect = ({ options, value = [], onChange }) => {
   const [expanded, setExpanded] = useState(false);
 
   const hasMore = options.length > VISIBLE_COUNT;
+
   const visibleOptions = expanded ? options : options.slice(0, VISIBLE_COUNT);
 
   const toggleOption = (optionValue) => {
     const isSelected = value.includes(optionValue);
+
     const nextValue = isSelected
       ? value.filter((item) => item !== optionValue)
       : [...value, optionValue];
+
     onChange?.(nextValue);
   };
 
@@ -56,6 +33,7 @@ const ExpandableMultiSelect = ({ options, value = [], onChange }) => {
     <div className="flex flex-wrap items-center gap-3">
       {visibleOptions.map((option) => {
         const isSelected = value.includes(option.value);
+
         return (
           <button
             key={option.value}
@@ -93,11 +71,151 @@ const PropertyFeaturesForm = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
 
-  const handleNext = async () => {
-    // const values = await form.validateFields();
+  const { formData, propertyId, updateFormData } = useSellProperty();
 
-    // setCategory(values.propertyCategory);
-    navigate("/sell-property/media");
+  const [amenitiesOptions, setAmenitiesOptions] = useState([]);
+  const [propertyHighlightsOptions, setPropertyHighlightsOptions] = useState(
+    [],
+  );
+
+  const [selectedAmenities, setSelectedAmenities] = useState([]);
+  const [selectedPropertyHighlights, setSelectedPropertyHighlights] = useState(
+    [],
+  );
+
+  // -------------------------------------------------------
+  // Next Button Disabled State
+  // Both categories must have at least one selection
+  // -------------------------------------------------------
+
+  const isNextDisabled =
+    selectedAmenities.length === 0 || selectedPropertyHighlights.length === 0;
+
+  useEffect(() => {
+    const fetchAmenities = async () => {
+      try {
+        const response = await getAmenity();
+
+        if (response?.success === 0) {
+          console.error("Failed to fetch amenities:", response?.error);
+          return;
+        }
+
+        console.log("amenities", response[0]);
+
+        const amenities = response || [];
+
+        const formattedAmenities = amenities.map((item) => ({
+          value: item.id,
+          label: item.name,
+        }));
+
+        setAmenitiesOptions(formattedAmenities);
+      } catch (error) {
+        console.error("Error fetching amenities:", error);
+      }
+    };
+
+    fetchAmenities();
+  }, []);
+
+  useEffect(() => {
+    const fetchPropertyHighlights = async () => {
+      try {
+        const response = await getPropertyHighlight();
+
+        if (response?.success === 0) {
+          console.error(
+            "Failed to fetch property highlights:",
+            response?.error,
+          );
+          return;
+        }
+
+        const propertyHighlights = response || [];
+
+        const formattedPropertyHighlights = propertyHighlights.map((item) => ({
+          value: item.id,
+          label: item.name,
+        }));
+
+        setPropertyHighlightsOptions(formattedPropertyHighlights);
+      } catch (error) {
+        console.error("Error fetching property highlights:", error);
+      }
+    };
+
+    fetchPropertyHighlights();
+  }, []);
+
+  useEffect(() => {
+    const savedFeatures = formData.propertyFeatures;
+
+    if (!savedFeatures || Object.keys(savedFeatures).length === 0) {
+      return;
+    }
+
+    const savedAmenities = savedFeatures.amenities || [];
+    const savedPropertyHighlights = savedFeatures["prop_highs"] || [];
+
+    setSelectedAmenities(savedAmenities);
+    setSelectedPropertyHighlights(savedPropertyHighlights);
+
+    form.setFieldsValue({
+      amenities: savedAmenities,
+      propHighs: savedPropertyHighlights,
+    });
+  }, [formData.propertyFeatures, form]);
+
+  const handleAmenitiesChange = (values) => {
+    setSelectedAmenities(values);
+
+    updateFormData("propertyFeatures", "amenities", values);
+  };
+
+  const handlePropertyHighlightsChange = (values) => {
+    setSelectedPropertyHighlights(values);
+
+    updateFormData("propertyFeatures", "prop_highs", values);
+  };
+
+  const handleNext = async () => {
+    try {
+      const values = await form.validateFields();
+
+      const latestFeatures = {
+        amenities: values.amenities || [],
+        prop_highs: values.propHighs || [],
+      };
+
+      updateFormData("propertyFeatures", "amenities", latestFeatures.amenities);
+
+      updateFormData(
+        "propertyFeatures",
+        "prop_highs",
+        latestFeatures["prop_highs"],
+      );
+
+      const payload = {
+        step: 3,
+        user_id: 1,
+        prop_id: propertyId,
+        amenities: latestFeatures.amenities,
+        prop_highs: latestFeatures["prop_highs"],
+      };
+
+      console.log("Property features payload:", payload);
+
+      const response = await postSellPropertyForm(payload);
+
+      navigate("/sell-property/media");
+    } catch (error) {
+      console.error("Property features validation failed:", error);
+    }
+  };
+
+  const handlePrevious = async () => {
+    navigate("/sell-property/details");
   };
 
   return (
@@ -113,20 +231,29 @@ const PropertyFeaturesForm = () => {
           name="amenities"
           className="!mb-0"
         >
-          <ExpandableMultiSelect options={amenitiesOptions} />
+          <ExpandableMultiSelect
+            options={amenitiesOptions}
+            value={selectedAmenities}
+            onChange={handleAmenitiesChange}
+          />
         </Form.Item>
 
         <Form.Item
           label={sectionLabel("Property Highlights")}
-          name="propertyHighlights"
+          name="propHighs"
           className="!mb-0"
         >
-          <ExpandableMultiSelect options={propertyHighlightsOptions} />
+          <ExpandableMultiSelect
+            options={propertyHighlightsOptions}
+            value={selectedPropertyHighlights}
+            onChange={handlePropertyHighlightsChange}
+          />
         </Form.Item>
+
         <FormNavigationButtons
-          // onPrevious={onPrevious}
           onNext={handleNext}
-          // disableNext={isNextDisabled}
+          onPrevious={handlePrevious}
+          disableNext={isNextDisabled}
         />
       </Form>
     </div>

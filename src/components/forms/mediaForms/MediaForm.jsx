@@ -17,8 +17,25 @@ import {
   RightOutlined,
   LeftOutlined,
 } from "@ant-design/icons";
+
 import FormNavigationButtons from "../../fornNavButtons";
+
+import { postUpload } from "../../../api/upload.api";
+import { postSellPropertyForm } from "../../../api/sellPropertyForm.api";
+
+import { useSellProperty } from "../../../context/SellPropertyContext";
+
 import "../mediaForms/MediaForm.css";
+import { useNavigate } from "react-router-dom";
+import StatusMessage, { showStatusMessage } from "../../common/MessagePopup";
+
+// ============================================================
+// FILE SIZE LIMITS
+// ============================================================
+
+const IMAGE_MAX_SIZE = 3 * 1024 * 1024;
+const VIDEO_MAX_SIZE = 20 * 1024 * 1024;
+const DOCUMENT_MAX_SIZE = 5 * 1024 * 1024;
 
 // ============================================================
 // COVER IMAGE CROP SETTINGS
@@ -26,6 +43,7 @@ import "../mediaForms/MediaForm.css";
 
 const COVER_IMAGE_WIDTH = 1200;
 const COVER_IMAGE_HEIGHT = 675;
+
 const COVER_ASPECT_RATIO = COVER_IMAGE_WIDTH / COVER_IMAGE_HEIGHT;
 
 const ZOOM_MIN = 1;
@@ -43,6 +61,16 @@ const formatFileSize = (bytes) => {
   const mb = bytes / (1024 * 1024);
 
   return mb >= 1 ? `${mb.toFixed(1)}MB` : `${(bytes / 1024).toFixed(0)}KB`;
+};
+
+const getSizeError = (file, maxSize, type) => {
+  if (!file) return null;
+
+  if (file.size > maxSize) {
+    return `${type} exceeds the allowed size`;
+  }
+
+  return null;
 };
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
@@ -77,6 +105,7 @@ const CoverCropModal = ({ open, imageFile, onCancel, onSave }) => {
   });
 
   const [zoom, setZoom] = useState(1);
+
   const [rotation, setRotation] = useState(0);
 
   const [pos, setPos] = useState({
@@ -91,55 +120,110 @@ const CoverCropModal = ({ open, imageFile, onCancel, onSave }) => {
   // ----------------------------------------------------------
 
   useEffect(() => {
-    if (!open || !imageFile) return;
+    if (!open || !imageFile) {
+      setImageSrc(null);
 
-    const url = URL.createObjectURL(imageFile);
-
-    setImageSrc(url);
-
-    const img = new window.Image();
-
-    img.onload = () => {
       setNaturalSize({
-        w: img.naturalWidth,
-        h: img.naturalHeight,
+        w: 0,
+        h: 0,
+      });
+
+      setFrameSize({
+        w: 0,
+        h: 0,
+      });
+
+      setZoom(1);
+      setRotation(0);
+
+      setPos({
+        x: 0,
+        y: 0,
+      });
+
+      return;
+    }
+
+    let cancelled = false;
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      if (cancelled) return;
+
+      setImageSrc(reader.result);
+    };
+
+    reader.onerror = () => {
+      if (cancelled) return;
+
+      setImageSrc(null);
+
+      showStatusMessage({
+        type: "error",
+        text: "Unable to load the cover image",
       });
     };
 
-    img.src = url;
+    reader.readAsDataURL(imageFile);
 
     return () => {
-      URL.revokeObjectURL(url);
+      cancelled = true;
+      reader.abort();
     };
   }, [open, imageFile]);
+
+  // ----------------------------------------------------------
+  // IMAGE LOADED
+  // ----------------------------------------------------------
+
+  const handleImageLoad = (e) => {
+    const img = e.currentTarget;
+
+    setNaturalSize({
+      w: img.naturalWidth,
+      h: img.naturalHeight,
+    });
+  };
 
   // ----------------------------------------------------------
   // MEASURE FRAME
   // ----------------------------------------------------------
 
+  const measureFrame = () => {
+    if (!frameRef.current) return;
+
+    const rect = frameRef.current.getBoundingClientRect();
+
+    setFrameSize({
+      w: rect.width,
+      h: rect.height,
+    });
+  };
+
+  // ----------------------------------------------------------
+  // MEASURE FRAME WHEN MODAL OPENS
+  // ----------------------------------------------------------
+
   useEffect(() => {
     if (!open) return;
 
-    const measure = () => {
-      if (!frameRef.current) return;
+    const timer = setTimeout(() => {
+      measureFrame();
+    }, 50);
 
-      const rect = frameRef.current.getBoundingClientRect();
-
-      setFrameSize({
-        w: rect.width,
-        h: rect.height,
-      });
-    };
-
-    measure();
-
-    const observer = new ResizeObserver(measure);
+    const observer = new ResizeObserver(() => {
+      measureFrame();
+    });
 
     if (frameRef.current) {
       observer.observe(frameRef.current);
     }
 
-    return () => observer.disconnect();
+    return () => {
+      clearTimeout(timer);
+      observer.disconnect();
+    };
   }, [open]);
 
   // ----------------------------------------------------------
@@ -154,6 +238,7 @@ const CoverCropModal = ({ open, imageFile, onCancel, onSave }) => {
     const rad = (rotationDeg * Math.PI) / 180;
 
     const cos = Math.abs(Math.cos(rad));
+
     const sin = Math.abs(Math.sin(rad));
 
     const bboxWAtScale1 = naturalSize.w * cos + naturalSize.h * sin;
@@ -182,6 +267,7 @@ const CoverCropModal = ({ open, imageFile, onCancel, onSave }) => {
     const rad = (rotationDeg * Math.PI) / 180;
 
     const cos = Math.abs(Math.cos(rad));
+
     const sin = Math.abs(Math.sin(rad));
 
     return {
@@ -198,20 +284,23 @@ const CoverCropModal = ({ open, imageFile, onCancel, onSave }) => {
   // ----------------------------------------------------------
 
   useEffect(() => {
-    if (!naturalSize.w || !frameSize.w) {
+    if (!naturalSize.w || !naturalSize.h || !frameSize.w || !frameSize.h) {
       return;
     }
-
-    setZoom(1);
-    setRotation(0);
 
     const scale = computeBaseScale(0);
 
     const dispW = naturalSize.w * scale;
+
     const dispH = naturalSize.h * scale;
+
+    setZoom(1);
+
+    setRotation(0);
 
     setPos({
       x: (frameSize.w - dispW) / 2,
+
       y: (frameSize.h - dispH) / 2,
     });
 
@@ -228,6 +317,7 @@ const CoverCropModal = ({ open, imageFile, onCancel, onSave }) => {
     const { w: bboxW, h: bboxH } = getBBoxSize(scale, rotationValue);
 
     const minX = frameSize.w - bboxW;
+
     const minY = frameSize.h - bboxH;
 
     return {
@@ -304,7 +394,9 @@ const CoverCropModal = ({ open, imageFile, onCancel, onSave }) => {
   };
 
   const handlePointerMove = (e) => {
-    if (!dragState.current) return;
+    if (!dragState.current) {
+      return;
+    }
 
     const dx = e.clientX - dragState.current.startX;
 
@@ -328,7 +420,19 @@ const CoverCropModal = ({ open, imageFile, onCancel, onSave }) => {
   // ----------------------------------------------------------
 
   const handleSave = () => {
-    if (!imgElRef.current || !frameSize.w) {
+    if (
+      !imgElRef.current ||
+      !frameSize.w ||
+      !frameSize.h ||
+      !naturalSize.w ||
+      !naturalSize.h ||
+      !imageFile
+    ) {
+      showStatusMessage({
+        type: "error",
+        text: "Unable to process the cover image",
+      });
+
       return;
     }
 
@@ -342,12 +446,22 @@ const CoverCropModal = ({ open, imageFile, onCancel, onSave }) => {
 
     const ctx = canvas.getContext("2d");
 
+    if (!ctx) {
+      showStatusMessage({
+        type: "error",
+        text: "Unable to process the cover image",
+      });
+
+      return;
+    }
+
     ctx.save();
 
     ctx.translate(pos.x * outputScale, pos.y * outputScale);
 
     ctx.translate(
       (bboxSize.w * outputScale) / 2,
+
       (bboxSize.h * outputScale) / 2,
     );
 
@@ -363,7 +477,14 @@ const CoverCropModal = ({ open, imageFile, onCancel, onSave }) => {
 
     canvas.toBlob(
       (blob) => {
-        if (!blob) return;
+        if (!blob) {
+          showStatusMessage({
+            type: "error",
+            text: "Unable to create the cropped image",
+          });
+
+          return;
+        }
 
         const croppedFile = new File([blob], imageFile.name || "cover.jpg", {
           type: "image/jpeg",
@@ -390,6 +511,14 @@ const CoverCropModal = ({ open, imageFile, onCancel, onSave }) => {
       onOk={handleSave}
       width={620}
       centered
+      destroyOnHidden
+      afterOpenChange={(isOpen) => {
+        if (isOpen) {
+          requestAnimationFrame(() => {
+            measureFrame();
+          });
+        }
+      }}
     >
       <div
         ref={frameRef}
@@ -432,10 +561,12 @@ const CoverCropModal = ({ open, imageFile, onCancel, onSave }) => {
               src={imageSrc}
               alt="crop preview"
               draggable={false}
+              onLoad={handleImageLoad}
               className="
                 absolute
                 top-1/2
                 left-1/2
+                block
               "
               style={{
                 width: naturalSize.w * effectiveScale || undefined,
@@ -443,6 +574,8 @@ const CoverCropModal = ({ open, imageFile, onCancel, onSave }) => {
                 height: naturalSize.h * effectiveScale || undefined,
 
                 transform: `translate(-50%, -50%) rotate(${rotation}deg)`,
+
+                maxWidth: "none",
               }}
             />
           </div>
@@ -450,6 +583,7 @@ const CoverCropModal = ({ open, imageFile, onCancel, onSave }) => {
       </div>
 
       {/* Zoom */}
+
       <div className="flex items-center gap-x-3 mt-4">
         <button
           type="button"
@@ -489,6 +623,7 @@ const CoverCropModal = ({ open, imageFile, onCancel, onSave }) => {
       </div>
 
       {/* Rotate */}
+
       <div className="flex items-center gap-x-3 mt-3">
         <button
           type="button"
@@ -535,6 +670,10 @@ const CoverCropModal = ({ open, imageFile, onCancel, onSave }) => {
 // ============================================================
 
 const MediaUploadForm = () => {
+  const navigate = useNavigate();
+
+  const { propertyId, updateFormData } = useSellProperty();
+
   const [coverImage, setCoverImage] = useState(null);
 
   const [isCropModalOpen, setIsCropModalOpen] = useState(false);
@@ -555,6 +694,8 @@ const MediaUploadForm = () => {
 
   const [videoPreviewIndex, setVideoPreviewIndex] = useState(0);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const coverInputRef = useRef(null);
 
   const imagesInputRef = useRef(null);
@@ -572,6 +713,15 @@ const MediaUploadForm = () => {
 
     if (!file) return;
 
+    const error = getSizeError(file, IMAGE_MAX_SIZE, "Cover image");
+
+    if (error) {
+      showStatusMessage({
+        type: "error",
+        text: "Cover image exceeds the allowed size of 3 MB",
+      });
+    }
+
     setCoverImage((prev) => {
       if (prev?.url) {
         URL.revokeObjectURL(prev.url);
@@ -580,13 +730,27 @@ const MediaUploadForm = () => {
       return {
         file,
         url: URL.createObjectURL(file),
+        error,
       };
     });
 
     e.target.value = "";
   };
 
+  // ==========================================================
+  // COVER CROP SAVE
+  // ==========================================================
+
   const handleCropSave = (croppedFile) => {
+    const error = getSizeError(croppedFile, IMAGE_MAX_SIZE, "Cover image");
+
+    if (error) {
+      showStatusMessage({
+        type: "error",
+        text: "Cropped cover image exceeds the allowed size of 3 MB",
+      });
+    }
+
     setCoverImage((prev) => {
       if (prev?.url) {
         URL.revokeObjectURL(prev.url);
@@ -595,6 +759,7 @@ const MediaUploadForm = () => {
       return {
         file: croppedFile,
         url: URL.createObjectURL(croppedFile),
+        error,
       };
     });
 
@@ -610,9 +775,22 @@ const MediaUploadForm = () => {
 
     const newImages = files.map((file) => ({
       id: `${file.name}-${file.lastModified}-${Math.random()}`,
+
       file,
+
       url: URL.createObjectURL(file),
+
+      error: getSizeError(file, IMAGE_MAX_SIZE, "Image"),
     }));
+
+    const hasInvalidImages = newImages.some((image) => image.error);
+
+    if (hasInvalidImages) {
+      showStatusMessage({
+        type: "error",
+        text: "One or more images exceed the allowed size of 3 MB",
+      });
+    }
 
     setImages((prev) => [...prev, ...newImages]);
 
@@ -628,9 +806,22 @@ const MediaUploadForm = () => {
 
     const newVideos = files.map((file) => ({
       id: `${file.name}-${file.lastModified}-${Math.random()}`,
+
       file,
+
       url: URL.createObjectURL(file),
+
+      error: getSizeError(file, VIDEO_MAX_SIZE, "Video"),
     }));
+
+    const hasInvalidVideos = newVideos.some((video) => video.error);
+
+    if (hasInvalidVideos) {
+      showStatusMessage({
+        type: "error",
+        text: "One or more videos exceed the allowed size of 20 MB",
+      });
+    }
 
     setVideos((prev) => [...prev, ...newVideos]);
 
@@ -646,8 +837,20 @@ const MediaUploadForm = () => {
 
     const newDocs = files.map((file) => ({
       id: `${file.name}-${file.lastModified}-${Math.random()}`,
+
       file,
+
+      error: getSizeError(file, DOCUMENT_MAX_SIZE, "Document"),
     }));
+
+    const hasInvalidDocuments = newDocs.some((document) => document.error);
+
+    if (hasInvalidDocuments) {
+      showStatusMessage({
+        type: "error",
+        text: "One or more documents exceed the allowed size of 5 MB",
+      });
+    }
 
     setDocuments((prev) => [...prev, ...newDocs]);
 
@@ -655,7 +858,19 @@ const MediaUploadForm = () => {
   };
 
   // ==========================================================
-  // REMOVE
+  // REMOVE COVER
+  // ==========================================================
+
+  const removeCover = () => {
+    if (coverImage?.url) {
+      URL.revokeObjectURL(coverImage.url);
+    }
+
+    setCoverImage(null);
+  };
+
+  // ==========================================================
+  // REMOVE IMAGE
   // ==========================================================
 
   const removeImage = (id) => {
@@ -670,6 +885,10 @@ const MediaUploadForm = () => {
     });
   };
 
+  // ==========================================================
+  // REMOVE VIDEO
+  // ==========================================================
+
   const removeVideo = (id) => {
     setVideos((prev) => {
       const videoToRemove = prev.find((vid) => vid.id === id);
@@ -682,12 +901,16 @@ const MediaUploadForm = () => {
     });
   };
 
+  // ==========================================================
+  // REMOVE DOCUMENT
+  // ==========================================================
+
   const removeDocument = (id) => {
     setDocuments((prev) => prev.filter((doc) => doc.id !== id));
   };
 
   // ==========================================================
-  // IMAGE PREVIEW NAVIGATION
+  // PREVIEW NAVIGATION
   // ==========================================================
 
   const showPreviousImage = () => {
@@ -702,10 +925,6 @@ const MediaUploadForm = () => {
     );
   };
 
-  // ==========================================================
-  // VIDEO PREVIEW NAVIGATION
-  // ==========================================================
-
   const showPreviousVideo = () => {
     setVideoPreviewIndex((current) =>
       current > 0 ? current - 1 : videos.length - 1,
@@ -719,11 +938,191 @@ const MediaUploadForm = () => {
   };
 
   // ==========================================================
-  // RENDER
+  // INVALID MEDIA CHECK
   // ==========================================================
+
+  const hasInvalidMedia =
+    Boolean(coverImage?.error) ||
+    images.some((image) => image.error) ||
+    videos.some((video) => video.error) ||
+    documents.some((document) => document.error);
+
+  // ==========================================================
+  // SUBMIT DISABLED CHECK
+  // ==========================================================
+
+  const isSubmitDisabled =
+    hasInvalidMedia || images.length === 0 || isSubmitting;
+
+  // ==========================================================
+  // UPLOAD ONE FILE
+  // ==========================================================
+
+  const uploadSingleFile = async (file) => {
+    if (!file) {
+      throw new Error("File is missing");
+    }
+
+    const response = await postUpload(file);
+
+    if (
+      !response?.data ||
+      !Array.isArray(response.data) ||
+      !response.data.length
+    ) {
+      throw new Error("Media upload failed");
+    }
+
+    return response.data[0].id;
+  };
+
+  // ==========================================================
+  // FINAL SUBMIT
+  // ==========================================================
+
+  const handleSubmit = async () => {
+    // Don't submit if any file is invalid
+    if (hasInvalidMedia) {
+      showStatusMessage({
+        type: "error",
+        text: "Please remove or replace the invalid media files",
+      });
+
+      return;
+    }
+
+    // Don't submit without at least one property image
+    if (images.length === 0) {
+      showStatusMessage({
+        type: "error",
+        text: "Please upload at least one property image",
+      });
+
+      return;
+    }
+
+    if (isSubmitting) {
+      return;
+    }
+
+    if (!propertyId) {
+      console.error("Property ID is missing");
+
+      showStatusMessage({
+        type: "error",
+        text: "Property ID is missing",
+      });
+
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      // ------------------------------------------------------
+      // 1. COVER
+      // ------------------------------------------------------
+
+      let coverId = null;
+
+      if (coverImage?.file) {
+        coverId = await uploadSingleFile(coverImage.file);
+      }
+
+      // ------------------------------------------------------
+      // 2. PROPERTY IMAGES
+      // ------------------------------------------------------
+
+      const imageIds = await Promise.all(
+        images.map((image) => uploadSingleFile(image.file)),
+      );
+
+      // ------------------------------------------------------
+      // 3. PROPERTY VIDEOS
+      // ------------------------------------------------------
+
+      const videoIds = await Promise.all(
+        videos.map((video) => uploadSingleFile(video.file)),
+      );
+
+      // ------------------------------------------------------
+      // 4. DOCUMENTS
+      // ------------------------------------------------------
+
+      const documentIds = await Promise.all(
+        documents.map((document) => uploadSingleFile(document.file)),
+      );
+
+      // ------------------------------------------------------
+      // 5. STORE IDS IN CONTEXT
+      // ------------------------------------------------------
+
+      updateFormData("media", "cover", coverId);
+
+      updateFormData("media", "pr_img", imageIds);
+
+      updateFormData("media", "pr_vid", videoIds);
+
+      updateFormData("media", "pr_doc", documentIds);
+
+      // ------------------------------------------------------
+      // 6. FINAL PAYLOAD
+      // ------------------------------------------------------
+
+      const payload = {
+        step: 4,
+
+        user_id: 1,
+
+        prop_id: propertyId,
+
+        cover: coverId,
+
+        pr_img: imageIds,
+
+        pr_vid: videoIds,
+
+        pr_doc: documentIds,
+
+        status: "inprogress",
+      };
+
+      console.log("Final Media Payload:", payload);
+
+      // ------------------------------------------------------
+      // 7. SAVE PROPERTY
+      // ------------------------------------------------------
+
+      const response = await postSellPropertyForm(payload);
+
+      console.log("Final Media Response:", response);
+
+      navigate("/", {
+        state: {
+          showSuccessMessage: true,
+          message: "Property added successfully",
+        },
+      });
+    } catch (error) {
+      console.error("Media submit failed:", error);
+
+      showStatusMessage({
+        type: "error",
+        text: "Unable to complete the property submission. Please try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handlePrevious = async () => {
+    navigate("/sell-property/features");
+  };
 
   return (
     <>
+      <StatusMessage placement="top-center" />
+
       <div className="w-full max-w-4xl">
         {/* ====================================================
             TITLE
@@ -753,6 +1152,7 @@ const MediaUploadForm = () => {
             rounded-lg
             p-4
             mt-4
+            text-start
           "
         >
           <InfoCircleOutlined
@@ -797,7 +1197,7 @@ const MediaUploadForm = () => {
 
           {coverImage ? (
             <div
-              className="
+              className={`
                 relative
                 rounded-lg
                 overflow-hidden
@@ -805,7 +1205,9 @@ const MediaUploadForm = () => {
                 sm:h-48
                 md:h-56
                 w-full
-              "
+                border-2
+                ${coverImage.error ? "border-red-500" : "border-transparent"}
+              `}
             >
               <img
                 src={coverImage.url}
@@ -847,13 +1249,7 @@ const MediaUploadForm = () => {
 
                 <button
                   type="button"
-                  onClick={() => {
-                    if (coverImage?.url) {
-                      URL.revokeObjectURL(coverImage.url);
-                    }
-
-                    setCoverImage(null);
-                  }}
+                  onClick={removeCover}
                   className="
                     w-8
                     h-8
@@ -1082,13 +1478,15 @@ const MediaUploadForm = () => {
               {images.map((image, index) => (
                 <div
                   key={image.id}
-                  className="
+                  className={`
                       relative
                       h-24
                       sm:h-28
                       rounded-lg
                       overflow-hidden
-                    "
+                      border-2
+                      ${image.error ? "border-red-500" : "border-transparent"}
+                    `}
                 >
                   <img
                     src={image.url}
@@ -1134,9 +1532,7 @@ const MediaUploadForm = () => {
               ))}
             </div>
 
-            {/* ==================================================
-                IMAGE PREVIEW MODAL
-            ================================================== */}
+            {/* IMAGE PREVIEW MODAL */}
 
             <Modal
               open={previewVisible}
@@ -1166,7 +1562,6 @@ const MediaUploadForm = () => {
               }}
             >
               <div className="image-preview-shell">
-                {/* Header */}
                 <div className="image-preview-header">
                   <span>Image Preview</span>
 
@@ -1179,9 +1574,7 @@ const MediaUploadForm = () => {
                   </button>
                 </div>
 
-                {/* Image + arrows */}
                 <div className="image-preview-row">
-                  {/* Previous */}
                   <button
                     type="button"
                     className="
@@ -1194,7 +1587,6 @@ const MediaUploadForm = () => {
                     <LeftOutlined />
                   </button>
 
-                  {/* Image */}
                   {images[previewIndex] && (
                     <img
                       src={images[previewIndex].url}
@@ -1203,7 +1595,6 @@ const MediaUploadForm = () => {
                     />
                   )}
 
-                  {/* Next */}
                   <button
                     type="button"
                     className="
@@ -1217,7 +1608,6 @@ const MediaUploadForm = () => {
                   </button>
                 </div>
 
-                {/* Counter */}
                 <div className="image-preview-count">
                   {previewIndex + 1} / {images.length}
                 </div>
@@ -1255,7 +1645,7 @@ const MediaUploadForm = () => {
               {videos.map((video, index) => (
                 <div
                   key={video.id}
-                  className="
+                  className={`
                       relative
                       h-24
                       sm:h-28
@@ -1263,7 +1653,9 @@ const MediaUploadForm = () => {
                       overflow-hidden
                       bg-black
                       cursor-pointer
-                    "
+                      border-2
+                      ${video.error ? "border-red-500" : "border-transparent"}
+                    `}
                   onClick={() => {
                     setVideoPreviewIndex(index);
 
@@ -1281,7 +1673,6 @@ const MediaUploadForm = () => {
                     preload="metadata"
                   />
 
-                  {/* Play icon */}
                   <div
                     className="
                         absolute
@@ -1300,7 +1691,6 @@ const MediaUploadForm = () => {
                     />
                   </div>
 
-                  {/* Delete */}
                   <button
                     type="button"
                     onClick={(e) => {
@@ -1329,9 +1719,7 @@ const MediaUploadForm = () => {
               ))}
             </div>
 
-            {/* ==================================================
-                VIDEO PREVIEW MODAL
-            ================================================== */}
+            {/* VIDEO PREVIEW MODAL */}
 
             <Modal
               open={videoPreviewVisible}
@@ -1361,7 +1749,6 @@ const MediaUploadForm = () => {
               }}
             >
               <div className="image-preview-shell">
-                {/* Header */}
                 <div className="image-preview-header">
                   <span>Video Preview</span>
 
@@ -1374,9 +1761,7 @@ const MediaUploadForm = () => {
                   </button>
                 </div>
 
-                {/* Video + arrows */}
                 <div className="image-preview-row">
-                  {/* Previous */}
                   <button
                     type="button"
                     className="
@@ -1389,7 +1774,6 @@ const MediaUploadForm = () => {
                     <LeftOutlined />
                   </button>
 
-                  {/* Video */}
                   {videos[videoPreviewIndex] && (
                     <video
                       src={videos[videoPreviewIndex].url}
@@ -1399,7 +1783,6 @@ const MediaUploadForm = () => {
                     />
                   )}
 
-                  {/* Next */}
                   <button
                     type="button"
                     className="
@@ -1413,7 +1796,6 @@ const MediaUploadForm = () => {
                   </button>
                 </div>
 
-                {/* Counter */}
                 <div className="image-preview-count">
                   {videoPreviewIndex + 1} / {videos.length}
                 </div>
@@ -1502,17 +1884,17 @@ const MediaUploadForm = () => {
               {documents.map((doc) => (
                 <div
                   key={doc.id}
-                  className="
+                  className={`
                       flex
                       items-center
                       gap-x-3
                       bg-[#F2F2F2]
                       border
-                      border-gray-200
                       rounded-lg
                       px-4
                       py-3
-                    "
+                      ${doc.error ? "border-red-500" : "border-gray-200"}
+                    `}
                 >
                   <FilePdfOutlined
                     className="
@@ -1571,7 +1953,12 @@ const MediaUploadForm = () => {
               FORM NAVIGATION
           ================================================== */}
 
-          <FormNavigationButtons nextLabel="submit" />
+          <FormNavigationButtons
+            nextLabel={isSubmitting ? "Submitting..." : "submit"}
+            onNext={handleSubmit}
+            disabled={isSubmitDisabled}
+            onPrevious={handlePrevious}
+          />
         </div>
       </div>
     </>

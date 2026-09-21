@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Modal } from "antd";
 import { LeftOutlined } from "@ant-design/icons";
 
@@ -11,13 +11,21 @@ import { AboutUsProvider } from "../context/AboutusContext.jsx";
 
 const SellPropertyLayout = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Check whether current route is the first step
+  const isFirstStep = location.pathname === "/sell-property";
 
   // Controls the confirmation modal
   const [showBackModal, setShowBackModal] = useState(false);
 
-  // Open confirmation modal
+  // Open confirmation modal only for first step
   const handleBackClick = () => {
-    setShowBackModal(true);
+    if (isFirstStep) {
+      setShowBackModal(true);
+    } else {
+      navigate(-1);
+    }
   };
 
   // Close modal and stay on current form
@@ -29,8 +37,8 @@ const SellPropertyLayout = () => {
   const handleConfirmBack = () => {
     setShowBackModal(false);
 
-    // Go back to the previous page
-    navigate(-1);
+    // Go to home page
+    navigate("/");
   };
 
   return (
@@ -44,22 +52,25 @@ const SellPropertyLayout = () => {
           <main className="flex-1 w-[90%] md:w-[80%] mx-auto">
             {/* ---------- Page Heading ---------- */}
             <section className="container mx-auto px-4 py-8 text-start">
-              {/* Back Button */}
+              {/* Back / Previous Button */}
               <button
                 type="button"
                 onClick={handleBackClick}
                 className="
-              mb-5
-              inline-flex items-center gap-x-1
-              text-sm font-medium text-gray-600
-              transition-colors duration-200
-              hover:text-gray-900
-              focus:outline-none
+              mb-5 
+              inline-flex items-center gap-x-1 
+              text-sm font-medium text-gray-600 
+              transition-colors duration-200 
+              hover:text-gray-900 
+              focus:outline-none 
               cursor-pointer
             "
               >
                 <LeftOutlined className="text-base" />
-                <span className="text-base">Back</span>
+
+                <span className="text-base">
+                  {isFirstStep ? "Back" : "Previous"}
+                </span>
               </button>
 
               <h1 className="text-2xl font-semibold">Sell Your Property</h1>
@@ -76,13 +87,13 @@ const SellPropertyLayout = () => {
                 {/* Stepper */}
                 <aside
                   className="
-                lg:w-[380px]
-                lg:h-full
-                lg:overflow-y-auto
-                [&::-webkit-scrollbar]:w-2
-                [&::-webkit-scrollbar-track]:bg-gray-100
-                [&::-webkit-scrollbar-thumb]:bg-gray-300
-                [&::-webkit-scrollbar-thumb]:rounded-full
+                lg:w-[380px] 
+                lg:h-full 
+                lg:overflow-y-auto 
+                [&::-webkit-scrollbar]:w-2 
+                [&::-webkit-scrollbar-track]:bg-gray-100 
+                [&::-webkit-scrollbar-thumb]:bg-gray-300 
+                [&::-webkit-scrollbar-thumb]:rounded-full 
               "
                 >
                   <PropertyStepper />
@@ -91,14 +102,14 @@ const SellPropertyLayout = () => {
                 {/* Dynamic Form */}
                 <section
                   className="
-                flex-1
-                px-0 sm:px-7
-                lg:h-full
-                lg:overflow-y-auto
-                [&::-webkit-scrollbar]:w-2
-                [&::-webkit-scrollbar-track]:bg-gray-100
-                [&::-webkit-scrollbar-thumb]:bg-gray-300
-                [&::-webkit-scrollbar-thumb]:rounded-full
+                flex-1 
+                px-0 sm:px-7 
+                lg:h-full 
+                lg:overflow-y-auto 
+                [&::-webkit-scrollbar]:w-2 
+                [&::-webkit-scrollbar-track]:bg-gray-100 
+                [&::-webkit-scrollbar-thumb]:bg-gray-300 
+                [&::-webkit-scrollbar-thumb]:rounded-full 
               "
                 >
                   <Outlet />
@@ -116,11 +127,10 @@ const SellPropertyLayout = () => {
             onCancel={handleCancelBack}
             centered
             footer={null}
-            // width={420}
             styles={{
               content: {
-                width: "80%", // fallback for mobile
-                maxWidth: "420px", // cap on desktop
+                width: "80%",
+                maxWidth: "420px",
               },
             }}
           >
@@ -143,16 +153,16 @@ const SellPropertyLayout = () => {
                   type="button"
                   onClick={handleCancelBack}
                   className="
-                w-full sm:w-auto
-                rounded-md
-                border border-gray-300
-                bg-white
-                px-5 py-2.5
-                text-base font-medium text-gray-700
-                transition-colors duration-200
-                hover:bg-gray-50
-                focus:outline-none
-                cursor-pointer
+                w-full sm:w-auto 
+                rounded-md 
+                border border-gray-300 
+                bg-white 
+                px-5 py-2.5 
+                text-base font-medium text-gray-700 
+                transition-colors duration-200 
+                hover:bg-gray-50 
+                focus:outline-none 
+                cursor-pointer 
               "
                 >
                   Cancel
@@ -163,15 +173,15 @@ const SellPropertyLayout = () => {
                   type="button"
                   onClick={handleConfirmBack}
                   className="
-                w-full sm:w-auto
-                rounded-md
-                bg-red-500
-                px-5 py-2.5
-                text-base font-medium text-white
-                transition-colors duration-200
-                hover:bg-red-600
+                w-full sm:w-auto 
+                rounded-md 
+                bg-red-500 
+                px-5 py-2.5 
+                text-base font-medium text-white 
+                transition-colors duration-200 
+                hover:bg-red-600 
                 focus:outline-none
-                 cursor-pointer
+                cursor-pointer
               "
                 >
                   Confirm
