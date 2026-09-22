@@ -14,12 +14,13 @@ export const EnquiryProvider = ({ children }) => {
 
   const resetFormData = () => {
     setFormData({
-      property_id: "",
-      regarding: "",
+      // property_id: "",
       name: "",
       mobile: "",
       email: "",
       message: "",
+      regarding: "General Enquiry",
+      status: "pending",
     });
   };
   return (
