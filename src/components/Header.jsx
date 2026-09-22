@@ -3,43 +3,52 @@ import { Button, Popover, Drawer } from "antd";
 import { MenuOutlined, CloseOutlined, UserOutlined } from "@ant-design/icons";
 import images from "../config/Images.jsx";
 import icons from "../config/Icons.jsx";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import useScrollLock from "../hooks/UseScrollLock.jsx";
 import { useAboutUs } from "../context/AboutusContext.jsx";
-import { useNavigate } from "react-router-dom";
 
 const Header = () => {
   const { aboutUs, loading, error } = useAboutUs();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  
   const [isDesktopAccountOpen, setIsDesktopAccountOpen] = useState(false);
 
   const [isMobileAccountOpen, setIsMobileAccountOpen] = useState(false);
-
 
   const [isMobilePropertiesOpen, setIsMobilePropertiesOpen] = useState(false);
 
   // Lock scroll if account Popover is open
   useScrollLock(isDesktopAccountOpen || isMobileAccountOpen);
 
- 
   const isLoggedIn = !!localStorage.getItem("authToken");
+
+  // ---------------------------------------------------------
+  // Check active route
+  // ---------------------------------------------------------
+
+  const isActive = (path) => {
+    return location.pathname === path;
+  };
+
+  // ---------------------------------------------------------
+  // Check if any property route is active
+  // ---------------------------------------------------------
+
+  const isPropertiesActive = location.pathname.startsWith("/properties/");
 
   const handleLogout = () => {
     localStorage.removeItem("authToken");
     window.location.reload();
   };
 
-  
   const closeAccountPopover = () => {
     setIsDesktopAccountOpen(false);
     setIsMobileAccountOpen(false);
   };
 
-  
   const propertyCategories = [
     {
       key: "farmland",
@@ -78,7 +87,6 @@ const Header = () => {
     },
   ];
 
-  
   const loggedOutPopoverContent = (
     <div className="w-75 p-1 z-40">
       <div className="flex items-center gap-x-2">
@@ -117,6 +125,7 @@ const Header = () => {
   // ---------------------------------------------------------
   // Logged In Account Popover
   // ---------------------------------------------------------
+
   const loggedInPopoverContent = (
     <div className="w-64 sm:w-72 p-1 z-40 max-h-[70vh] account-popover-scroll overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden overscroll-contain">
       <div className="flex flex-col items-center text-center pb-3 border-b border-gray-100">
@@ -262,13 +271,15 @@ const Header = () => {
   // ---------------------------------------------------------
   // Account Popover Content
   // ---------------------------------------------------------
+
   const accountPopoverContent = isLoggedIn
     ? loggedInPopoverContent
-    : loggedInPopoverContent;
+    : loggedOutPopoverContent;
 
   // ---------------------------------------------------------
   // Properties Popover Content
   // ---------------------------------------------------------
+
   const propertiesPopoverContent = (
     <div className="w-55 py-1 z-40">
       {propertyCategories.map((category) => (
@@ -299,6 +310,7 @@ const Header = () => {
       <div className="w-[90%] p-4 lg:p-3 mx-auto">
         <div className="grid grid-cols-[40%_60%] md:grid-cols-[25%_75%] lg:grid-cols-[17%_83%] xl:grid-cols-[30%_70%] 2xl:grid-cols-[35%_65%]">
           {/* Logo */}
+
           <div className="flex items-center">
             <Link to="/">
               <img
@@ -310,15 +322,29 @@ const Header = () => {
           </div>
 
           {/* Desktop nav */}
+
           <div className="hidden lg:flex items-center gap-x-5 justify-between">
             <div>
               <ul className="flex gap-x-5 lg:gap-x-4 xl:gap-x-5 text-base">
-                <li className="transition-colors hover:text-secondary">
+                {/* Home */}
+
+                <li
+                  className={`transition-colors ${
+                    isActive("/") ? "text-secondary" : "hover:text-secondary"
+                  }`}
+                >
                   <Link to="/">Home</Link>
                 </li>
 
                 {/* Desktop Properties Popover */}
-                <li className="transition-colors hover:text-secondary">
+
+                <li
+                  className={`transition-colors ${
+                    isPropertiesActive
+                      ? "text-secondary"
+                      : "hover:text-secondary"
+                  }`}
+                >
                   <Popover
                     content={propertiesPopoverContent}
                     trigger="hover"
@@ -328,25 +354,50 @@ const Header = () => {
                       offset: [0, 10],
                     }}
                   >
-                    Properties
+                    <span className="cursor-pointer">Properties</span>
                   </Popover>
                 </li>
 
-                <li className="transition-colors hover:text-secondary">
+                {/* Gallery */}
+
+                <li
+                  className={`transition-colors ${
+                    isActive("/gallery")
+                      ? "text-secondary"
+                      : "hover:text-secondary"
+                  }`}
+                >
                   <Link to="/gallery">Gallery</Link>
                 </li>
 
-                <li className="transition-colors hover:text-secondary">
+                {/* About */}
+
+                <li
+                  className={`transition-colors ${
+                    isActive("/about")
+                      ? "text-secondary"
+                      : "hover:text-secondary"
+                  }`}
+                >
                   <Link to="/about">AboutUs</Link>
                 </li>
 
-                <li className="transition-colors hover:text-secondary">
+                {/* Contact */}
+
+                <li
+                  className={`transition-colors ${
+                    isActive("/contactus")
+                      ? "text-secondary"
+                      : "hover:text-secondary"
+                  }`}
+                >
                   <Link to="/contactus">ContactUs</Link>
                 </li>
               </ul>
             </div>
 
             {/* Sell property */}
+
             <div>
               <Link to="/sell-property">
                 <Button type="primary" className="!bg-secondary !text-base">
@@ -356,6 +407,7 @@ const Header = () => {
             </div>
 
             {/* Phone */}
+
             <div className="flex items-center">
               <img
                 src={icons.callBlackIcon}
@@ -372,6 +424,7 @@ const Header = () => {
             </div>
 
             {/* Desktop account Popover */}
+
             <div>
               <Popover
                 content={accountPopoverContent}
@@ -396,8 +449,10 @@ const Header = () => {
           </div>
 
           {/* Mobile hamburger trigger + account avatar */}
+
           <div className="flex lg:hidden items-center justify-end gap-x-5">
             {/* Mobile account Popover */}
+
             <Popover
               content={accountPopoverContent}
               trigger="click"
@@ -419,6 +474,7 @@ const Header = () => {
             </Popover>
 
             {/* Mobile menu button */}
+
             <button onClick={() => setIsMenuOpen(true)}>
               <MenuOutlined className="w-7 h-7" />
             </button>
@@ -427,6 +483,7 @@ const Header = () => {
       </div>
 
       {/* Mobile menu - antd Drawer, right to left */}
+
       <Drawer
         placement="right"
         open={isMenuOpen}
@@ -445,6 +502,7 @@ const Header = () => {
         <div className="bg-primary h-full overflow-y-auto">
           <div className="w-[90%] mx-auto p-4">
             {/* Drawer header */}
+
             <div className="flex items-center justify-between">
               <Link to="/" onClick={() => setIsMenuOpen(false)}>
                 <img src={images.logo} alt="Logo" className="w-36 h-auto" />
@@ -461,24 +519,27 @@ const Header = () => {
             </div>
 
             {/* Drawer navigation */}
+
             <ul className="flex flex-col text-start gap-y-5 text-base mt-8">
+              {/* Home */}
+
               <li className="transition-colors">
                 <Link
                   to="/"
                   onClick={() => setIsMenuOpen(false)}
-                  className="!text-black"
+                  className={isActive("/") ? "!text-secondary" : "!text-black"}
                 >
                   Home
                 </Link>
               </li>
 
-              {/* -------------------------------------------------
-                  Mobile Properties Popover
+              {/* Mobile Properties Popover */}
 
-                  Clicking Properties opens the SAME
-                  propertiesPopoverContent used on desktop.
-              ------------------------------------------------- */}
-              <li className="transition-colors">
+              <li
+                className={`transition-colors ${
+                  isPropertiesActive ? "text-secondary" : "text-black"
+                }`}
+              >
                 <Popover
                   content={propertiesPopoverContent}
                   trigger="click"
@@ -490,37 +551,54 @@ const Header = () => {
                     offset: [0, 10],
                   }}
                 >
-                  <button type="button" className="!text-black">
+                  <button
+                    type="button"
+                    className={
+                      isPropertiesActive ? "!text-secondary" : "!text-black"
+                    }
+                  >
                     Properties
                   </button>
                 </Popover>
               </li>
 
+              {/* Gallery */}
+
               <li className="transition-colors">
                 <Link
                   to="/gallery"
                   onClick={() => setIsMenuOpen(false)}
-                  className="!text-black"
+                  className={
+                    isActive("/gallery") ? "!text-secondary" : "!text-black"
+                  }
                 >
                   Gallery
                 </Link>
               </li>
 
+              {/* About */}
+
               <li className="transition-colors">
                 <Link
                   to="/about"
                   onClick={() => setIsMenuOpen(false)}
-                  className="!text-black"
+                  className={
+                    isActive("/about") ? "!text-secondary" : "!text-black"
+                  }
                 >
                   AboutUs
                 </Link>
               </li>
 
+              {/* Contact */}
+
               <li className="transition-colors">
                 <Link
                   to="/contactus"
                   onClick={() => setIsMenuOpen(false)}
-                  className="!text-black"
+                  className={
+                    isActive("/contactus") ? "!text-secondary" : "!text-black"
+                  }
                 >
                   ContactUs
                 </Link>
@@ -528,6 +606,7 @@ const Header = () => {
             </ul>
 
             {/* Phone */}
+
             <div className="flex items-center mt-8">
               <img
                 src={icons.callBlackIcon}
@@ -544,6 +623,7 @@ const Header = () => {
             </div>
 
             {/* Sell property */}
+
             <div className="mt-8 text-start">
               <Link to="/sell-property" onClick={() => setIsMenuOpen(false)}>
                 <Button

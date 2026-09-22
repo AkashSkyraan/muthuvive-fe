@@ -1,45 +1,12 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import images from "../../../config/Images.jsx";
-
-// Dynamic data - replace with API response
-const team = [
-  {
-    id: 1,
-    image: images.worker,
-    name: "Raguvaran R",
-    role: "Commercial Engineer",
-  },
-  {
-    id: 2,
-    image: images.worker,
-    name: "Jagadeesh Kumar",
-    role: "Farmland Engineer",
-  },
-  {
-    id: 3,
-    image: images.worker,
-    name: "Vengateshwaran",
-    role: "Residential Expert",
-  },
-  {
-    id: 4,
-    image: images.worker,
-    name: "Gokulakrishna",
-    role: "Renovation & Remodeling",
-  },
-  {
-    id: 5,
-    image: images.worker,
-    name: "Mukeshwar",
-    role: "General Engineering",
-  },
-];
+import { getConsultant } from "../../../api/aboutus.api.js";
 
 const TeamCard = ({ member }) => (
   <div className="w-[180px] sm:w-[200px] shrink-0">
     <div className="h-[220px] sm:h-[240px] rounded-lg overflow-hidden">
       <img
-        src={member.image}
+        src={member.assetUrl}
         alt={member.name}
         className="w-full h-full object-cover"
       />
@@ -48,11 +15,39 @@ const TeamCard = ({ member }) => (
     <h3 className="text-base font-semibold text-gray-900 text-center mt-4">
       {member.name}
     </h3>
+
     <p className="text-sm text-gray-500 text-center mt-1">{member.role}</p>
   </div>
 );
 
+// ============================================================
+// MAIN COMPONENT
+// ============================================================
+
 const OurTeam = () => {
+  const [team, setTeam] = useState([]);
+
+  // ==========================================================
+  // FETCH TEAM
+  // ==========================================================
+
+  const fetchTeam = async () => {
+    try {
+      const response = await getConsultant();
+
+      const data = response?.data || response || [];
+
+      setTeam(data);
+    } catch (error) {
+      console.error("Failed to fetch team members:", error);
+
+      setTeam([]);
+    }
+  };
+  useEffect(() => {
+    fetchTeam();
+  }, []);
+
   return (
     <div className="w-full py-16">
       <div className="text-center px-4">
@@ -73,7 +68,7 @@ const OurTeam = () => {
 
       <div className="mt-10 overflow-hidden group">
         <div className="flex gap-x-6 w-max animate-marquee-team group-hover:[animation-play-state:paused]">
-          {/* Rendered twice back-to-back so the scroll loops seamlessly */}
+          {/* Rendered three times so the scroll loops seamlessly */}
           {[...team, ...team, ...team].map((member, index) => (
             <TeamCard key={`${member.id}-${index}`} member={member} />
           ))}

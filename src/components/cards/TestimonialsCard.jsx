@@ -20,7 +20,7 @@ const Testimonials = () => {
   useEffect(() => {
     const fetchTestimonials = async () => {
       const data = await getTestimonials();
-      setTestimonials([data]);
+      setTestimonials(data);
     };
 
     fetchTestimonials();

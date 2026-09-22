@@ -11,7 +11,7 @@ const SellProperty = () => {
   useEffect(() => {
     const fetchPlans = async () => {
       const data = await getSubscriptionPlans();
-      setPlans(data);
+      setPlans([data[0]]);
     };
 
     fetchPlans();

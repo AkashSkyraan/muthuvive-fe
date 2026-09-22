@@ -64,8 +64,8 @@ const Mission = () => {
           // Image collage: main image + a smaller overlaid image with a white border
           const overlayPositionClasses =
             block.overlayPosition === "top-left"
-              ? "top-0 left-0 sm:-top-2 sm:-left-2 border-b-5 border-r-5 border-white md:border-b-10 md:border-r-10 rounded-2xl md:rounded-xl"
-              : "bottom-0 right-0 sm:-bottom-2 sm:-right-2 border-t-5 border-l-5 border-white md:border-b-10 md:border-r-10 rounded-2xl md:rounded-xl";
+              ? "top-0 left-0 sm:-top-2 sm:-left-2 border-b-5 border-r-5 md:border-b-8 md:border-r-8 border-white rounded-2xl md:rounded-xl"
+              : "bottom-0 right-0 sm:-bottom-2 sm:-right-2 border-t-5 border-l-5 md:border-t-8 md:border-l-8 border-white rounded-2xl md:rounded-xl";
 
           return (
             <div

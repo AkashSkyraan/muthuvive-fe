@@ -23,7 +23,7 @@ const getPageNumbers = (current, totalPages, maxVisible) => {
   return Array.from({ length: end - start + 1 }, (_, i) => start + i);
 };
 
-const Pagination = ({ current = 1, total = 50, pageSize = 10, onChange }) => {
+const Pagination = ({ current = 1, total = 10, pageSize = 5, onChange }) => {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
