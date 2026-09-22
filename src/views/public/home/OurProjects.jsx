@@ -1,100 +1,148 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Segmented } from "antd";
 import images from "../../../config/Images.jsx";
 import TabSection from "../properties/TabSection.jsx";
+import { getProperties } from "../../../api/getProperties.api.js";
+import { IndianRupee } from "lucide-react";
 
 const tabOptions = [
   {
-    key: 0,
-    label: "Ongoing Projects",
+    key: "available",
+    label: "Available",
   },
   {
-    key: 1,
-    label: "Upcoming",
+    key: "sold",
+    label: "Sold",
   },
-  // {
-  //   key: 2,
-  //   label: "Sold Projects",
-  // },
 ];
 
-// Dynamic data - replace with API response
-const projects = [
-  {
-    id: 1,
-    image: images.farmLand,
-    price: "₹ 1.5 Lk",
-    unit: "Per Cent",
-    title: "Arjunavel Plots",
-    address:
-      "Sri Venkateshwara Towers, FCI Rd, Opp. Fire Station, Gandhimaa Naga...",
-  },
-  {
-    id: 2,
-    image: images.farmLand,
-    price: "₹ 2.5 Lk",
-    unit: "Per Cent",
-    title: "Arjunavel Plots",
-    address:
-      "Sri Venkateshwara Towers, FCI Rd, Opp. Fire Station, Gandhimaa Naga...",
-  },
-  {
-    id: 3,
-    image: images.farmLand,
-    price: "₹ 3.5 Lk",
-    unit: "Per Cent",
-    title: "Arjunavel Plots",
-    address:
-      "Sri Venkateshwara Towers, FCI Rd, Opp. Fire Station, Gandhimaa Naga...",
-  },
-  {
-    id: 4,
-    image: images.farmLand,
-    price: "₹ 2.5 Lk",
-    unit: "Per Cent",
-    title: "Arjunavel Plots",
-    address:
-      "Sri Venkateshwara Towers, FCI Rd, Opp. Fire Station, Gandhimaa Naga...",
-  },
-  {
-    id: 5,
-    image: images.farmLand,
-    price: "₹ 2.5 Lk",
-    unit: "Per Cent",
-    title: "Arjunavel Plots",
-    address:
-      "Sri Venkateshwara Towers, FCI Rd, Opp. Fire Station, Gandhimaa Naga...",
-  },
-];
+const DTCP_TYPE = 5;
+
+// ============================================================
+// FORMAT PRICE
+// ============================================================
+
+const formatPrice = (value) => {
+  if (value === null || value === undefined || value === "") {
+    return "";
+  }
+
+  const price = Number(value);
+
+  if (Number.isNaN(price)) {
+    return value;
+  }
+
+  // 1 Lakh and above
+  if (price >= 100000) {
+    const lakh = price / 100000;
+
+    return `${Number(lakh.toFixed(2))}LK`;
+  }
+
+  // 1 Thousand and above
+  if (price >= 1000) {
+    const thousand = price / 1000;
+
+    return `${Number(thousand.toFixed(2))}K`;
+  }
+
+  return `${price}`;
+};
+
+// ============================================================
+// PROJECT CARD
+// ============================================================
 
 const ProjectCard = ({ project }) => {
   return (
     <div className="relative rounded-lg overflow-hidden h-64 shrink-0 w-full sm:w-[calc(50%-11px)] md:w-[calc(33.33%-11px)] lg:w-[calc(20%-13px)]">
       <img
-        src={project.image}
-        alt={project.title}
+        src={project.cover_image?.url}
+        alt={project.prop_name}
         className="w-full h-full object-cover"
       />
 
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
 
       <div className="absolute top-3 right-3 text-right">
-        <p className="text-white font-semibold text-sm">{project.price}</p>
-        <p className="text-white text-[10px]">{project.unit}</p>
+        {/* Rupee + Price */}
+        <div className="flex items-center justify-end gap-1">
+          <IndianRupee className="w-4 h-4 text-white" />
+
+          <p className="text-white font-semibold text-base">
+            {formatPrice(project.min_price)}
+          </p>
+        </div>
+
+        {/* Area Unit */}
+        <p className="text-white text-[12px]">per {project.area_unit}</p>
       </div>
 
-      <div className="absolute bottom-3 left-3 right-3">
-        <h3 className="text-white text-sm font-semibold">{project.title}</h3>
+      <div className="absolute bottom-3 left-3 right-3 text-start">
+        <h3 className="text-white text-sm font-semibold">
+          {project.prop_name}
+        </h3>
+
         <p className="text-gray-300 text-xs mt-1 line-clamp-2">
-          {project.address}
+          {project.city}, {project.district}, {project.state}
         </p>
       </div>
     </div>
   );
 };
 
+// ============================================================
+// MAIN COMPONENT
+// ============================================================
+
 const DTCPProjects = () => {
-  const [activeTab, setActiveTab] = useState(tabOptions[0]);
+  const [activeTab, setActiveTab] = useState(tabOptions[0].key);
+
+  const [projects, setProjects] = useState([]);
+
+  // ==========================================================
+  // FETCH DTCP PROJECTS
+  // ==========================================================
+
+  const fetchProjects = async (tab) => {
+    try {
+      // Convert UI tab value to API status value
+      const status = tab === "available" ? "inprogress" : "sold";
+
+      const response = await getProperties({
+        limit: 5,
+        type: DTCP_TYPE,
+        status,
+      });
+
+      const data = response?.data || response || [];
+
+      setProjects(data?.properties || []);
+    } catch (error) {
+      console.error("Failed to fetch DTCP projects:", error);
+
+      setProjects([]);
+    }
+  };
+
+  // ==========================================================
+  // INITIAL API CALL
+  // ==========================================================
+
+  useEffect(() => {
+    fetchProjects("available");
+  }, []);
+
+  // ==========================================================
+  // TAB CHANGE
+  // ==========================================================
+
+  const handleTabChange = (value) => {
+    setActiveTab(value);
+
+    fetchProjects(value);
+  };
 
   return (
     <div className="w-full py-16">
@@ -103,6 +151,7 @@ const DTCPProjects = () => {
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
             Our DTCP Projects
           </h2>
+
           <p className="text-base text-gray-500 mt-3 max-w-2xl mx-auto">
             Highlight the best of your properties by using the List Category
             shortcode. You can list categories, types, cities, areas and states
@@ -111,22 +160,12 @@ const DTCPProjects = () => {
         </div>
 
         <div className="mt-6">
-          {/* {tabOptions.map((tab) => (
-            <button
-              key={tab.key}
-              type="button"
-              onClick={() => setActiveTab(tab.key)}
-              className={`flex-1 rounded-xs py-2 md:py-2 text-sm md:text-base transition-colors duration-400 ${
-                activeTab === tab.key
-                  ? "bg-secondary text-primary"
-                  : "text-black"
-              }
-              ${tab.key !== tabOptions.length - 1 ? "border-r border-black/20" : ""}`}
-            >
-              {tab.label}
-            </button>
-          ))} */}
-          <TabSection tabs={tabOptions} alignment="center" />
+          <TabSection
+            tabs={tabOptions}
+            alignment="center"
+            value={activeTab}
+            onChange={handleTabChange}
+          />
         </div>
 
         <div className="flex flex-wrap gap-4 mt-12">

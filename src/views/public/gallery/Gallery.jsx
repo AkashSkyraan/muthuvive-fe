@@ -50,7 +50,7 @@ const prepareClusters = (images) => {
 // Gallery Image
 // ---------------------------------------------------------
 const GalleryImage = ({ src }) => (
-  <div className="w-full h-full overflow-hidden rounded-lg">
+  <div className="w-full h-full overflow-hidden rounded-lg shadow-xl border border-gray-300">
     <img src={src} alt="gallery" className="w-full h-full object-cover" />
   </div>
 );
@@ -83,7 +83,7 @@ const MasonryCluster = ({ images, isDesktop, heroPosition }) => {
           <img
             src={hero.src}
             alt="gallery"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover shadow-xl border border-gray-300"
           />
         </div>
 
@@ -311,7 +311,7 @@ const Gallery = () => {
                     <img
                       src={image.src}
                       alt="gallery"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover shadow-xl border border-gray-300"
                     />
                   </div>
                 ))}

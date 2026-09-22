@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "antd";
+import { Link } from "react-router-dom";
 
 const Categories = ({ services = [] }) => {
   const columns = services.length >= 6 ? 3 : 2;
@@ -22,10 +23,11 @@ const Categories = ({ services = [] }) => {
             of your choice.Highlight the best of your properties by using the
             List Category shortcode.
           </p>
-
-          <Button type="primary" className="!bg-secondary mt-6 !text-base">
-            Explore All Services
-          </Button>
+          <Link to="/search">
+            <Button type="primary" className="!bg-secondary mt-6 !text-base">
+              Explore All Services
+            </Button>
+          </Link>
         </div>
 
         {/* Right grid */}
