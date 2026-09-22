@@ -1,20 +1,24 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+
 import "./index.css";
 import App from "./App.jsx";
-import { SearchProvider } from "./context/SearchContext.jsx";
+
 import { SignupProvider } from "./context/SignupContext.jsx";
 import { AuthProvider } from "./context/UserContext.jsx";
+import { SearchProvider } from "./context/SearchContext.jsx";
 
 createRoot(document.getElementById("root")).render(
-  <SignupProvider>
-    <StrictMode>
-      <SearchProvider>
+  <StrictMode>
+    <BrowserRouter>
+      <SignupProvider>
         <AuthProvider>
-          <App />
+          <SearchProvider>
+            <App />
+          </SearchProvider>
         </AuthProvider>
-      </SearchProvider>
-    </StrictMode>
-    ,
-  </SignupProvider>,
+      </SignupProvider>
+    </BrowserRouter>
+  </StrictMode>,
 );

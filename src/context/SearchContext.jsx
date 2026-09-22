@@ -1,17 +1,46 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
+import { useSearchParams } from "react-router-dom";
 
 const SearchContext = createContext(null);
 
 export const SearchProvider = ({ children }) => {
-  const [location, setLocation] = useState("");
+  const [searchParams] = useSearchParams();
+
+  // =========================
+  // STATE
+  // =========================
+  const [location, setLocationState] = useState("");
+  const [propertyType, setPropertyTypeState] = useState("");
+
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
 
   const [locationLoading, setLocationLoading] = useState(false);
   const [locationPermission, setLocationPermission] = useState("unknown");
 
-  // Get current location
-  const getCurrentLocation = () => {
+  // =========================
+  // URL -> STATE (initial + back/forward)
+  // =========================
+  useEffect(() => {
+    const urlLocation = searchParams.get("location") || "";
+    const urlPropertyType = searchParams.get("propertyType") || "";
+
+    setLocationState((prev) => (prev !== urlLocation ? urlLocation : prev));
+    setPropertyTypeState((prev) =>
+      prev !== urlPropertyType ? urlPropertyType : prev,
+    );
+  }, [searchParams]);
+
+  // =========================
+  // GET CURRENT LOCATION
+  // =========================
+  const getCurrentLocation = useCallback(() => {
     if (!navigator.geolocation) {
       console.error("Geolocation is not supported");
       setLocationPermission("denied");
@@ -35,7 +64,6 @@ export const SearchProvider = ({ children }) => {
           );
 
           const data = await response.json();
-
           const address = data.address || {};
 
           const city =
@@ -47,9 +75,11 @@ export const SearchProvider = ({ children }) => {
 
           const state = address.state || "";
 
-          const formattedLocation = [city, state].filter(Boolean).join(", ");
+          const formattedLocation = [city, state]
+            .filter(Boolean)
+            .join(", ");
 
-          setLocation(formattedLocation);
+          setLocationState(formattedLocation);
         } catch (error) {
           console.error("Reverse geocoding failed:", error);
         } finally {
@@ -63,11 +93,9 @@ export const SearchProvider = ({ children }) => {
         if (error.code === error.PERMISSION_DENIED) {
           setLocationPermission("denied");
         }
-
         if (error.code === error.POSITION_UNAVAILABLE) {
           setLocationPermission("unavailable");
         }
-
         if (error.code === error.TIMEOUT) {
           setLocationPermission("timeout");
         }
@@ -81,58 +109,84 @@ export const SearchProvider = ({ children }) => {
         maximumAge: 0,
       },
     );
-  };
-
-  // First time only
-  useEffect(() => {
-    getCurrentLocation();
   }, []);
 
-  // User manually changes location
-  const handleLocationChange = (value) => {
-    setLocation(value);
+  // =========================
+  // FIRST MOUNT — geolocation (URL la location illena mattum)
+  // =========================
+  useEffect(() => {
+    if (!searchParams.get("location")) {
+      getCurrentLocation();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    // Important:
-    // Manual location means coordinates are no longer reliable
+  // =========================
+  // SET LOCATION (manual)
+  // =========================
+  const setLocation = useCallback((value) => {
+    setLocationState(value);
     setLatitude(null);
     setLongitude(null);
-  };
+  }, []);
 
-  // Clear location
-  const clearLocation = () => {
-    setLocation("");
+  // =========================
+  // SET PROPERTY TYPE
+  // =========================
+  const setPropertyType = useCallback((value) => {
+    setPropertyTypeState(value);
+  }, []);
+
+  // =========================
+  // CLEAR LOCATION
+  // =========================
+  const clearLocation = useCallback(() => {
+    setLocationState("");
     setLatitude(null);
     setLongitude(null);
-  };
+  }, []);
 
-  const search = () => {
-    const searchData = {
-      location,
-      latitude,
-      longitude,
-    };
+  // =========================
+  // CLEAR PROPERTY TYPE
+  // =========================
+  const clearPropertyType = useCallback(() => {
+    setPropertyTypeState("");
+  }, []);
 
-    // console.log("Search:", searchData);
-
-    // API call / navigation here
-  };
+  // =========================
+  // CLEAR ALL
+  // =========================
+  const clearAll = useCallback(() => {
+    setLocationState("");
+    setPropertyTypeState("");
+    setLatitude(null);
+    setLongitude(null);
+  }, []);
 
   return (
     <SearchContext.Provider
       value={{
+        // location
         location,
-        setLocation: handleLocationChange,
+        setLocation,
+        clearLocation,
 
+        // property type
+        propertyType,
+        setPropertyType,
+        clearPropertyType,
+
+        // coordinates
         latitude,
         longitude,
 
+        // status
         locationLoading,
         locationPermission,
 
+        // actions
         getCurrentLocation,
-        clearLocation,
-
-        search,
+        clearAll,
       }}
     >
       {children}

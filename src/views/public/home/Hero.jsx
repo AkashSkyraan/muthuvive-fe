@@ -45,33 +45,11 @@ const Hero = () => {
 
       <div className="relative w-[95%] mx-auto py-6 md:py-10">
         {/* Search bar */}
-        <div className="bg-white/20 backdrop-blur-sm rounded-lg p-3 flex flex-col md:flex-row gap-3 my-5">
-          <div className="flex-1 flex items-center bg-white rounded-md px-3">
+    
+
+          <div className="flex-1 flex items-center  rounded-lg px-3">
             <SearchPage />
           </div>
-
-          {/* <div className="flex-1 flex items-center bg-white rounded-md px-3">
-            <img src={icons.categoryIcon} alt="category" className="w-4 h-4" />
-            <Select
-              placeholder="Search Categories"
-              variant="borderless"
-              className="w-full"
-              options={[
-                { value: "residential", label: "Residential" },
-                { value: "commercial", label: "Commercial" },
-                { value: "agricultural", label: "Agricultural" },
-              ]}
-            />
-          </div> */}
-
-          {/* <Button
-            type="primary"
-            block
-            className="bg-secondary! !h-auto md:!w-auto md:!px-8"
-          >
-            Search
-          </Button> */}
-        </div>
 
         {/* Heading */}
         <div className="mt-10 max-w-full md:max-w-[70%]">
@@ -84,9 +62,12 @@ const Hero = () => {
             location. Buy, sell, or rent your perfect property with confidence.
           </p>
 
-          <div className="flex flex-wrap items-center gap-4 mt-6">
+          <div className="flex flex-wrap items-center gap-4 mt-6 !z-[1]">
             <Link to="/search">
-              <Button className="!bg-white !text-secondary !border-2 !border-transparent !font-medium !py-5 !px-9 !text-base">
+              <Button
+                className=" !z-[1] !bg-white !text-secondary !border-2 !border-transparent !font-medium !py-5 !px-9 !text-base"
+              
+              >
                 Explore
               </Button>
             </Link>

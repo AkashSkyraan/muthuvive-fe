@@ -1,16 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Select } from "antd";
 import { CloseOutlined, DownOutlined, UpOutlined } from "@ant-design/icons";
+import { useSearch } from "../../../context/SearchContext";
 
 // Local only - not covered by index.jsx state since price uses plain
 // min/max values, not an options array like the other sections.
-const priceOptions = [
-  { label: "₹5,00,000", value: 500000 },
-  { label: "₹10,00,000", value: 1000000 },
-  { label: "₹20,00,000", value: 2000000 },
-  { label: "₹50,00,000", value: 5000000 },
-  { label: "₹1,00,00,000", value: 10000000 },
-];
 
 const toggleValue = (array, value) =>
   array.includes(value) ? array.filter((v) => v !== value) : [...array, value];
@@ -71,6 +65,15 @@ const PropertyFilters = ({
   onPriceChange,
   onClearAll,
 }) => {
+  const { propertyType: contextPropertyType, setPropertyType } = useSearch();
+
+  useEffect(() => {
+    if (contextPropertyType) {
+      onChipChange("propertyType", [contextPropertyType]);
+    } else {
+      onChipChange("propertyType", []);
+    }
+  }, [contextPropertyType]);
   const [openSections, setOpenSections] = useState({
     sortBy: true,
     price: true,
@@ -80,11 +83,12 @@ const PropertyFilters = ({
     facingDirection: true,
   });
 
+  const [priceRange, setPriceRange] = useState(null);
+  const [priceRangeLoading, setPriceRangeLoading] = useState(false);
+
   const toggleSection = (key) =>
     setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
 
-  // Every group + its option list, used both for building the active
-  // chip row and for rendering each ToggleGrid below.
   const groups = [
     { key: "sortBy", title: "Sort By", options: sortByOptions },
     {
@@ -120,6 +124,38 @@ const PropertyFilters = ({
     );
   };
 
+  useEffect(() => {
+    const fetchRange = async () => {
+      setPriceRangeLoading(true);
+      const data = await getPriceRange();
+      setPriceRange(data);
+      setPriceRangeLoading(false);
+    };
+    fetchRange();
+  }, []);
+
+  // Format ₹ Indian style
+  const formatINR = (value) => {
+    if (value === null || value === undefined || value === "") return "—";
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
+
+  // Text input -> number
+  const handleMinChange = (e) => {
+    const raw = e.target.value.replace(/[^0-9]/g, "");
+    const num = raw ? Number(raw) : null;
+    onPriceChange(num, filters.priceMax);
+  };
+
+  const handleMaxChange = (e) => {
+    const raw = e.target.value.replace(/[^0-9]/g, "");
+    const num = raw ? Number(raw) : null;
+    onPriceChange(filters.priceMin, num);
+  };
   return (
     <div className="bg-white border border-gray-100 rounded-xl p-4">
       {/* Filter By - active chips + Clear All */}
@@ -177,43 +213,76 @@ const PropertyFilters = ({
           onToggle={() => toggleSection("price")}
         >
           <div className="grid grid-cols-2 gap-2">
-            <Select
+            <input
               placeholder="Min"
-              suffixIcon={<DownOutlined className="text-gray-400 text-sm" />}
-              value={filters.priceMin ?? undefined}
-              onChange={(value) => onPriceChange(value, filters.priceMax)}
-              options={priceOptions}
-              className="w-full [&_.ant-select-selector]:!rounded-lg [&_.ant-select-selector]:!border-gray-300 [&_.ant-select-selector]:!py-1"
-            />
-            <Select
+              value={filters.priceMin ?? ""}
+              onChange={handleMinChange}
+              inputMode="numeric"
+              prefix="₹"
+              className="
+              !h-10
+              !rounded-lg
+              !border-gray-300
+              hover:!border-blue-500
+              focus:!border-blue-500
+            "
+            ></input>
+
+            <input
               placeholder="Max"
-              suffixIcon={<DownOutlined className="text-gray-400 text-sm" />}
-              value={filters.priceMax ?? undefined}
-              onChange={(value) => onPriceChange(filters.priceMin, value)}
-              options={priceOptions}
-              className="w-full [&_.ant-select-selector]:!rounded-lg [&_.ant-select-selector]:!border-gray-300 [&_.ant-select-selector]:!py-1"
-            />
+              value={filters.priceMax ?? ""}
+              onChange={handleMaxChange}
+              inputMode="numeric"
+              prefix="₹"
+              className="
+              !h-10
+              !rounded-lg
+              !border-gray-300
+              hover:!border-blue-500
+              focus:!border-blue-500
+            "
+            ></input>
+          </div>
+
+          {/* ============================================================
+            API RANGE DISPLAY
+        ============================================================ */}
+          <div className="mt-3 text-xs text-gray-500 leading-relaxed">
+            {priceRangeLoading ? (
+              <span>Loading price range...</span>
+            ) : priceRange ? (
+              <span>
+                Available range:{" "}
+                <span className="font-medium text-gray-700">
+                  {formatINR(priceRange.min)}
+                </span>{" "}
+                –{" "}
+                <span className="font-medium text-gray-700">
+                  {formatINR(priceRange.max)}
+                </span>
+              </span>
+            ) : (
+              <span className="text-gray-400">Price range unavailable</span>
+            )}
           </div>
         </FilterSection>
 
-        <FilterSection
-          title="Types Of Property"
-          isOpen={openSections.propertyType}
-          onToggle={() => toggleSection("propertyType")}
-        >
-          <ToggleGrid
-            options={propertyTypeOptions}
-            selectedValues={filters.propertyType}
-            onToggle={(value) =>
-              onChipChange(
-                "propertyType",
-                toggleValue(filters.propertyType, value),
-              )
-            }
-          />
-        </FilterSection>
+       <FilterSection
+  title="Types Of Property"
+  isOpen={openSections.propertyType}
+  onToggle={() => toggleSection("propertyType")}
+>
+  <ToggleGrid
+    options={propertyTypeOptions}
+    selectedValues={filters.propertyType}
+    onToggle={(value) => {
+      onChipChange("propertyType", [value]);
+      setPropertyType(value);
+    }}
+  />
+</FilterSection>
 
-        <FilterSection
+        {/* <FilterSection
           title="Ownership Type"
           isOpen={openSections.ownershipType}
           onToggle={() => toggleSection("ownershipType")}
@@ -228,7 +297,7 @@ const PropertyFilters = ({
               )
             }
           />
-        </FilterSection>
+        </FilterSection> */}
 
         <FilterSection
           title="Amenities"

@@ -80,7 +80,7 @@ const Header = () => {
 
   
   const loggedOutPopoverContent = (
-    <div className="w-75 p-1 z-40">
+    <div className="w-75 p-1 z-[999]">
       <div className="flex items-center gap-x-2">
         <UserOutlined className="text-gray-500" />
 

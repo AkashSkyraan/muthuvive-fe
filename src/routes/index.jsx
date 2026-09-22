@@ -9,7 +9,8 @@ import ScrollToTop from "../components/common/ScrollToTop.jsx";
 
 const AppRoutes = () => {
   return (
-    <BrowserRouter>
+   <>
+   
       <ScrollToTop />
       <Routes>
         {AuthRoutes}
@@ -17,7 +18,8 @@ const AppRoutes = () => {
         {SellPropertyRoutes}
         {PropertyRoutes}
       </Routes>
-    </BrowserRouter>
+      </>
+    
   );
 };
 

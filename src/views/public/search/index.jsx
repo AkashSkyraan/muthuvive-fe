@@ -1,42 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Button, Drawer } from "antd";
 import { FilterOutlined } from "@ant-design/icons";
 
-// ============================================================
-// Already built
-// ============================================================
 import SearchBar from "./SearhPage.jsx";
 import ProjectCard from "../../../components/cards/ProjectCard";
 import Pagination from "../../../components/common/pagination/Pagination";
 import images from "../../../config/Images";
-
-// ============================================================
-// To be built separately - the ENTIRE left sidebar (active filter
-// chips, Sort By, Price Range, Types Of Property, Ownership Type,
-// Amenities, Facing Direction) lives inside this one component.
-// index.jsx just hands it the option lists + current filter state +
-// change handlers.
-// ============================================================
 import SearchFilters from "./SearchFilter.jsx";
+import { getAmenities, getPropertyTypes } from "../../../api/search.api.js";
+import axiosInstance from "../../../api/axios";
+import { useSearch } from "../../../context/SearchContext.jsx";
 
 const PropertySearchResults = () => {
   // ============================================================
-  // Filter option definitions - replace with API response later
+  // Filter option definitions
   // ============================================================
   const sortByOptions = [
     { label: "Available", value: "available" },
     { label: "Sold", value: "sold" },
-    { label: "Ongoing", value: "ongoing" },
-    { label: "Upcoming", value: "upcoming" },
-  ];
-
-  const propertyTypeOptions = [
-    { label: "Agriculture Land", value: "agriculture-land" },
-    { label: "Farmland", value: "farmland" },
-    { label: "Classification", value: "classification" },
-    { label: "Commercial Land", value: "commercial-land" },
-    { label: "Construction", value: "construction" },
-    { label: "DTCP Approved", value: "dtcp-approved" },
   ];
 
   const ownershipTypeOptions = [
@@ -46,104 +28,46 @@ const PropertySearchResults = () => {
     { label: "Power of Attorney", value: "power-of-attorney" },
   ];
 
-  const amenitiesOptions = [
-    { label: "Gated Society", value: "gated-society" },
-    { label: "Club House", value: "club-house" },
-    { label: "Drip Irrigation", value: "drip-irrigation" },
-    { label: "Borewell", value: "borewell" },
-  ];
-
   const facingDirectionOptions = [
-    { label: "North Facing", value: "north-facing" },
-    { label: "East Facing", value: "east-facing" },
-    { label: "North East Facing", value: "north-east-facing" },
-    { label: "West Facing", value: "west-facing" },
+    { label: "North Facing", value: 1 },
+    { label: "North East Facing", value: 2 },
+    { label: "East Facing", value: 3 },
+    { label: "South East Facing", value: 4 },
+    { label: "South Facing", value: 5 },
+    { label: "South West Facing", value: 6 },
+    { label: "West Facing", value: 7 },
+    { label: "North West Facing", value: 8 },
   ];
 
-  // Dynamic data - replace with API response
-  const mockProperties = [
-    {
-      id: 1,
-      image: images.agricultureLand,
-      category: "Agriculture Land",
-      title: "Boutique Space On Greenville Road",
-      price: "₹ 12,00,000 / Per Acre",
-      address:
-        "Sri Venkateswara Towers, FCI Rd, Opp. Fire Station, Gandhinagar Nagar, Peelamedu, Coimbatore, Tamil Nadu 64...",
-      area: "5000 SF",
-      hospitals: "5 Hospitals",
-      schools: "6 Schools",
-    },
-    {
-      id: 2,
-      image: images.agricultureLand,
-      category: "Agriculture Land",
-      title: "Boutique Space On Greenville Road",
-      price: "₹ 12,00,000 / Per Acre",
-      address:
-        "Sri Venkateswara Towers, FCI Rd, Opp. Fire Station, Gandhinagar Nagar, Peelamedu, Coimbatore, Tamil Nadu 64...",
-      area: "5000 SF",
-      hospitals: "5 Hospitals",
-      schools: "5 Schools",
-    },
-    {
-      id: 3,
-      image: images.agricultureLand,
-      category: "Agriculture Land",
-      title: "Boutique Space On Greenville Road",
-      price: "₹ 12,00,000 / Per Acre",
-      address:
-        "Sri Venkateswara Towers, FCI Rd, Opp. Fire Station, Gandhinagar Nagar, Peelamedu, Coimbatore, Tamil Nadu 64...",
-      area: "5000 SF",
-      hospitals: "5 Hospitals",
-      schools: "6 Schools",
-    },
-    {
-      id: 4,
-      image: images.agricultureLand,
-      category: "Agriculture Land",
-      title: "Boutique Space On Greenville Road",
-      price: "₹ 12,00,000 / Per Acre",
-      address:
-        "Sri Venkateswara Towers, FCI Rd, Opp. Fire Station, Gandhinagar Nagar, Peelamedu, Coimbatore, Tamil Nadu 64...",
-      area: "5000 SF",
-      hospitals: "5 Hospitals",
-      schools: "6 Schools",
-    },
-  ];
+  const [propertyTypeOptions, setPropertyTypeOptions] = useState([]);
+  const [amenitiesOptions, setAmenitiesOptions] = useState([]);
 
   // ============================================================
-  // Search bar state
+  // URL params — source of truth for API fetch
   // ============================================================
-  const [location, setLocation] = useState("");
-  const [searchCategory, setSearchCategory] = useState("");
+  const [searchParams] = useSearchParams();
+
+  const urlLocation = searchParams.get("location") || "";
+  const urlPropertyType = searchParams.get("propertyType") || "";
 
   // ============================================================
-  // One consolidated object for every sidebar filter group.
-  // Each key holds an array of currently-selected values for that
-  // group (multi-select), except priceMin/priceMax which are single
-  // values.
+  // Local sidebar filters
   // ============================================================
   const [filters, setFilters] = useState({
     sortBy: [],
-    propertyType: ["agriculture-land"],
+    propertyType: [],
     ownershipType: [],
     amenities: [],
-    facingDirection: ["north-facing"],
+    facingDirection: [],
     priceMin: null,
     priceMax: null,
   });
 
-  const [properties, setProperties] = useState(mockProperties);
+  const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // ============================================================
-  // Mobile filter drawer state
-  // ============================================================
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  // Generic handler - PropertyFilters calls this with whichever key
-  // changed (e.g. "propertyType") and its new array of selected values.
   const handleChipFilterChange = (filterKey, values) => {
     setFilters((prev) => ({ ...prev, [filterKey]: values }));
   };
@@ -164,40 +88,75 @@ const PropertySearchResults = () => {
     });
   };
 
-  const handleSearch = () => {
-    // Wire up the real fetch here later - location, searchCategory,
-    // and filters are all already available in this scope.
-    // console.log("Search:", { location, searchCategory, filters });
-  };
+  // ============================================================
+  // FETCH PROPERTIES — URL params + filters change aanaa re-run
+  // ============================================================
+  useEffect(() => {
+    const fetchProperties = async () => {
+      try {
+        setLoading(true);
 
-  // Breadcrumb-style summary text next to the results count -
-  // built from the first selected propertyType + facingDirection,
-  // matching "Agriculture Land / North Facing" in the design.
+        // ✅ Real API call (uncomment when ready)
+        const response = await axiosInstance.get("/property/list", {
+          params: {
+            ...(urlLocation && { location: urlLocation }),
+            ...(urlPropertyType && { propertyType: urlPropertyType }),
+            ...filters,
+          },
+        });
+
+        const data = response?.data?.data || [];
+        setProperties(data);
+
+        // Fallback mock (until API ready)
+        // setProperties([]);
+      } catch (err) {
+        console.error("Fetch properties error:", err);
+        setProperties([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProperties();
+  }, [urlLocation, urlPropertyType, filters]);
+
+  // ============================================================
+  // Fetch filter options
+  // ============================================================
+  useEffect(() => {
+    (async () => {
+      try {
+        const [amenities, types] = await Promise.all([
+          getAmenities(),
+          getPropertyTypes(),
+        ]);
+        setAmenitiesOptions(amenities || []);
+        setPropertyTypeOptions(types || []);
+      } catch (err) {
+        console.error("Filter options fetch error:", err);
+      }
+    })();
+  }, []);
+
+  // ============================================================
+  // Breadcrumb
+  // ============================================================
   const breadcrumbParts = [
     propertyTypeOptions.find((o) => o.value === filters.propertyType[0])?.label,
-
     facingDirectionOptions.find((o) => o.value === filters.facingDirection[0])
       ?.label,
   ].filter(Boolean);
 
+  const { propertyType: contextPropertyType, setPropertyType } = useSearch();
+
   return (
     <div className="w-full">
       <div className="w-[95%] mx-auto my-5 text-start">
-        {/* ============================================================
-            SEARCH BAR
-            ============================================================ */}
-        <SearchBar
-          location={location}
-          onLocationChange={setLocation}
-          category={searchCategory}
-          onCategoryChange={setSearchCategory}
-          onSearch={handleSearch}
-        />
+        {/* SEARCH BAR — no props, reads from context */}
+        <SearchBar />
 
-        {/* ============================================================
-            MOBILE FILTER BUTTON
-            Only visible below lg
-            ============================================================ */}
+        {/* MOBILE FILTER BUTTON */}
         <div className="flex lg:hidden justify-start mt-4">
           <Button
             type="default"
@@ -210,11 +169,22 @@ const PropertySearchResults = () => {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-6 my-6">
-          {/* ========================================================
-              LEFT SIDE - Filters
-              Desktop only
-              ======================================================== */}
-          <aside className="hidden lg:block w-full lg:w-[30%] shrink-0">
+          {/* LEFT — Desktop Filters (STICKY) */}
+          <aside
+            className="
+      hidden
+      lg:block
+      w-full
+      lg:w-[30%]
+      shrink-0
+      lg:sticky
+      lg:top-[80px]
+      lg:self-start
+      lg:max-h-[calc(100vh-100px)]
+      lg:overflow-y-auto
+      pr-1
+    "
+          >
             <SearchFilters
               sortByOptions={sortByOptions}
               propertyTypeOptions={propertyTypeOptions}
@@ -228,13 +198,12 @@ const PropertySearchResults = () => {
             />
           </aside>
 
-          {/* ========================================================
-              RIGHT SIDE - Results
-              ======================================================== */}
+          {/* RIGHT — Results */}
           <div className="w-full lg:w-[65%] mx-auto">
-            {/* Results count + breadcrumb */}
             <p className="text-sm text-gray-700 mb-4">
-              <span className="font-semibold text-gray-900">1234 Results</span>
+              <span className="font-semibold text-gray-900">
+                {properties.length} Results
+              </span>
 
               {breadcrumbParts.length > 0 && (
                 <span className="text-black font-semibold">
@@ -246,13 +215,13 @@ const PropertySearchResults = () => {
 
             {loading ? (
               <div className="flex justify-center py-10">Loading...</div>
-            ) : mockProperties.length === 0 ? (
+            ) : properties.length === 0 ? (
               <div className="flex justify-center py-10 text-gray-500">
                 No properties found
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {mockProperties.map((property) => (
+                {properties.map((property) => (
                   <ProjectCard key={property.id} listing={property} />
                 ))}
               </div>
@@ -265,21 +234,14 @@ const PropertySearchResults = () => {
         </div>
       </div>
 
-      {/* ============================================================
-          MOBILE FILTER DRAWER
-          ============================================================ */}
-
+      {/* MOBILE FILTER DRAWER */}
       <Drawer
         title={<span className="text-base">Filters</span>}
         placement="left"
         size="90%"
         open={isFilterOpen}
         onClose={() => setIsFilterOpen(false)}
-        styles={{
-          body: {
-            padding: 16,
-          },
-        }}
+        styles={{ body: { padding: 16 } }}
       >
         <SearchFilters
           sortByOptions={sortByOptions}
@@ -293,7 +255,6 @@ const PropertySearchResults = () => {
           onClearAll={handleClearAllFilters}
         />
 
-        {/* Optional close/apply button */}
         <Button
           type="primary"
           block

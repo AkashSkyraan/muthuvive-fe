@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useSearch } from "../../../context/SearchContext";
 import Button from "../../../components/common/Button";
+import axiosInstance from "../../../api/axios";
+import { useNavigate } from "react-router-dom";
 
 function LocationIcon() {
   return (
@@ -14,25 +16,6 @@ function LocationIcon() {
     >
       <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" />
       <circle cx="12" cy="10" r="2.5" />
-    </svg>
-  );
-}
-
-function PropertyIcon() {
-  return (
-    <svg
-      width="22"
-      height="22"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-    >
-      <path d="M4 19h16" />
-      <path d="M6 16.5 12 11l6 5.5" />
-      <path d="M8 16v-4" />
-      <path d="M12 12V7" />
-      <path d="M16 16v-4" />
     </svg>
   );
 }
@@ -71,16 +54,25 @@ function ChevronDownIcon({ open }) {
   );
 }
 
-const propertyTypes = [
-  "Agriculture Land",
-  "Residential Land",
-  "Commercial Land",
-  "Farm House",
-  "Residential Property",
-  "Commercial Property",
-];
+function SearchIcon() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
+      <circle cx="11" cy="11" r="7" />
+      <path d="m20 20-4-4" />
+    </svg>
+  );
+}
 
 function SearchPage() {
+  const navigate = useNavigate();
+
   const {
     location,
     setLocation,
@@ -88,13 +80,44 @@ function SearchPage() {
     setPropertyType,
     clearLocation,
     clearPropertyType,
-    search,
   } = useSearch();
 
+  // =========================
+  // STATES
+  // =========================
+  const [propertyTypes, setPropertyTypes] = useState([]);
   const [openPropertyType, setOpenPropertyType] = useState(false);
 
-  const propertyTypeRef = useRef(null);
+  const [locationSuggestions, setLocationSuggestions] = useState([]);
+  const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
 
+  const [loadingLocations, setLoadingLocations] = useState(false);
+  const [locationSearched, setLocationSearched] = useState(false);
+
+  const propertyTypeRef = useRef(null);
+  const locationRef = useRef(null);
+
+  // =========================
+  // GET PROPERTY TYPES
+  // =========================
+  useEffect(() => {
+    const fetchPropertyTypes = async () => {
+      try {
+        const response = await axiosInstance.get("/property/properties");
+        const data = response?.data?.data || [];
+        setPropertyTypes(data);
+      } catch (error) {
+        console.error("Property types fetch error:", error);
+        setPropertyTypes([]);
+      }
+    };
+
+    fetchPropertyTypes();
+  }, []);
+
+  // =========================
+  // CLICK OUTSIDE
+  // =========================
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -102,6 +125,10 @@ function SearchPage() {
         !propertyTypeRef.current.contains(event.target)
       ) {
         setOpenPropertyType(false);
+      }
+
+      if (locationRef.current && !locationRef.current.contains(event.target)) {
+        setShowLocationSuggestions(false);
       }
     };
 
@@ -112,44 +139,418 @@ function SearchPage() {
     };
   }, []);
 
+  // =========================
+  // LOCATION SEARCH API
+  // =========================
+  useEffect(() => {
+    const keyword = location.trim();
+
+    if (keyword.length < 3) {
+      setLocationSuggestions([]);
+      setShowLocationSuggestions(false);
+      setLocationSearched(false);
+      setLoadingLocations(false);
+      return;
+    }
+
+    const controller = new AbortController();
+
+    const timer = setTimeout(async () => {
+      try {
+        setLoadingLocations(true);
+        setLocationSearched(false);
+
+        const response = await axiosInstance.get("/src/find-address", {
+          params: { search: keyword },
+          signal: controller.signal,
+        });
+
+        const data = response?.data?.data || [];
+
+        setLocationSuggestions(data);
+        setShowLocationSuggestions(true);
+        setLocationSearched(true);
+      } catch (error) {
+        if (
+          error?.name !== "CanceledError" &&
+          error?.code !== "ERR_CANCELED"
+        ) {
+          console.error("Location search error:", error);
+
+          setLocationSuggestions([]);
+          setShowLocationSuggestions(true);
+          setLocationSearched(true);
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoadingLocations(false);
+        }
+      }
+    }, 300);
+
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [location]);
+
+  // =========================
+  // SELECT LOCATION
+  // =========================
+  const handleLocationSelect = (item) => {
+    let locationText = "";
+
+    if (item.post) {
+      locationText = item.post;
+      if (item.district) locationText += `, ${item.district}`;
+      if (item.state) locationText += `, ${item.state}`;
+    } else if (item.district) {
+      locationText = item.district;
+      if (item.state) locationText += `, ${item.state}`;
+    } else if (item.state) {
+      locationText = item.state;
+    }
+
+    setLocation(locationText);
+    setShowLocationSuggestions(false);
+    setLocationSuggestions([]);
+    setLocationSearched(false);
+  };
+
+  // =========================
+  // CLEAR LOCATION
+  // =========================
+  const handleClearLocation = () => {
+    clearLocation();
+    setLocationSuggestions([]);
+    setShowLocationSuggestions(false);
+    setLocationSearched(false);
+  };
+
+  // =========================
+  // SEARCH CLICK
+  // =========================
+  const handleSearchClick = () => {
+    const params = new URLSearchParams();
+
+    if (location?.trim()) params.set("location", location.trim());
+    if (propertyType?.trim()) params.set("propertyType", propertyType.trim());
+
+    const qs = params.toString();
+    navigate(qs ? `/search?${qs}` : "/search");
+  };
+
   return (
-    <div className="flex w-full flex-col items-stretch gap-3 py-4 px-4 sm:px-3 min-[850px]:flex-row md:items-center md:gap-8 md:py-3">
-      {/* Location */}
-      <div className="flex min-h-[45px] w-full items-center rounded-sm border border-[#999999] bg-white px-5 md:flex-1">
-        <div className="flex shrink-0 items-center text-[#17213D]">
-          <LocationIcon />
+    <div
+      className="
+        relative
+        z-[2]
+        flex
+        w-full
+        flex-col
+        gap-3
+        overflow-visible
+        rounded-md
+        bg-white/20
+        px-4
+        py-8
+        sm:px-5
+        min-[850px]:flex-row
+        min-[850px]:items-center
+        min-[850px]:gap-5
+        min-[850px]:px-3
+        min-[850px]:py-3
+      "
+    >
+      {/* =========================
+          LOCATION
+      ========================== */}
+      <div
+        ref={locationRef}
+        className="
+          relative
+          z-[10000]
+          w-full
+          min-[850px]:flex-1
+        "
+      >
+        <div
+          className="
+            relative
+            z-[10001]
+            flex
+            h-[48px]
+            w-full
+            items-center
+            rounded-lg
+            border
+            border-[#999999]
+            bg-white
+            px-4
+            transition
+            focus-within:border-blue-500
+            focus-within:ring-2
+            focus-within:ring-blue-100
+            min-[850px]:h-[45px]
+            min-[850px]:rounded-sm
+            min-[850px]:px-5
+          "
+        >
+          <div className="flex shrink-0 items-center text-[#17213D]">
+            <LocationIcon />
+          </div>
+
+          <input
+            type="text"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            onFocus={() => {
+              if (
+                location.trim().length >= 3 &&
+                (locationSuggestions.length > 0 || locationSearched)
+              ) {
+                setShowLocationSuggestions(true);
+              }
+            }}
+            placeholder="Enter location"
+            autoComplete="off"
+            className="
+              ml-3
+              min-w-0
+              flex-1
+              bg-transparent
+              text-[15px]
+              text-[#111827]
+              outline-none
+              placeholder:text-[#777]
+              sm:text-[16px]
+            "
+          />
+
+          {loadingLocations && (
+            <div
+              className="
+                mr-2
+                h-4
+                w-4
+                shrink-0
+                animate-spin
+                rounded-full
+                border-2
+                border-gray-300
+                border-t-blue-600
+              "
+            />
+          )}
+
+          {location && !loadingLocations && (
+            <button
+              type="button"
+              onClick={handleClearLocation}
+              aria-label="Clear location"
+              className="
+                ml-2
+                flex
+                h-9
+                w-9
+                shrink-0
+                items-center
+                justify-center
+                rounded-full
+                text-[#17213D]
+                transition
+                hover:bg-gray-100
+                active:bg-gray-200
+              "
+            >
+              <CloseIcon />
+            </button>
+          )}
         </div>
 
-        <input
-          type="text"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          placeholder="Enter location"
-          className="ml-3 min-w-0 flex-1 bg-transparent text-[16px] text-[#111827] outline-none placeholder:text-[#777]"
-        />
-
-        {location && (
-          <button
-            type="button"
-            onClick={clearLocation}
-            className="ml-3 flex shrink-0 items-center justify-center text-[#17213D]"
+        {/* LOCATION SUGGESTIONS */}
+        {showLocationSuggestions && (
+          <div
+            className="
+              absolute
+              left-0
+              right-0
+              top-[55px]
+              z-[99999]
+              overflow-hidden
+              rounded-xl
+              border
+              border-gray-200
+              bg-white
+              shadow-2xl
+              ring-1
+              ring-black/5
+              min-[850px]:top-[52px]
+              min-[850px]:rounded-lg
+            "
           >
-            <CloseIcon />
-          </button>
+            {loadingLocations && (
+              <div className="px-5 py-4 text-center text-sm text-gray-500">
+                Searching locations...
+              </div>
+            )}
+
+            {!loadingLocations && locationSuggestions.length > 0 && (
+              <div className="max-h-[280px] overflow-y-auto overscroll-contain">
+                {locationSuggestions.map((item, index) => (
+                  <button
+                    key={`${item.post || "location"}-${
+                      item.district || ""
+                    }-${item.state || ""}-${index}`}
+                    type="button"
+                    onClick={() => handleLocationSelect(item)}
+                    className="
+                      flex
+                      min-h-[64px]
+                      w-full
+                      items-center
+                      border-b
+                      border-gray-100
+                      px-4
+                      py-3
+                      text-left
+                      transition
+                      hover:bg-gray-50
+                      active:bg-gray-100
+                      last:border-b-0
+                      sm:px-5
+                    "
+                  >
+                    <div
+                      className="
+                        mr-3
+                        flex
+                        h-9
+                        w-9
+                        shrink-0
+                        items-center
+                        justify-center
+                        rounded-full
+                        bg-blue-50
+                        text-[#17213D]
+                      "
+                    >
+                      <LocationIcon />
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <div
+                        className="
+                          truncate
+                          text-[15px]
+                          font-medium
+                          text-[#111827]
+                          sm:text-[16px]
+                        "
+                      >
+                        {item.post || item.district || item.state}
+                      </div>
+
+                      <div
+                        className="
+                          mt-0.5
+                          truncate
+                          text-[13px]
+                          text-gray-500
+                          sm:text-[14px]
+                        "
+                      >
+                        {item.post && item.district
+                          ? `${item.district}${
+                              item.state ? `, ${item.state}` : ""
+                            }`
+                          : item.district && item.state
+                            ? item.state
+                            : ""}
+                      </div>
+                    </div>
+
+                    <div className="ml-2 shrink-0 text-gray-400">
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                      >
+                        <path d="m9 18 6-6-6-6" />
+                      </svg>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {!loadingLocations &&
+              locationSearched &&
+              locationSuggestions.length === 0 && (
+                <div className="px-5 py-6 text-center">
+                  <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-500">
+                    <LocationIcon />
+                  </div>
+
+                  <p className="text-sm font-medium text-gray-700">
+                    No locations found
+                  </p>
+
+                  <p className="mt-1 text-xs text-gray-500">
+                    Try another location
+                  </p>
+                </div>
+              )}
+          </div>
         )}
       </div>
 
-      {/* Property Type */}
-      <div className="relative w-full md:flex-1" ref={propertyTypeRef}>
-        <div className="flex h-[45px] items-center rounded-sm border border-[#999999] bg-white px-5">
-          <div className="flex shrink-0 items-center text-[#17213D]">
-            <PropertyIcon />
-          </div>
-
+      {/* =========================
+          PROPERTY TYPE
+      ========================== */}
+      <div
+        ref={propertyTypeRef}
+        className="
+          relative
+          z-[10]
+          w-full
+          min-[850px]:flex-1
+        "
+      >
+        <div
+          className="
+            relative
+            z-[11]
+            flex
+            h-[48px]
+            items-center
+            rounded-lg
+            border
+            border-[#999999]
+            bg-white
+            px-4
+            min-[850px]:h-[45px]
+            min-[850px]:rounded-sm
+            min-[850px]:px-5
+          "
+        >
           <button
             type="button"
             onClick={() => setOpenPropertyType((prev) => !prev)}
-            className="ml-3 flex min-w-0 flex-1 items-center text-left text-[16px] text-[#111827]"
+            className="
+              ml-3
+              flex
+              min-w-0
+              flex-1
+              items-center
+              text-left
+              text-[15px]
+              text-[#111827]
+              sm:text-[16px]
+            "
           >
             <span className="truncate">
               {propertyType || "Select property type"}
@@ -160,7 +561,19 @@ function SearchPage() {
             <button
               type="button"
               onClick={clearPropertyType}
-              className="ml-3 flex shrink-0 items-center justify-center text-[#17213D]"
+              aria-label="Clear property type"
+              className="
+                ml-2
+                flex
+                h-9
+                w-9
+                shrink-0
+                items-center
+                justify-center
+                rounded-full
+                text-[#17213D]
+                hover:bg-gray-100
+              "
             >
               <CloseIcon />
             </button>
@@ -169,43 +582,117 @@ function SearchPage() {
           <button
             type="button"
             onClick={() => setOpenPropertyType((prev) => !prev)}
-            className="ml-3 flex shrink-0 items-center text-[#17213D]"
+            aria-label="Open property types"
+            className="
+              ml-1
+              flex
+              h-9
+              w-9
+              shrink-0
+              items-center
+              justify-center
+              text-[#17213D]
+            "
           >
             <ChevronDownIcon open={openPropertyType} />
           </button>
         </div>
 
-        {/* Dropdown */}
         {openPropertyType && (
-          <div className="absolute left-0 right-0 top-[58px] z-50 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg">
-            {propertyTypes.map((type) => (
-              <button
-                key={type}
-                type="button"
-                onClick={() => {
-                  setPropertyType(type);
-                  setOpenPropertyType(false);
-                }}
-                className={`block w-full px-5 py-3 text-left text-base transition hover:bg-gray-50 ${
-                  propertyType === type
-                    ? "bg-gray-50 font-medium text-blue-600"
-                    : "text-gray-800"
-                }`}
-              >
-                {type}
-              </button>
-            ))}
+          <div
+            className="
+              absolute
+              left-0
+              right-0
+              top-[54px]
+              z-[9999]
+              max-h-[280px]
+              overflow-y-auto
+              rounded-xl
+              border
+              border-gray-200
+              bg-white
+              shadow-2xl
+              ring-1
+              ring-black/5
+              min-[850px]:top-[52px]
+              min-[850px]:rounded-lg
+            "
+          >
+            {propertyTypes.length > 0 ? (
+              propertyTypes.map((type) => (
+                <button
+                  key={type.id}
+                  type="button"
+                  onClick={() => {
+                    setPropertyType(type.name);
+                    setOpenPropertyType(false);
+                  }}
+                  className={`
+                    flex
+                    min-h-[48px]
+                    w-full
+                    items-center
+                    px-4
+                    py-3
+                    text-left
+                    text-[15px]
+                    transition
+                    hover:bg-gray-50
+                    active:bg-gray-100
+                    sm:px-5
+                    sm:text-base
+                    ${
+                      propertyType === type.name
+                        ? "bg-blue-50 font-medium text-blue-600"
+                        : "text-gray-800"
+                    }
+                  `}
+                >
+                  {type.name}
+                </button>
+              ))
+            ) : (
+              <div className="px-5 py-6 text-center text-sm text-gray-500">
+                No property types found
+              </div>
+            )}
           </div>
         )}
       </div>
 
+      {/* =========================
+          SEARCH BUTTON
+      ========================== */}
       <Button
         type="primary"
         htmlType="button"
-        onClick={search}
-        className="!h-10 w-full shrink-0 rounded-lg px-11 !text-base font-medium text-white transition !bg-blue hover:!bg-blue min-[850px]:!w-25"
+        onClick={handleSearchClick}
+        className="
+          relative
+          z-[1]
+          !h-[48px]
+          w-full
+          shrink-0
+          rounded-lg
+          px-8
+          !bg-blue
+          !text-[15px]
+          font-medium
+          text-white
+          transition
+          hover:!bg-blue
+          active:scale-[0.99]
+          sm:!text-base
+          min-[850px]:!h-10
+          min-[850px]:!w-auto
+          min-[850px]:!px-11
+        "
       >
-        Search
+        <span className="flex items-center justify-center gap-2">
+          <SearchIcon />
+          Search
+        </span>
       </Button>
     </div>
   );
