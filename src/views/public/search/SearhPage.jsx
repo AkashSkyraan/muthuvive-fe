@@ -105,6 +105,7 @@ function SearchPage() {
       try {
         const response = await axiosInstance.get("/property/properties");
         const data = response?.data?.data || [];
+
         setPropertyTypes(data);
       } catch (error) {
         console.error("Property types fetch error:", error);
@@ -486,7 +487,7 @@ function SearchPage() {
                 ))}
               </div>
             )}
-
+{/* 
             {!loadingLocations &&
               locationSearched &&
               locationSuggestions.length === 0 && (
@@ -503,7 +504,7 @@ function SearchPage() {
                     Try another location
                   </p>
                 </div>
-              )}
+              )} */}
           </div>
         )}
       </div>
@@ -620,7 +621,7 @@ function SearchPage() {
             "
           >
             {propertyTypes.length > 0 ? (
-              propertyTypes.map((type) => (
+              propertyTypes?.map((type) => (
                 <button
                   key={type.id}
                   type="button"

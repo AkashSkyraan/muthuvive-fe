@@ -1,14 +1,20 @@
-import React, { useState } from "react";
-import { Button, Popover, Drawer } from "antd";
+import React, { useEffect, useState } from "react";
+import { Button, Popover, Drawer, Modal, message } from "antd";
 import { MenuOutlined, CloseOutlined, UserOutlined } from "@ant-design/icons";
+
 import images from "../config/Images.jsx";
 import icons from "../config/Icons.jsx";
+
 import { Link, useNavigate, useLocation } from "react-router-dom";
+
 import useScrollLock from "../hooks/UseScrollLock.jsx";
 import { useAboutUs } from "../context/AboutusContext.jsx";
+import axiosInstance from "../api/axios.js";
+import { useLoginModal } from "../context/LoginModalContext.jsx";
 
 const Header = () => {
   const { aboutUs, loading, error } = useAboutUs();
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -20,10 +26,73 @@ const Header = () => {
 
   const [isMobilePropertiesOpen, setIsMobilePropertiesOpen] = useState(false);
 
+  // ---------------------------------------------------------
+  // User State
+  // ---------------------------------------------------------
+
+  const [user, setUser] = useState(null);
+  const [userLoading, setUserLoading] = useState(true);
+
+  const [isLoginPopupOpen, setIsLoginPopupOpen] = useState(false);
+
+  const handleSellProperty = () => {
+    if (!isLoggedIn) {
+      openLoginModal();
+      return;
+    }
+
+    navigate("/sell-property");
+  };
   // Lock scroll if account Popover is open
   useScrollLock(isDesktopAccountOpen || isMobileAccountOpen);
 
-  const isLoggedIn = !!localStorage.getItem("authToken");
+  // ---------------------------------------------------------
+  // Get Current Logged In User
+  // ---------------------------------------------------------
+
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      try {
+        setUserLoading(true);
+
+        const response = await axiosInstance.get("/user/get-user");
+
+        console.log("CURRENT USER RESPONSE:", response);
+
+        if (response?.data?.success === 1 && response?.data?.data?.length > 0) {
+          setUser(response.data.data[0]);
+        } else {
+          setUser(null);
+        }
+      } catch (error) {
+        console.error("Get Current User Error:", error);
+
+        setUser(null);
+      } finally {
+        setUserLoading(false);
+      }
+    };
+
+    getCurrentUser();
+  }, []);
+
+  // ---------------------------------------------------------
+  // Login Status
+  // ---------------------------------------------------------
+
+  const isLoggedIn = !!user;
+
+  // ---------------------------------------------------------
+  // Get User First Letter
+  // ---------------------------------------------------------
+
+  const getUserInitial = () => {
+    if (!user?.user_name) {
+      return "U";
+    }
+
+    return user.user_name.trim().charAt(0).toUpperCase();
+  };
 
   // ---------------------------------------------------------
   // Check active route
@@ -39,15 +108,52 @@ const Header = () => {
 
   const isPropertiesActive = location.pathname.startsWith("/properties/");
 
-  const handleLogout = () => {
-    localStorage.removeItem("authToken");
-    window.location.reload();
+  // ---------------------------------------------------------
+  // Logout
+  // ---------------------------------------------------------
+
+  const handleLogout = async () => {
+    try {
+      await axiosInstance.post("/auth/logout");
+
+      setUser(null);
+
+      setIsDesktopAccountOpen(false);
+      setIsMobileAccountOpen(false);
+
+      message.success("Logout successful");
+
+      navigate("/", {
+        replace: true,
+      });
+    } catch (error) {
+      console.error("Logout Error:", error);
+
+      message.error(error?.response?.data?.message || "Logout failed");
+    }
   };
+
+  // ---------------------------------------------------------
+  // Close Account Popover
+  // ---------------------------------------------------------
 
   const closeAccountPopover = () => {
     setIsDesktopAccountOpen(false);
     setIsMobileAccountOpen(false);
   };
+
+  // ---------------------------------------------------------
+  // Close Mobile Menu
+  // ---------------------------------------------------------
+
+  const closeMobileMenu = () => {
+    setIsMenuOpen(false);
+    setIsMobilePropertiesOpen(false);
+  };
+
+  // ---------------------------------------------------------
+  // Property Categories
+  // ---------------------------------------------------------
 
   const propertyCategories = [
     {
@@ -87,6 +193,10 @@ const Header = () => {
     },
   ];
 
+  // ---------------------------------------------------------
+  // Logged Out Popover
+  // ---------------------------------------------------------
+
   const loggedOutPopoverContent = (
     <div className="w-75 p-1 z-[999]">
       <div className="flex items-center gap-x-2">
@@ -101,7 +211,7 @@ const Header = () => {
         <Button
           className="!border-secondary !text-secondary flex-1 !text-sm"
           onClick={() => {
-            closeAccountPopover;
+            closeAccountPopover();
             navigate("/login");
           }}
         >
@@ -112,7 +222,7 @@ const Header = () => {
           type="primary"
           className="!bg-secondary flex-1 !text-sm"
           onClick={() => {
-            closeAccountPopover;
+            closeAccountPopover();
             navigate("/signup");
           }}
         >
@@ -128,17 +238,39 @@ const Header = () => {
 
   const loggedInPopoverContent = (
     <div className="w-64 sm:w-72 p-1 z-40 max-h-[70vh] account-popover-scroll overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden overscroll-contain">
+      {/* User Info */}
+
       <div className="flex flex-col items-center text-center pb-3 border-b border-gray-100">
-        <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold text-lg">
-          A
+        {/* First Letter */}
+
+        <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold text-lg uppercase">
+          {getUserInitial()}
         </div>
 
+        {/* User Name */}
+
         <p className="mt-2 text-base font-semibold text-black">
-          Muthvive's Properties
+          {user?.user_name || "User"}
         </p>
+
+        {/* Email */}
+
+        {user?.email && (
+          <p className="text-xs text-gray-500 mt-1 break-all">{user.email}</p>
+        )}
+
+        {/* Mobile */}
+
+        {user?.mobile && (
+          <p className="text-xs text-gray-500 mt-1">{user.mobile}</p>
+        )}
       </div>
 
       <div className="pt-3">
+        {/* ------------------------------------------------ */}
+        {/* My Activity */}
+        {/* ------------------------------------------------ */}
+
         <p className="text-base font-semibold text-black mb-1 px-1">
           My Activity
         </p>
@@ -175,6 +307,10 @@ const Header = () => {
           </li>
         </ul>
 
+        {/* ------------------------------------------------ */}
+        {/* Account Settings */}
+        {/* ------------------------------------------------ */}
+
         <p className="text-base font-semibold text-black mt-3 mb-1 px-1">
           Account Settings
         </p>
@@ -200,6 +336,10 @@ const Header = () => {
             </Link>
           </li>
         </ul>
+
+        {/* ------------------------------------------------ */}
+        {/* General Settings */}
+        {/* ------------------------------------------------ */}
 
         <p className="text-base font-semibold text-black mt-3 mb-1 px-1">
           General Settings
@@ -257,6 +397,10 @@ const Header = () => {
           </li>
         </ul>
 
+        {/* ------------------------------------------------ */}
+        {/* Logout */}
+        {/* ------------------------------------------------ */}
+
         <button
           type="button"
           onClick={handleLogout}
@@ -302,6 +446,10 @@ const Header = () => {
     </div>
   );
 
+  // ---------------------------------------------------------
+  // Render
+  // ---------------------------------------------------------
+  const { openLoginModal } = useLoginModal();
   return (
     <div
       id="main-header"
@@ -309,7 +457,9 @@ const Header = () => {
     >
       <div className="w-[90%] p-4 lg:p-3 mx-auto">
         <div className="grid grid-cols-[40%_60%] md:grid-cols-[25%_75%] lg:grid-cols-[17%_83%] xl:grid-cols-[30%_70%] 2xl:grid-cols-[35%_65%]">
+          {/* ================================================= */}
           {/* Logo */}
+          {/* ================================================= */}
 
           <div className="flex items-center">
             <Link to="/">
@@ -321,9 +471,13 @@ const Header = () => {
             </Link>
           </div>
 
-          {/* Desktop nav */}
+          {/* ================================================= */}
+          {/* Desktop Navigation */}
+          {/* ================================================= */}
 
           <div className="hidden lg:flex items-center gap-x-5 justify-between">
+            {/* Navigation */}
+
             <div>
               <ul className="flex gap-x-5 lg:gap-x-4 xl:gap-x-5 text-base">
                 {/* Home */}
@@ -336,7 +490,7 @@ const Header = () => {
                   <Link to="/">Home</Link>
                 </li>
 
-                {/* Desktop Properties Popover */}
+                {/* Properties */}
 
                 <li
                   className={`transition-colors ${
@@ -396,17 +550,23 @@ const Header = () => {
               </ul>
             </div>
 
-            {/* Sell property */}
+            {/* ================================================= */}
+            {/* Sell Property */}
+            {/* ================================================= */}
 
             <div>
-              <Link to="/sell-property">
-                <Button type="primary" className="!bg-secondary !text-base">
-                  Sell my Properties
-                </Button>
-              </Link>
+              <Button
+                type="primary"
+                className="!bg-secondary !text-base"
+                onClick={handleSellProperty}
+              >
+                Sell my Properties
+              </Button>
             </div>
 
+            {/* ================================================= */}
             {/* Phone */}
+            {/* ================================================= */}
 
             <div className="flex items-center">
               <img
@@ -423,7 +583,9 @@ const Header = () => {
               </a>
             </div>
 
-            {/* Desktop account Popover */}
+            {/* ================================================= */}
+            {/* Desktop Account */}
+            {/* ================================================= */}
 
             <div>
               <Popover
@@ -437,21 +599,29 @@ const Header = () => {
                   offset: [0, 15],
                 }}
               >
-                <button>
-                  <img
-                    src={icons.userAvatarHolder}
-                    alt="user-profile-placeholder"
-                    className="w-[80%] hover:cursor-pointer"
-                  />
+                <button type="button">
+                  {isLoggedIn ? (
+                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold text-lg uppercase cursor-pointer">
+                      {getUserInitial()}
+                    </div>
+                  ) : (
+                    <img
+                      src={icons.userAvatarHolder}
+                      alt="user-profile-placeholder"
+                      className="w-[80%] hover:cursor-pointer"
+                    />
+                  )}
                 </button>
               </Popover>
             </div>
           </div>
 
-          {/* Mobile hamburger trigger + account avatar */}
+          {/* ================================================= */}
+          {/* Mobile Hamburger + Account */}
+          {/* ================================================= */}
 
           <div className="flex lg:hidden items-center justify-end gap-x-5">
-            {/* Mobile account Popover */}
+            {/* Mobile Account */}
 
             <Popover
               content={accountPopoverContent}
@@ -464,33 +634,38 @@ const Header = () => {
                 offset: [70, 20],
               }}
             >
-              <button>
-                <img
-                  src={icons.userAvatarHolder}
-                  alt="user-profile-placeholder"
-                  className="w-6 h-6 hover:cursor-pointer"
-                />
+              <button type="button">
+                {isLoggedIn ? (
+                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold text-sm uppercase cursor-pointer">
+                    {getUserInitial()}
+                  </div>
+                ) : (
+                  <img
+                    src={icons.userAvatarHolder}
+                    alt="user-profile-placeholder"
+                    className="w-6 h-6 hover:cursor-pointer"
+                  />
+                )}
               </button>
             </Popover>
 
-            {/* Mobile menu button */}
+            {/* Mobile Menu */}
 
-            <button onClick={() => setIsMenuOpen(true)}>
+            <button type="button" onClick={() => setIsMenuOpen(true)}>
               <MenuOutlined className="w-7 h-7" />
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile menu - antd Drawer, right to left */}
+      {/* ===================================================== */}
+      {/* Mobile Drawer */}
+      {/* ===================================================== */}
 
       <Drawer
         placement="right"
         open={isMenuOpen}
-        onClose={() => {
-          setIsMenuOpen(false);
-          setIsMobilePropertiesOpen(false);
-        }}
+        onClose={closeMobileMenu}
         closable={false}
         size="85%"
         styles={{
@@ -501,24 +676,23 @@ const Header = () => {
       >
         <div className="bg-primary h-full overflow-y-auto">
           <div className="w-[90%] mx-auto p-4">
-            {/* Drawer header */}
+            {/* ================================================= */}
+            {/* Drawer Header */}
+            {/* ================================================= */}
 
             <div className="flex items-center justify-between">
-              <Link to="/" onClick={() => setIsMenuOpen(false)}>
+              <Link to="/" onClick={closeMobileMenu}>
                 <img src={images.logo} alt="Logo" className="w-36 h-auto" />
               </Link>
 
-              <button
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  setIsMobilePropertiesOpen(false);
-                }}
-              >
+              <button type="button" onClick={closeMobileMenu}>
                 <CloseOutlined className="text-lg" />
               </button>
             </div>
 
-            {/* Drawer navigation */}
+            {/* ================================================= */}
+            {/* Drawer Navigation */}
+            {/* ================================================= */}
 
             <ul className="flex flex-col text-start gap-y-5 text-base mt-8">
               {/* Home */}
@@ -526,14 +700,14 @@ const Header = () => {
               <li className="transition-colors">
                 <Link
                   to="/"
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={closeMobileMenu}
                   className={isActive("/") ? "!text-secondary" : "!text-black"}
                 >
                   Home
                 </Link>
               </li>
 
-              {/* Mobile Properties Popover */}
+              {/* Properties */}
 
               <li
                 className={`transition-colors ${
@@ -567,7 +741,7 @@ const Header = () => {
               <li className="transition-colors">
                 <Link
                   to="/gallery"
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={closeMobileMenu}
                   className={
                     isActive("/gallery") ? "!text-secondary" : "!text-black"
                   }
@@ -581,7 +755,7 @@ const Header = () => {
               <li className="transition-colors">
                 <Link
                   to="/about"
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={closeMobileMenu}
                   className={
                     isActive("/about") ? "!text-secondary" : "!text-black"
                   }
@@ -595,7 +769,7 @@ const Header = () => {
               <li className="transition-colors">
                 <Link
                   to="/contactus"
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={closeMobileMenu}
                   className={
                     isActive("/contactus") ? "!text-secondary" : "!text-black"
                   }
@@ -605,7 +779,9 @@ const Header = () => {
               </li>
             </ul>
 
+            {/* ================================================= */}
             {/* Phone */}
+            {/* ================================================= */}
 
             <div className="flex items-center mt-8">
               <img
@@ -622,10 +798,12 @@ const Header = () => {
               </a>
             </div>
 
-            {/* Sell property */}
+            {/* ================================================= */}
+            {/* Sell Property */}
+            {/* ================================================= */}
 
             <div className="mt-8 text-start">
-              <Link to="/sell-property" onClick={() => setIsMenuOpen(false)}>
+              <Link to="/sell-property" onClick={closeMobileMenu}>
                 <Button
                   type="primary"
                   className="!bg-secondary w-auto max-w-[500px] !py-5 !text-base"

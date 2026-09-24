@@ -96,7 +96,6 @@ const PropertySearchResults = () => {
       try {
         setLoading(true);
 
-        // ✅ Real API call (uncomment when ready)
         const response = await axiosInstance.get("/property/list", {
           params: {
             ...(urlLocation && { location: urlLocation }),
@@ -118,7 +117,7 @@ const PropertySearchResults = () => {
       }
     };
 
-    fetchProperties();
+    // fetchProperties();
   }, [urlLocation, urlPropertyType, filters]);
 
   // ============================================================
@@ -132,6 +131,7 @@ const PropertySearchResults = () => {
           getPropertyTypes(),
         ]);
         setAmenitiesOptions(amenities || []);
+        console.log(types , "type")
         setPropertyTypeOptions(types || []);
       } catch (err) {
         console.error("Filter options fetch error:", err);
@@ -147,8 +147,6 @@ const PropertySearchResults = () => {
     facingDirectionOptions.find((o) => o.value === filters.facingDirection[0])
       ?.label,
   ].filter(Boolean);
-
-  const { propertyType: contextPropertyType, setPropertyType } = useSearch();
 
   return (
     <div className="w-full">
@@ -204,13 +202,13 @@ const PropertySearchResults = () => {
               <span className="font-semibold text-gray-900">
                 {properties.length} Results
               </span>
-
+              {/* 
               {breadcrumbParts.length > 0 && (
                 <span className="text-black font-semibold">
                   {" "}
                   / {breadcrumbParts.join(" / ")}
                 </span>
-              )}
+              )} */}
             </p>
 
             {loading ? (

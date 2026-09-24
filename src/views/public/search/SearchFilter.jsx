@@ -35,6 +35,7 @@ const FilterSection = ({ title, isOpen, onToggle, children }) => (
 const ToggleGrid = ({ options, selectedValues, onToggle }) => (
   <div className="grid grid-cols-2 gap-2">
     {options.map((option) => {
+      console.log(option)
       const isActive = selectedValues.includes(option.value);
       return (
         <button
@@ -67,6 +68,8 @@ const PropertyFilters = ({
 }) => {
   const { propertyType: contextPropertyType, setPropertyType } = useSearch();
 
+
+
   useEffect(() => {
     if (contextPropertyType) {
       onChipChange("propertyType", [contextPropertyType]);
@@ -74,6 +77,7 @@ const PropertyFilters = ({
       onChipChange("propertyType", []);
     }
   }, [contextPropertyType]);
+
   const [openSections, setOpenSections] = useState({
     sortBy: true,
     price: true,
@@ -267,37 +271,20 @@ const PropertyFilters = ({
           </div>
         </FilterSection>
 
-       <FilterSection
-  title="Types Of Property"
-  isOpen={openSections.propertyType}
-  onToggle={() => toggleSection("propertyType")}
->
-  <ToggleGrid
-    options={propertyTypeOptions}
-    selectedValues={filters.propertyType}
-    onToggle={(value) => {
-      onChipChange("propertyType", [value]);
-      setPropertyType(value);
-    }}
-  />
-</FilterSection>
-
-        {/* <FilterSection
-          title="Ownership Type"
-          isOpen={openSections.ownershipType}
-          onToggle={() => toggleSection("ownershipType")}
+        <FilterSection
+          title="Types Of Property"
+          isOpen={openSections.propertyType}
+          onToggle={() => toggleSection("propertyType")}
         >
           <ToggleGrid
-            options={ownershipTypeOptions}
-            selectedValues={filters.ownershipType}
-            onToggle={(value) =>
-              onChipChange(
-                "ownershipType",
-                toggleValue(filters.ownershipType, value),
-              )
-            }
+            options={propertyTypeOptions}
+            selectedValues={filters.propertyType}
+            onToggle={(value) => {
+              onChipChange("propertyType", [value]);
+              setPropertyType(value);
+            }}
           />
-        </FilterSection> */}
+        </FilterSection>
 
         <FilterSection
           title="Amenities"
