@@ -1,23 +1,84 @@
-import React from "react";
+import React, { useState } from "react";
 import icons from "../../config/Icons.jsx";
 import { CircleSmall } from "lucide-react";
+import { useLoginModal } from "../../context/LoginModalContext.jsx";
 
 // Renders a singling card. Pass one `listing` object with
 // { id, image, category, title, price, address, area, hospitals, schools }.
-const ProjectCard = ({ listing }) => {
-  console.log("inside project card", listing);
+const ProjectCard = ({ listing, user }) => {
+
+  const { openLoginModal } = useLoginModal();
+
+ 
+
+  const [isBookmarked, setIsBookmarked] = useState(
+    Boolean(listing?.is_bookmarked),
+  );
+
+  const [bookmarkLoading, setBookmarkLoading] = useState(false);
+
+  const handleBookmark = async (event) => {
+    // Prevent card click
+    event.preventDefault();
+    event.stopPropagation();
+
+    // Not logged in
+    if (!user) {
+      openLoginModal();
+      return;
+    }
+
+    // Prevent multiple clicks
+    if (bookmarkLoading) {
+      return;
+    }
+
+    try {
+      setBookmarkLoading(true);
+
+      const response = await AxiosInstance.post("/properties/bookmark", {
+        prop_id: listing.prop_id,
+      });
+
+      if (response?.data?.success === 1) {
+        setIsBookmarked((prev) => !prev);
+
+        message.success(
+          isBookmarked
+            ? "Property removed from bookmarks"
+            : "Property added to bookmarks",
+        );
+      } else {
+        message.error(response?.data?.message || "Unable to update bookmark");
+      }
+    } catch (error) {
+      console.error("Bookmark Error:", error);
+
+      message.error(error?.response?.data?.message || "Something went wrong");
+    } finally {
+      setBookmarkLoading(false);
+    }
+  };
 
   return (
     <div className="bg-white rounded-lg overflow-hidden border border-gray-100 cursor-pointer">
       <div className="relative h-48 sm:h-44 lg:h-48">
         <img
-          src={listing.cover_image?.url}
+          src={listing?.cover_image?.url}
           alt={listing.prop_name}
           className="w-full h-full object-cover"
         />
 
-        <button className="absolute top-2 right-2 w-8 h-8 rounded-md flex items-center justify-center hover:cursor-pointer">
-          <img src={icons.bookmarkIcon} alt="bookmark" className="w-5 h-5" />
+        <button
+          className={`absolute top-2 right-2 w-8 h-8 rounded-md flex items-center justify-center hover:cursor-pointer `}
+          onClick={handleBookmark}
+          disabled={bookmarkLoading}
+        >
+          <img
+            src={isBookmarked ? icons.bookmarkIconFilled : icons.bookmarkIcon}
+            alt="bookmark"
+            className="w-5 h-5"
+          />
         </button>
 
         <span className="absolute bottom-3 right-3 bg-white text-secondary text-sm font-medium px-3 py-1 rounded-md">
@@ -60,9 +121,9 @@ const ProjectCard = ({ listing }) => {
 
             <span
               className="text-sm text-gray-500 truncate"
-              title={listing?.highlights?.name}
+              title={listing?.highlights[0]?.name}
             >
-              {listing?.highlights?.name}
+              {listing?.highlights[0]?.name}
             </span>
           </div>
 
@@ -72,9 +133,9 @@ const ProjectCard = ({ listing }) => {
 
             <span
               className="text-sm text-gray-500 truncate"
-              title={listing?.amenities?.name}
+              title={listing?.amenities[0]?.name}
             >
-              {listing?.amenities?.name}
+              {listing?.amenities[0]?.name}
             </span>
           </div>
         </div>

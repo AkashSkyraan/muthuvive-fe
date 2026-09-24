@@ -3,8 +3,8 @@ import React, { useEffect, useState } from "react";
 import ProjectCard from "../../../components/cards/ProjectCard";
 import Header from "./Header";
 import Pagination from "../../../components/common/pagination/Pagination";
-import CategoryFilter from "../myProperties/CategoryFilter";
-import images from "../../../config/Images";
+import { getRecentViews } from "../../../api/auth.api";
+import { useAuth } from "../../../context/UserContext";
 
 const MyProperties = () => {
   const filterOptions = [
@@ -29,85 +29,7 @@ const MyProperties = () => {
       value: "commercial-residential-buildings",
     },
   ];
-  const mockProperties = [
-    {
-      id: 1,
-      image: images.agricultureLand,
-      category: "Agriculture Land",
-      title: "Boutique Space On Greenville Road",
-      price: "₹ 12,00,000 / Per Acre",
-      address:
-        "Sri Venkateswara Towers, FCI Rd, Opp. Fire Station, Gandhinagar Nagar, Peelamedu, Coimbatore, Tamil Nadu 64...",
-      area: "5000 SF",
-      hospitals: "5 Hospitals",
-      schools: "6 Schools",
-    },
 
-    {
-      id: 2,
-      image: images.agricultureLand,
-      category: "Agriculture Land",
-      title: "Boutique Space On Greenville Road",
-      price: "₹ 12,00,000 / Per Acre",
-      address:
-        "Sri Venkateswara Towers, FCI Rd, Opp. Fire Station, Gandhinagar Nagar, Peelamedu, Coimbatore, Tamil Nadu 64...",
-      area: "5000 SF",
-      hospitals: "5 Hospitals",
-      schools: "5 Schools",
-    },
-
-    {
-      id: 3,
-      image: images.agricultureLand,
-      category: "Agriculture Land",
-      title: "Boutique Space On Greenville Road",
-      price: "₹ 12,00,000 / Per Acre",
-      address:
-        "Sri Venkateswara Towers, FCI Rd, Opp. Fire Station, Gandhinagar Nagar, Peelamedu, Coimbatore, Tamil Nadu 64...",
-      area: "5000 SF",
-      hospitals: "5 Hospitals",
-      schools: "6 Schools",
-    },
-
-    {
-      id: 4,
-      image: images.agricultureLand,
-      category: "Agriculture Land",
-      title: "Boutique Space On Greenville Road",
-      price: "₹ 12,00,000 / Per Acre",
-      address:
-        "Sri Venkateswara Towers, FCI Rd, Opp. Fire Station, Gandhinagar Nagar, Peelamedu, Coimbatore, Tamil Nadu 64...",
-      area: "5000 SF",
-      hospitals: "5 Hospitals",
-      schools: "6 Schools",
-    },
-
-    {
-      id: 5,
-      image: images.agricultureLand,
-      category: "Agriculture Land",
-      title: "Boutique Space On Greenville Road",
-      price: "₹ 12,00,000 / Per Acre",
-      address:
-        "Sri Venkateswara Towers, FCI Rd, Opp. Fire Station, Gandhinagar Nagar, Peelamedu, Coimbatore, Tamil Nadu 64...",
-      area: "5000 SF",
-      hospitals: "5 Hospitals",
-      schools: "5 Schools",
-    },
-
-    {
-      id: 6,
-      image: images.agricultureLand,
-      category: "Agriculture Land",
-      title: "Boutique Space On Greenville Road",
-      price: "₹ 12,00,000 / Per Acre",
-      address:
-        "Sri Venkateswara Towers, FCI Rd, Opp. Fire Station, Gandhinagar Nagar, Peelamedu, Coimbatore, Tamil Nadu 64...",
-      area: "5000 SF",
-      hospitals: "5 Hospitals",
-      schools: "5 Schools",
-    },
-  ];
   const requestCategories = [
     { label: "All Requests", value: "all" },
     { label: "Requested", value: "requested" },
@@ -118,97 +40,152 @@ const MyProperties = () => {
     { label: "Rejected", value: "rejected" },
   ];
 
-  // Selected property categories
+  // ============================================================
+  // STATE
+  // ============================================================
+
   const [selectedFilters, setSelectedFilters] = useState([]);
 
-  // Search text
   const [search, setSearch] = useState("");
 
-  // Properties returned from API
   const [properties, setProperties] = useState([]);
 
-  // API loading state
   const [loading, setLoading] = useState(false);
 
-  // ACTIVE CATEGORY
   const [activeCategory, setActiveCategory] = useState("all");
+
+  // Pagination
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0,
+  });
+  const { user } = useAuth();
+
+  const user_id = user?.id;
 
   // ============================================================
   // FILTER CHANGE
   // ============================================================
-  // This function will be passed to Header.
-  //
-  // Header does not directly manage the main page state.
-  // It simply tells this page when the user changes a filter.
-  // ============================================================
 
   const handleFilterChange = (values) => {
     setSelectedFilters(values);
+
+    // Filter change -> page 1
+    setPagination((prev) => ({
+      ...prev,
+      page: 1,
+    }));
   };
+
+  // ============================================================
+  // SEARCH
+  // ============================================================
 
   const handleSearch = (value) => {
     setSearch(value);
+
+    // Search -> page 1
+    setPagination((prev) => ({
+      ...prev,
+      page: 1,
+    }));
   };
 
   // ============================================================
-  // FETCH PROPERTIES
-  // ============================================================
-  // Whenever selectedFilters or search changes,
-  // this API call will run again.
+  // FETCH RECENT VIEWS
   // ============================================================
 
   useEffect(() => {
-    const fetchProperties = async () => {
+    const fetchRecentViews = async () => {
+      if (!user_id) {
+        setProperties([]);
+        return;
+      }
+
       try {
         setLoading(true);
 
-        // Data we are sending to the backend
-        const payload = {
-          categories: selectedFilters,
-          search: search,
-        };
+        const response = await getRecentViews({
+          user_id,
+          page: pagination.page,
+          limit: pagination.limit,
+        });
 
-        // API call
-        // const response = await getMyProperties(payload);
+        console.log("Recent Views:", response);
 
-        // Store API response in state
-        // setProperties(response.data);
+        if (response?.success === 1) {
+          const recentData = response?.data?.[0];
+
+          setProperties(recentData?.properties || []);
+
+          setPagination((prev) => ({
+            ...prev,
+            page: recentData?.pagination?.page || prev.page,
+            limit: recentData?.pagination?.limit || prev.limit,
+            total: recentData?.pagination?.total || 0,
+            totalPages: recentData?.pagination?.totalPages || 0,
+          }));
+        } else {
+          setProperties([]);
+
+          setPagination((prev) => ({
+            ...prev,
+            total: 0,
+            totalPages: 0,
+          }));
+        }
       } catch (error) {
-        console.error("Failed to fetch properties:", error);
+        console.error("Failed to fetch recent views:", error);
 
-        // If API fails, clear the properties
         setProperties([]);
+
+        setPagination((prev) => ({
+          ...prev,
+          total: 0,
+          totalPages: 0,
+        }));
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProperties();
-  }, [selectedFilters, search]);
-
-  // ============================================================
+    fetchRecentViews();
+  }, [user_id, pagination.page, pagination.limit]); // ============================================================
   // SELL PROPERTY
-  // ============================================================
-  // This can later use navigate("/sell-property")
   // ============================================================
 
   const handleSellProperty = () => {
-    // console.log("Sell my property");
+    console.log("Sell my property");
   };
 
   // ============================================================
   // SORT
   // ============================================================
-  // We can add sorting functionality later.
-  // ============================================================
 
   const handleSort = () => {
-    // console.log("Sort clicked");
+    console.log("Sort clicked");
+  };
+
+  // ============================================================
+  // PAGINATION
+  // ============================================================
+
+  const handlePageChange = (page) => {
+    setPagination((prev) => ({
+      ...prev,
+      page,
+    }));
   };
 
   return (
     <div className="w-full">
       <div className="w-[95%] mx-auto my-5 text-start">
+        {/* =====================================================
+            HEADER
+        ===================================================== */}
+
         <Header
           filterOptions={filterOptions}
           selectedFilters={selectedFilters}
@@ -219,48 +196,71 @@ const MyProperties = () => {
         />
 
         <div className="flex flex-col lg:flex-row gap-0 mt-6">
-          {/* LEFT SIDE - 35%*/}
+          {/* ===================================================
+              LEFT SIDE
+          =================================================== */}
 
-          {/* <div className="w-full lg:w-[30%] shrink-0 justify-items-center">
+          {/* 
+          <div className="w-full lg:w-[30%] shrink-0 justify-items-center">
             <CategoryFilter
               options={requestCategories}
               value={activeCategory}
               onChange={setActiveCategory}
             />
-          </div> */}
+          </div>
+          */}
 
-          {/* RIGHT SIDE - 65% */}
+          {/* ===================================================
+              RIGHT SIDE
+          =================================================== */}
 
           <div className="w-full lg:w-[95%] mx-auto">
-            <div className="bg-white border border-gray-100 rounded-xl min-h-[400px] p-4">
-              {/* ==================================================
+            <div className="bg-white  rounded-xl min-h-[400px] p-4">
+              {/* =================================================
                   LOADING
-                  ================================================== */}
+              ================================================= */}
 
               {loading ? (
-                <div className="flex justify-center py-10">Loading...</div>
-              ) : mockProperties.length === 0 ? (
-                /* ================================================
-                   EMPTY STATE
-                   ================================================ */
+                <div className="flex justify-center items-center py-16">
+                  <p className="text-gray-500">Loading recent views...</p>
+                </div>
+              ) : properties.length === 0 ? (
+                /* ===============================================
+                   EMPTY
+                =============================================== */
 
-                <div className="flex justify-center py-10 text-gray-500">
-                  No properties found
+                <div className="flex flex-col justify-center items-center py-16">
+                  <p className="text-gray-500">No recently viewed properties</p>
                 </div>
               ) : (
-                /* ================================================
+                /* ===============================================
                    PROPERTY LIST
-                   ================================================ */
+                =============================================== */
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  {mockProperties.map((property) => (
-                    <ProjectCard key={property.id} listing={property} />
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {properties.map((property) => (
+                    <>
+                    
+                    
+                    <ProjectCard key={property.prop_id} listing={property} />
+                    </>
                   ))}
                 </div>
               )}
-              <div>
-                <Pagination />
-              </div>
+
+              {/* =================================================
+                  PAGINATION
+              ================================================= */}
+
+              {pagination.totalPages > 1 && (
+                <div className="mt-6 flex justify-center">
+                  <Pagination
+                    currentPage={pagination.page}
+                    totalPages={pagination.totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>

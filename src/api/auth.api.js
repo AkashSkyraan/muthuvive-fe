@@ -77,12 +77,26 @@ export const resetPassword = async (payload) => {
 
 export const getUser = async () => {
   try {
-    const response = await axiosInstance.get("/users/get-user");
+    const response = await axiosInstance.get("/user/get-user");
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getRecentViews = async ({ user_id, page = 1, limit = 10 }) => {
+  try {
+    const response = await axiosInstance.get("/property/recent-views", {
+      params: {
+        user_id,
+        page,
+        limit,
+      },
+    });
 
     return response.data;
   } catch (error) {
-    console.error("Get User Error:", error);
-
+    console.error("Get Recent Views Error:", error);
     throw error;
   }
 };

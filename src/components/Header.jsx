@@ -57,7 +57,7 @@ const Header = () => {
 
         const response = await axiosInstance.get("/user/get-user");
 
-        console.log("CURRENT USER RESPONSE:", response);
+      
 
         if (response?.data?.success === 1 && response?.data?.data?.length > 0) {
           setUser(response.data.data[0]);
@@ -423,7 +423,7 @@ const Header = () => {
 
   const accountPopoverContent = isLoggedIn
     ? loggedInPopoverContent
-    : loggedInPopoverContent;
+    : loggedOutPopoverContent;
 
   // ---------------------------------------------------------
   // Properties Popover Content
