@@ -9,7 +9,8 @@ export const categoryConfigMap = {
   1: "Agriculture Land",
   2: "Commercial Land",
   3: "Investment Land",
-  4: "Commercial / Residential Buildings",
+  4: "Commercial Buildings",
+  7: "Residential Buildings",
 };
 export const sellPropertyFormConfig = {
   "Agriculture Land": {
@@ -33,17 +34,16 @@ export const sellPropertyFormConfig = {
     media: MediaForm,
   },
 
-  "Commercial / Residential Buildings": {
+  "Commercial Buildings": {
     location: LocationForm,
     details: CommercialDetailForm,
     features: CommercialFeatureForm,
     media: MediaForm,
   },
-
-  // commercial_Building: {
-  //   location: LocationForm,
-  //   details: CommercialDetailForm,
-  //   features: CommercialFeatureForm,
-  //   media: MediaForm,
-  // },
+  "Residential Buildings": {
+    location: LocationForm,
+    details: CommercialDetailForm,
+    features: CommercialFeatureForm,
+    media: MediaForm,
+  },
 };

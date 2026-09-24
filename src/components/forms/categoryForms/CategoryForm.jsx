@@ -4,10 +4,7 @@ import { DownOutlined } from "@ant-design/icons";
 import FormNavigationButtons from "../../fornNavButtons";
 import { useNavigate } from "react-router-dom";
 import { useSellProperty } from "../../../context/SellPropertyContext";
-import {
-  getPropertyCategories,
-  getSubPropertyCategories,
-} from "../../../api/propertyFormDropdown.api";
+import { getPropertyCategories } from "../../../api/propertyFormDropdown.api";
 // import { deleteProperty } from "../../../api/property.api";
 
 const selectClassName =
@@ -27,24 +24,31 @@ const PropertyCategoryForm = ({ onPrevious }) => {
     resetCategoryDependentData,
   } = useSellProperty();
 
-  // State
+  // ============================================================
+  // STATE
+  // ============================================================
+
   const [propertyCategories, setPropertyCategories] = useState([]);
-  const [subPropertyCategories, setSubPropertyCategories] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(false);
 
-  // Watched form values
+  // ============================================================
+  // WATCHED FORM VALUE
+  // ============================================================
+
   const categoryValue = Form.useWatch("category", form);
-  const subCategory = Form.useWatch("sub_category", form);
-
-  // Derived values
-  const selectedCategory = propertyCategories.find(
-    (category) => category.id === categoryValue,
-  );
-
-  const isCategoryTypeEnabled = selectedCategory?.has_subcat === 1;
 
   // ============================================================
-  // Restore previously entered values from Context
+  // FILTER CATEGORIES
+  // ============================================================
+  // IDs 5 and 6 should not be shown to the user
+  // ============================================================
+
+  const filteredPropertyCategories = propertyCategories.filter(
+    (item) => item.id !== 5 && item.id !== 6,
+  );
+
+  // ============================================================
+  // RESTORE PREVIOUSLY ENTERED CATEGORY FROM CONTEXT
   // ============================================================
 
   useEffect(() => {
@@ -54,16 +58,15 @@ const PropertyCategoryForm = ({ onPrevious }) => {
       return;
     }
 
-    if (savedCategory.category || savedCategory.sub_category) {
+    if (savedCategory.category) {
       form.setFieldsValue({
         category: savedCategory.category,
-        sub_category: savedCategory.sub_category,
       });
     }
   }, [formData.category, form]);
 
   // ============================================================
-  // Fetch main property categories
+  // FETCH MAIN PROPERTY CATEGORIES
   // ============================================================
 
   useEffect(() => {
@@ -85,37 +88,7 @@ const PropertyCategoryForm = ({ onPrevious }) => {
   }, []);
 
   // ============================================================
-  // Fetch subcategories when selected category requires them
-  // ============================================================
-
-  useEffect(() => {
-    if (selectedCategory?.has_subcat !== 1) {
-      setSubPropertyCategories([]);
-      return;
-    }
-
-    const fetchSubCategories = async () => {
-      try {
-        setLoadingCategories(true);
-
-        const data = await getSubPropertyCategories({
-          prop_id: selectedCategory.id,
-        });
-
-        setSubPropertyCategories(data);
-      } catch (error) {
-        console.error("Failed to fetch subcategories:", error);
-        setSubPropertyCategories([]);
-      } finally {
-        setLoadingCategories(false);
-      }
-    };
-
-    fetchSubCategories();
-  }, [selectedCategory]);
-
-  // ============================================================
-  // Handle category selection
+  // HANDLE CATEGORY SELECTION
   // ============================================================
 
   const handleCategoryChange = (value) => {
@@ -132,12 +105,6 @@ const PropertyCategoryForm = ({ onPrevious }) => {
     // ==========================================================
 
     if (!propertyId) {
-      if (selectedCategory?.has_subcat !== 1) {
-        form.setFieldValue("sub_category", undefined);
-
-        updateFormData("category", "sub_category", undefined);
-      }
-
       setCategory(value);
 
       updateFormData("category", "category", value);
@@ -165,12 +132,14 @@ const PropertyCategoryForm = ({ onPrevious }) => {
 
     Modal.confirm({
       title: "Change Property Category ?",
+
       content: (
         <p className="mt-2 text-base leading-6 text-gray-500">
           Changing the property category will erase the previously entered
           property details and features. Do you want to continue?
         </p>
       ),
+
       centered: true,
       okText: "Yes",
       cancelText: "No",
@@ -200,12 +169,6 @@ const PropertyCategoryForm = ({ onPrevious }) => {
           // Set newly selected category
           // ======================================================
 
-          if (selectedCategory?.has_subcat !== 1) {
-            form.setFieldValue("sub_category", undefined);
-
-            updateFormData("category", "sub_category", undefined);
-          }
-
           form.setFieldValue("category", value);
 
           setCategory(value);
@@ -222,15 +185,7 @@ const PropertyCategoryForm = ({ onPrevious }) => {
   };
 
   // ============================================================
-  // Handle sub category selection
-  // ============================================================
-
-  const handleCategoryTypeChange = (value) => {
-    updateFormData("category", "sub_category", value);
-  };
-
-  // ============================================================
-  // Handle next
+  // HANDLE NEXT
   // ============================================================
 
   const handleNext = async () => {
@@ -240,22 +195,14 @@ const PropertyCategoryForm = ({ onPrevious }) => {
     // to determine which next form should be rendered.
     setCategory(values.category);
 
-    // Save the complete Step 1 data into Context
+    // Save only category into Context
     updateFormData("category", "category", values.category);
 
-    updateFormData("category", "sub_category", values.sub_category);
-
-    // No API call here.
-    // Step 1 only saves data and moves to Step 2.
+    // Step 1 moves to Step 2
     navigate("/sell-property/location");
   };
 
-  // const handlePrevious = async () => {
-  //   navigate("/");
-  // };
-
-  const isNextDisabled =
-    !categoryValue || (isCategoryTypeEnabled && !subCategory);
+  const isNextDisabled = !categoryValue;
 
   return (
     <div className="w-full max-w-xl">
@@ -277,14 +224,14 @@ const PropertyCategoryForm = ({ onPrevious }) => {
           <Select
             placeholder="Select your Category"
             suffixIcon={<DownOutlined className="text-gray-900!" />}
-            className={`w-full bg-[#f3f3f3]! !text-base   
+            className={`w-full bg-[#f3f3f3]! !text-base    
              ${selectClassName}`}
             classNames={{
               popup: {
                 root: "property-category-dropdown",
               },
             }}
-            options={propertyCategories}
+            options={filteredPropertyCategories}
             fieldNames={{
               label: "name",
               value: "id",
@@ -292,40 +239,6 @@ const PropertyCategoryForm = ({ onPrevious }) => {
             onChange={handleCategoryChange}
           />
         </Form.Item>
-
-        {isCategoryTypeEnabled && (
-          <Form.Item
-            label={
-              <span className="text-base font-semibold text-gray-900">
-                Select Sub Category
-              </span>
-            }
-            name="sub_category"
-            rules={[
-              {
-                required: true,
-                message: "Please select a sub category",
-              },
-            ]}
-          >
-            <Select
-              placeholder="Select your Category"
-              suffixIcon={<DownOutlined className="text-gray-400" />}
-              className={`w-full bg-[#f3f3f3]! !text-base ${selectClassName}`}
-              classNames={{
-                popup: {
-                  root: "property-category-dropdown",
-                },
-              }}
-              options={subPropertyCategories}
-              fieldNames={{
-                label: "sub_name",
-                value: "id",
-              }}
-              onChange={handleCategoryTypeChange}
-            />
-          </Form.Item>
-        )}
 
         {/* Reusable navigation buttons */}
         <FormNavigationButtons

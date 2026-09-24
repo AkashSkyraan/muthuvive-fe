@@ -46,7 +46,7 @@ const CategoryFilter = ({ options = [], value, onChange }) => {
         key={option.value}
         type="button"
         onClick={() => onChange?.(option.value)}
-        className={`w-full rounded-xl border px-5 py-2.5 text-sm text-center transition-colors ${
+        className={`cursor-pointer w-full rounded-xl border px-5 py-2.5 text-sm text-center transition-colors ${
           isSelected
             ? "border-2 border-blue-500 font-semibold text-blue-600"
             : "border-gray-200 text-gray-600 hover:border-gray-300 hover:text-gray-800"
@@ -59,9 +59,14 @@ const CategoryFilter = ({ options = [], value, onChange }) => {
 
   return (
     <>
-      {/* Mobile & tablet - horizontal scroll strip */}
+      {/* Mobile & tablet - horizontal scroll strip. w-full + min-w-0
+          constrain this to its parent's actual width first - without
+          that, a row of fixed-width pills renders at its natural full
+          width and pushes past the viewport, giving the whole PAGE a
+          horizontal scrollbar instead of just this strip scrolling
+          internally. */}
       <div
-        className="lg:hidden flex items-center gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="lg:hidden flex items-center gap-2 overflow-x-auto pb-1 w-full min-w-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         style={{
           position: "sticky",
           top: `${topOffset}px`,

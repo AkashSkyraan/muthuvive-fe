@@ -53,6 +53,17 @@ const lengthUnitOptions = [
 ];
 
 // ---------------------------------------------------------
+// BHK Options
+// ---------------------------------------------------------
+
+const bhkOptions = [
+  { value: 1, label: "1BHK" },
+  { value: 2, label: "2BHK" },
+  { value: 3, label: "3BHK" },
+  { value: 4, label: "4BHK+" },
+];
+
+// ---------------------------------------------------------
 // Whole Number Validator
 // ---------------------------------------------------------
 
@@ -211,10 +222,16 @@ const CommercialPropertyDetailsForm = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
 
-  const { formData, updateFormData, propertyId } = useSellProperty();
+  const { formData, updateFormData, propertyId, category } = useSellProperty();
 
   const [hasBuildUpArea, setHasBuildUpArea] = useState(true);
   const [hasSuperBuildUpArea, setHasSuperBuildUpArea] = useState(true);
+
+  // -------------------------------------------------------
+  // Check whether BHK should be shown
+  // -------------------------------------------------------
+
+  const showBHK = Number(category) === 7;
 
   // -------------------------------------------------------
   // Watch conditional fields
@@ -244,6 +261,8 @@ const CommercialPropertyDetailsForm = () => {
   const isNextDisabled =
     // Property Name
     isEmpty(formValues?.prop_name) ||
+    // BHK - only required for category 7
+    (showBHK && isEmpty(formValues?.bhk)) ||
     // Carpet Area
     isEmpty(formValues?.carpet_area) ||
     // Build-Up Area - required when added
@@ -601,6 +620,30 @@ const CommercialPropertyDetailsForm = () => {
             autoComplete="off"
           />
         </Form.Item>
+
+        {/* -------------------------------------------------
+            BHK
+            Only visible when category = 7
+        ------------------------------------------------- */}
+
+        {showBHK && (
+          <Form.Item
+            label={fieldLabel("Select BHK Paln")}
+            name="bhk"
+            className="!mb-0"
+            rules={[
+              {
+                required: true,
+                message: "Please select BHK",
+              },
+            ]}
+          >
+            <ToggleGroup
+              options={bhkOptions}
+              onChange={(value) => handleFieldChange("bhk", value)}
+            />
+          </Form.Item>
+        )}
 
         {/* -------------------------------------------------
             Carpet Area

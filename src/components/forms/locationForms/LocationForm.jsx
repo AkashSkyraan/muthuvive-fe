@@ -36,6 +36,14 @@ const LocationForm = () => {
   });
 
   // ============================================================
+  // Save default country to Context
+  // ============================================================
+
+  useEffect(() => {
+    updateFormData("location", "country", "india");
+  }, []);
+
+  // ============================================================
   // Restore saved location data from Context
   // ============================================================
 
@@ -307,7 +315,7 @@ const LocationForm = () => {
     const values = await form.validateFields();
 
     // Make sure the latest values are stored in Context
-    updateFormData("location", "country", values.country);
+    updateFormData("location", "country", values.country || "india");
     updateFormData("location", "state", values.state);
     updateFormData("location", "district", values.district);
     updateFormData("location", "city", values.city);
@@ -319,8 +327,14 @@ const LocationForm = () => {
     const payload = {
       step: 1,
       user_id: 1,
+
       ...formData.category,
-      ...formData.location,
+
+      // Use latest form values
+      country: values.country || "india",
+      state: values.state,
+      district: values.district,
+      city: values.city,
 
       // Add property_id only when propertyId already exists
       ...(propertyId !== null && {

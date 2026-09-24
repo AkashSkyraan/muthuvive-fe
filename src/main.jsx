@@ -15,6 +15,5 @@ createRoot(document.getElementById("root")).render(
         </AuthProvider>
       </SearchProvider>
     </StrictMode>
-    ,
   </SignupProvider>,
 );

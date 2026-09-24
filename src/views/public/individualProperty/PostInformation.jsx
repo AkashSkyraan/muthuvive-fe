@@ -55,14 +55,12 @@ const defaultSteps = [
 ];
 
 // Custom-built accordion (no antd Collapse) so the header/body backgrounds
-// sit flush against each other with zero unwanted inset padding - antd's
-// internal .ant-collapse-content-box padding kept leaving a visible gap
-// around the body, which this sidesteps entirely.
+// sit flush against each other with zero unwanted inset padding.
 const PropertyPostInfo = ({
   title = "Property Post Information",
   intro = "Please Read Carefully",
   steps = defaultSteps,
-  defaultOpen = true,
+  defaultOpen = false,
 }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
@@ -77,6 +75,7 @@ const PropertyPostInfo = ({
           <InfoCircleOutlined className="text-gray-900" />
           {title}
         </span>
+
         <DownOutlined
           className={`text-gray-800 text-sm shrink-0 transition-transform ${
             isOpen ? "rotate-180" : ""
@@ -85,8 +84,9 @@ const PropertyPostInfo = ({
       </button>
 
       {isOpen && (
-        <div className="bg-[#fff8db] px-4 py-4 sm:px-5 sm:py-5">
+        <div className="bg-[#fff8db] px-4 py-4 sm:px-5 sm:py-5 lg:max-h-[600px] overflow-y-auto hide-scrollbar">
           <p className="text-base font-semibold text-gray-900 mb-3">{intro}</p>
+
           <ol className="space-y-3">
             {steps.map((step, index) => (
               <li key={step.label} className="text-sm leading-relaxed">

@@ -23,8 +23,9 @@ const getPageNumbers = (current, totalPages, maxVisible) => {
   return Array.from({ length: end - start + 1 }, (_, i) => start + i);
 };
 
-const Pagination = ({ current = 1, total = 10, pageSize = 5, onChange }) => {
+const Pagination = ({ current = 1, totalPages = 1, onChange }) => {
   const [isMobile, setIsMobile] = useState(false);
+  // console.log(current, totalPages);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(max-width: 369px)");
@@ -44,8 +45,6 @@ const Pagination = ({ current = 1, total = 10, pageSize = 5, onChange }) => {
     };
   }, []);
 
-  const totalPages = Math.max(Math.ceil(total / pageSize), 1);
-
   // Mobile = 3 pages
   // sm and above = 5 pages
   const maxVisible = isMobile ? MOBILE_MAX_VISIBLE : DESKTOP_MAX_VISIBLE;
@@ -61,7 +60,7 @@ const Pagination = ({ current = 1, total = 10, pageSize = 5, onChange }) => {
       return;
     }
 
-    onChange?.(page, pageSize);
+    onChange?.(page);
   };
 
   return (

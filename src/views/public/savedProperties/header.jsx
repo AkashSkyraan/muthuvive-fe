@@ -4,25 +4,12 @@ import { SearchOutlined, SortAscendingOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 
 const MyPropertiesHeader = ({
-  // ============================================================
-  // Data coming from MyProperties/index.jsx
-  // ============================================================
-
   filterOptions = [],
   selectedFilters = [],
-
-  // ============================================================
-  // Functions coming from MyProperties/index.jsx
-  // ============================================================
-
   onFilterChange = () => {},
   onSearch = () => {},
-  onSellProperty = () => {},
-  onSortClick = () => {},
-
-  // ============================================================
-  // Loading state for filter options
-  // ============================================================
+  // onSellProperty = () => {},
+  // onSortClick = () => {},
 
   loadingFilters = false,
 }) => {
@@ -51,7 +38,9 @@ const MyPropertiesHeader = ({
   const handleSearch = (event) => {
     const value = event.target.value;
 
-    onSearch(value);
+    if (value.trim().length >= 3 || value.trim().length === 0) {
+      onSearch(value);
+    }
   };
 
   // ============================================================

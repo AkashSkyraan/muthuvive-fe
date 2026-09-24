@@ -12,13 +12,34 @@ const StatusMessage = ({ placement = "top-right" }) => {
 
       setTimeout(() => {
         setMessage(null);
-      }, 5000);
+      }, 4000);
     };
 
     return () => {
       showMessage = null;
     };
   }, []);
+
+  // Close popup when user performs any browser action
+  useEffect(() => {
+    if (!message) return;
+
+    const closePopup = () => {
+      setMessage(null);
+    };
+
+    window.addEventListener("click", closePopup);
+    // window.addEventListener("keydown", closePopup);
+    // window.addEventListener("scroll", closePopup);
+    // window.addEventListener("touchstart", closePopup);
+
+    return () => {
+      window.removeEventListener("click", closePopup);
+      // window.removeEventListener("keydown", closePopup);
+      // window.removeEventListener("scroll", closePopup);
+      // window.removeEventListener("touchstart", closePopup);
+    };
+  }, [message]);
 
   useEffect(() => {
     const updatePosition = () => {
@@ -82,7 +103,6 @@ const StatusMessage = ({ placement = "top-right" }) => {
 
 export const showStatusMessage = ({ type = "success", text }) => {
   if (!showMessage) return;
-  // console.log("message triggered");
 
   showMessage({
     type,
