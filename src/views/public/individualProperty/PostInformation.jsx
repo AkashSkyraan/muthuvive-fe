@@ -84,7 +84,7 @@ const PropertyPostInfo = ({
       </button>
 
       {isOpen && (
-        <div className="bg-[#fff8db] px-4 py-4 sm:px-5 sm:py-5 lg:max-h-[600px] overflow-y-auto hide-scrollbar">
+        <div className="bg-[#fff8db] px-4 py-4 sm:px-5 sm:py-5 lg:max-h-[600px] overflow-y-scroll [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           <p className="text-base font-semibold text-gray-900 mb-3">{intro}</p>
 
           <ol className="space-y-3">

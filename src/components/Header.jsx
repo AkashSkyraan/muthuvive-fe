@@ -24,6 +24,8 @@ const Header = () => {
 
   const [isMobileAccountOpen, setIsMobileAccountOpen] = useState(false);
 
+  const [isDesktopPropertiesOpen, setIsDesktopPropertiesOpen] = useState(false);
+
   const [isMobilePropertiesOpen, setIsMobilePropertiesOpen] = useState(false);
 
   // ---------------------------------------------------------
@@ -436,6 +438,7 @@ const Header = () => {
           key={category.key}
           to={`/properties/${category.key}`}
           onClick={() => {
+            setIsDesktopPropertiesOpen(false);
             setIsMobilePropertiesOpen(false);
             setIsMenuOpen(false);
           }}
@@ -507,6 +510,8 @@ const Header = () => {
                   <Popover
                     content={propertiesPopoverContent}
                     trigger="hover"
+                    open={isDesktopPropertiesOpen}
+                    onOpenChange={setIsDesktopPropertiesOpen}
                     placement="bottomLeft"
                     arrow={false}
                     align={{

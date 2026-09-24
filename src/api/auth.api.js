@@ -100,3 +100,13 @@ export const getRecentViews = async ({ user_id, page = 1, limit = 10 }) => {
     throw error;
   }
 };
+
+export const updateProfile = async (payload = {}) => {
+  try {
+    const response = await axiosInstance.put("/user/update-profile", payload);
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

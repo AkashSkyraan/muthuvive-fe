@@ -30,14 +30,14 @@ const StatusMessage = ({ placement = "top-right" }) => {
 
     window.addEventListener("click", closePopup);
     // window.addEventListener("keydown", closePopup);
-    // window.addEventListener("scroll", closePopup);
-    // window.addEventListener("touchstart", closePopup);
+    window.addEventListener("scroll", closePopup);
+    window.addEventListener("touchstart", closePopup);
 
     return () => {
       window.removeEventListener("click", closePopup);
       // window.removeEventListener("keydown", closePopup);
-      // window.removeEventListener("scroll", closePopup);
-      // window.removeEventListener("touchstart", closePopup);
+      window.removeEventListener("scroll", closePopup);
+      window.removeEventListener("touchstart", closePopup);
     };
   }, [message]);
 

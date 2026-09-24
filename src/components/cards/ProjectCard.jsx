@@ -103,15 +103,20 @@ const ProjectCard = ({ listing, user }) => {
           </p>
         )}
 
-        <div className="flex items-start gap-x-2 mt-3">
+        <div className="flex items-start gap-x-2 mt-3 w-[95%]">
           <img
             src={icons.locationBlackIcon}
             alt="location"
             className="w-4 h-4 mt-0.5 shrink-0"
           />
-          <p className="text-sm text-gray-500 line-clamp-2">
+          <span
+            className="text-sm text-gray-500 truncate"
+            title={[listing.city, listing.district, listing.state]
+              .filter(Boolean)
+              .join(", ")}
+          >
             {listing.city}, {listing.district}, {listing.state}
-          </p>
+          </span>
         </div>
 
         <div className="flex items-center flex-wrap gap-x-4 gap-y-2 mt-3 pt-4 justify-around">

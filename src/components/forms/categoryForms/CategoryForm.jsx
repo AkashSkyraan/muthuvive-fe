@@ -245,6 +245,7 @@ const PropertyCategoryForm = ({ onPrevious }) => {
           // onPrevious={handlePrevious}
           onNext={handleNext}
           disableNext={isNextDisabled}
+          showPrevious={false}
         />
       </Form>
     </div>
