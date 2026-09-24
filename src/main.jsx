@@ -5,15 +5,18 @@ import App from "./App.jsx";
 import { SearchProvider } from "./context/SearchContext.jsx";
 import { SignupProvider } from "./context/SignupContext.jsx";
 import { AuthProvider } from "./context/UserContext.jsx";
+import { LoaderProvider } from "./context/LoaderContext.jsx";
 
 createRoot(document.getElementById("root")).render(
   <SignupProvider>
     <StrictMode>
-      <SearchProvider>
-        <AuthProvider>
-          <App />
-        </AuthProvider>
-      </SearchProvider>
+      <LoaderProvider>
+        <SearchProvider>
+          <AuthProvider>
+            <App />
+          </AuthProvider>
+        </SearchProvider>
+      </LoaderProvider>
     </StrictMode>
   </SignupProvider>,
 );

@@ -48,7 +48,7 @@ const areaUnitOptions = [
 
 const lengthUnitOptions = [
   { value: "ft", label: "Ft" },
-  { value: "feet", label: "Feet" },
+  // { value: "feet", label: "Feet" },
   { value: "m", label: "M" },
 ];
 

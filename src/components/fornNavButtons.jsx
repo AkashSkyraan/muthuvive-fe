@@ -7,12 +7,16 @@ const FormNavigationButtons = ({
   onNext,
   disableNext,
   nextLabel = "Next",
+  showPrevious = true,
 }) => {
   return (
     <div className="flex justify-end gap-x-5 mt-6">
-      <Button onClick={onPrevious} className="rounded-full px-6 !text-base">
-        Previous
-      </Button>
+      {showPrevious && (
+        <Button onClick={onPrevious} className="rounded-full px-6 !text-base">
+          Previous
+        </Button>
+      )}
+
       <Button
         type="primary"
         onClick={onNext}

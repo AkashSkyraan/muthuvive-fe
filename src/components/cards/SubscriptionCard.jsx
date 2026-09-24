@@ -3,7 +3,7 @@ import icons from "../../config/Icons.jsx";
 import { IndianRupee } from "lucide-react";
 
 const SubscriptionCard = ({ plans = [] }) => {
-  if (!plans.length) {
+  if (!plans?.length) {
     return (
       <div className="w-full py-10 text-center text-sm text-gray-500">
         No subscription plans found.
@@ -12,7 +12,7 @@ const SubscriptionCard = ({ plans = [] }) => {
   }
 
   return (
-    <div className="flex flex-col gap-y-4">
+    <div className="flex flex-col gap-y-4 w-full mx-auto">
       {plans.map((plan) => (
         <div
           key={plan.id}

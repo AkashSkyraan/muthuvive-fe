@@ -24,6 +24,9 @@ import {
   getNearByProperties,
 } from "../../../api/getProperties.api.js";
 
+// Replace this with your actual plan API
+import { getSubscriptionPlans } from "../../../api/subscriptionPlans.api.js";
+
 const PropertyDetails = () => {
   // ==========================================================
   // PROPERTY ID FROM URL
@@ -45,6 +48,9 @@ const PropertyDetails = () => {
 
   // Plan details visibility
   const [showPlanDetails, setShowPlanDetails] = useState(false);
+
+  // Plan details data
+  const [planDetailsData, setPlanDetailsData] = useState(null);
 
   // ==========================================================
   // TABS
@@ -83,7 +89,8 @@ const PropertyDetails = () => {
 
   // ==========================================================
   // FETCH INDIVIDUAL PROPERTY
-  // THEN FETCH NEARBY PROPERTIES
+  // THEN CONDITIONALLY FETCH PLAN
+  // THEN FETCH NEARBY
   // ==========================================================
 
   useEffect(() => {
@@ -96,8 +103,9 @@ const PropertyDetails = () => {
       // Clear old nearby properties when property changes
       setNearByFields([]);
 
-      // Clear old plan visibility when property changes
+      // Clear old plan data when property changes
       setShowPlanDetails(false);
+      setPlanDetailsData(null);
 
       try {
         // ======================================================
@@ -116,16 +124,37 @@ const PropertyDetails = () => {
         setShowPriceDetails(property);
 
         // ======================================================
-        // CHECK PLAN DETAILS
-        //
-        // Show PlanDetails only when both user_id and is_plan
-        // are available in the individual property response.
+        // 2. CHECK PLAN DETAILS
         // ======================================================
 
         const hasPlanDetails =
-          property?.user_id != null && property?.is_plan != null;
+          property?.user_id != null && property?.purchase_plan != null;
+        // console.log("to show plan:", hasPlanDetails);
 
-        setShowPlanDetails(hasPlanDetails);
+        if (hasPlanDetails) {
+          setShowPlanDetails(true);
+
+          try {
+            // ==================================================
+            // 3. PLAN API
+            // ==================================================
+
+            const planResponse = await getSubscriptionPlans({
+              id: property.purchase_plan,
+            });
+            console.log("Plan response:", planResponse);
+
+            setPlanDetailsData(planResponse);
+          } catch (planError) {
+            console.error("Failed to fetch plan details:", planError);
+
+            setShowPlanDetails(false);
+            setPlanDetailsData(null);
+          }
+        } else {
+          setShowPlanDetails(false);
+          setPlanDetailsData(null);
+        }
 
         // ======================================================
         // HEADING
@@ -439,10 +468,7 @@ const PropertyDetails = () => {
           : [];
 
         // ======================================================
-        // 2. NEARBY PROPERTY API
-        //
-        // This runs only after the individual property
-        // API above has successfully completed.
+        // 4. NEARBY PROPERTY API
         // ======================================================
 
         try {
@@ -485,11 +511,11 @@ const PropertyDetails = () => {
       } catch (error) {
         console.error("Failed to fetch property details:", error);
 
-        // Individual property failed
         setNearByFields([]);
 
-        // Hide PlanDetails if property API fails
         setShowPlanDetails(false);
+
+        setPlanDetailsData(null);
       }
     };
 
@@ -619,17 +645,14 @@ const PropertyDetails = () => {
 
               <PostInformation />
 
-              {/* Plan Details
-                  Show only when the individual-property
-                  response contains user_id and is_plan */}
+              {/* Plan Details */}
 
-              {showPlanDetails && <PlanDetails />}
+              {showPlanDetails && <PlanDetails plans={planDetailsData} />}
             </aside>
           </div>
 
           {/* ==========================================================
               NEARBY PROPERTIES
-              SHOW ONLY WHEN API RETURNS DATA
               ========================================================== */}
 
           {Array.isArray(nearByFields) && nearByFields.length > 0 && (

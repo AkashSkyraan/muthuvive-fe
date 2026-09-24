@@ -1,11 +1,15 @@
 import React, { useState } from "react";
 import { Input } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
-import showStatusMessage from "../../../components/common/MessagePopup";
+import { showStatusMessage } from "../../../components/common/MessagePopup.jsx";
 
-// Mock async "update" - swap this out for your real API call. Resolves
-// or rejects so both success and failure paths through showStatusMessage
-// can be demonstrated/tested.
+// Replace this with your actual profile API function
+import { updateProfile } from "../../../api/auth.api.js";
+import { useAuth } from "../../../context/UserContext.jsx";
+
+// Mock async "update" - swap this out for your real API call.
+// Resolves or rejects so both success and failure paths through
+// showStatusMessage can be demonstrated/tested.
 const mockUpdateField = () =>
   new Promise((resolve, reject) => {
     setTimeout(() => {
@@ -15,7 +19,10 @@ const mockUpdateField = () =>
   });
 
 const ProfilePage = () => {
+  const { user, setUser } = useAuth();
+  console.log("user details", user);
   const [savedFullName, setSavedFullName] = useState("Muthvive's Properties");
+
   const [fullName, setFullName] = useState(savedFullName);
   const [isEditingName, setIsEditingName] = useState(false);
 
@@ -34,23 +41,49 @@ const ProfilePage = () => {
     setIsEditingName(false);
   };
 
-  const handleSaveName = () => {
-    mockUpdateField()
-      .then(() => {
-        setSavedFullName(fullName);
-        setIsEditingName(false);
+  const handleSaveName = async () => {
+    try {
+      const payload = {
+        user_id: 13,
+        name: fullName,
+      };
+
+      console.log("Update Profile Payload:", payload);
+
+      const response = await updateProfile(payload);
+      setUser(fullName);
+
+      console.log("Update Profile Response:", response);
+
+      if (response?.success !== 1) {
         showStatusMessage({
-          type: "success",
-          text: "Name Changed Successfully",
+          type: "error",
+          text: "Name Change Failed",
         });
-      })
-      .catch(() => {
-        showStatusMessage({ type: "error", text: "Name Change Failed" });
+
+        return;
+      }
+
+      setSavedFullName(fullName);
+      setIsEditingName(false);
+
+      showStatusMessage({
+        type: "success",
+        text: "Name Changed Successfully",
       });
+    } catch (error) {
+      console.error("Profile update failed:", error);
+
+      showStatusMessage({
+        type: "error",
+        text: "Name Change Failed",
+      });
+    }
   };
 
   const handleChangeMobile = () => {
     setIsChangingMobile(true);
+
     mockUpdateField()
       .then(() => {
         showStatusMessage({
@@ -69,6 +102,7 @@ const ProfilePage = () => {
 
   const handleChangeEmail = () => {
     setIsChangingEmail(true);
+
     mockUpdateField()
       .then(() => {
         showStatusMessage({
@@ -77,7 +111,10 @@ const ProfilePage = () => {
         });
       })
       .catch(() => {
-        showStatusMessage({ type: "error", text: "Email Change Failed" });
+        showStatusMessage({
+          type: "error",
+          text: "Email Change Failed",
+        });
       })
       .finally(() => setIsChangingEmail(false));
   };

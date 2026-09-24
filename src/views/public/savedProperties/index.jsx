@@ -7,6 +7,8 @@ import CategoryFilter from "../myProperties/CategoryFilter";
 import images from "../../../config/Images";
 
 import { getBookmarkedProperties } from "../../../api/getProperties.api";
+import { Link } from "react-router-dom";
+import { useLoader } from "../../../context/LoaderContext";
 
 const MyProperties = () => {
   const filterOptions = [
@@ -47,6 +49,7 @@ const MyProperties = () => {
   // FILTER STATES
   // ============================================================
 
+  const { setIsLoading } = useLoader();
   const [selectedFilters, setSelectedFilters] = useState([]);
 
   // Search text
@@ -109,7 +112,8 @@ const MyProperties = () => {
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        setLoading(true);
+        setIsLoading(true);
+        await new Promise((resolve) => setTimeout(resolve, 9000));
 
         const payload = {
           user_id: 1,
@@ -144,7 +148,7 @@ const MyProperties = () => {
         setProperties([]);
         setTotalPages(0);
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
@@ -215,7 +219,11 @@ const MyProperties = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {properties.map((property) => (
-                    <ProjectCard key={property.id} listing={property} />
+                    <Link
+                      to={`/properties/${property.category}/${property.prop_id}`}
+                    >
+                      <ProjectCard key={property.id} listing={property} />
+                    </Link>
                   ))}
                 </div>
               )}

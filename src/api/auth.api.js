@@ -77,12 +77,21 @@ export const resetPassword = async (payload) => {
 
 export const getUser = async () => {
   try {
-    const response = await axiosInstance.get("/users/get-user");
-
+    const response = await axiosInstance.get("/user/get-user");
     return response.data;
   } catch (error) {
     console.error("Get User Error:", error);
 
+    throw error;
+  }
+};
+
+export const updateProfile = async (payload = {}) => {
+  try {
+    const response = await axiosInstance.put("/user/update-profile", payload);
+
+    return response.data;
+  } catch (error) {
     throw error;
   }
 };

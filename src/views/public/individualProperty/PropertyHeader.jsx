@@ -66,19 +66,24 @@ const PropertyHeader = ({ data = {} }) => {
       url: window.location.href,
     };
 
+    // Copy URL first so it is available in clipboard
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+    } catch (error) {
+      console.error("Failed to copy URL before sharing:", error);
+    }
+
     // Browser/device supports native sharing
     if (navigator.share) {
       try {
         // Optional validation when canShare is available
         if (navigator.canShare && !navigator.canShare(shareData)) {
-          // await handleCopyUrl();
           return;
         }
 
         await navigator.share(shareData);
 
-        // Do not show success message here.
-        // The native share sheet handles the user's share action.
+        // Native share sheet handled the share action
       } catch (error) {
         // User closing/cancelling the native share sheet
         // is not an application error.
@@ -87,16 +92,16 @@ const PropertyHeader = ({ data = {} }) => {
         }
 
         console.error("Failed to share property:", error);
-
-        // Fallback if native share fails
-        // await handleCopyUrl();
       }
 
       return;
     }
 
     // Browser does not support navigator.share
-    await handleCopyUrl();
+    showStatusMessage({
+      type: "success",
+      text: "Link copied to clipboard",
+    });
   };
 
   // ============================================================

@@ -5,6 +5,7 @@ const LoaderContext = createContext(undefined);
 // Wrap your app with this once (e.g. in App.jsx), then any component
 // can call showLoader()/hideLoader() around an API call - no prop
 // drilling needed, the <Loader /> component below reacts automatically.
+
 export const LoaderProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
 

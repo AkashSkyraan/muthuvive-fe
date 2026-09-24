@@ -5,8 +5,6 @@ import { CircleSmall } from "lucide-react";
 // Renders a singling card. Pass one `listing` object with
 // { id, image, category, title, price, address, area, hospitals, schools }.
 const ProjectCard = ({ listing }) => {
-  console.log("inside project card", listing);
-
   return (
     <div className="bg-white rounded-lg overflow-hidden border border-gray-100 cursor-pointer">
       <div className="relative h-48 sm:h-44 lg:h-48">
@@ -42,15 +40,20 @@ const ProjectCard = ({ listing }) => {
           </p>
         )}
 
-        <div className="flex items-start gap-x-2 mt-3">
+        <div className="flex items-start gap-x-2 mt-3 w-[95%]">
           <img
             src={icons.locationBlackIcon}
             alt="location"
             className="w-4 h-4 mt-0.5 shrink-0"
           />
-          <p className="text-sm text-gray-500 line-clamp-2">
+          <span
+            className="text-sm text-gray-500 truncate"
+            title={[listing.city, listing.district, listing.state]
+              .filter(Boolean)
+              .join(", ")}
+          >
             {listing.city}, {listing.district}, {listing.state}
-          </p>
+          </span>
         </div>
 
         <div className="flex items-center flex-wrap gap-x-4 gap-y-2 mt-3 pt-4 justify-around">
