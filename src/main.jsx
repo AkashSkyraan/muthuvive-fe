@@ -21,7 +21,13 @@ createRoot(document.getElementById("root")).render(
             </LoginModalProvider>
           </SearchProvider>
         </AuthProvider>
+<<<<<<< HEAD
       </SignupProvider>
     </BrowserRouter>
   </StrictMode>,
+=======
+      </SearchProvider>
+    </StrictMode>
+  </SignupProvider>,
+>>>>>>> 1d10a7732934c0aadb44f17ef2fbce6ef420bd1e
 );

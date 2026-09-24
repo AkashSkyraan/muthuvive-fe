@@ -8,7 +8,8 @@ import StatusMessage, {
   showStatusMessage,
 } from "../../../components/common/MessagePopup";
 
-const EnquiryForm = ({ propertyId = 32432, onSubmit }) => {
+const EnquiryForm = ({ propertyId = 0, onSubmit }) => {
+  console.log(propertyId);
   const [form] = Form.useForm();
 
   const { formData, setFormData, resetFormData } = useEnquiry();

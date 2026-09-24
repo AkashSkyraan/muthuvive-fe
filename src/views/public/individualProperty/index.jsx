@@ -1,15 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
-// ============================================================
-// Full-width components
-// ============================================================
 import PropertyHeader from "./PropertyHeader.jsx";
 import PropertyGallery from "./PropertyGallery.jsx";
-// import PropertyTabs from "./PropertyTabs.jsx";
+import TabListing from "../properties/TabListing.jsx";
 
-// ============================================================
-// Left-side components
-// ============================================================
 import OverviewSection from "./OverviewSection.jsx";
 import LocationSection from "./LocationSection.jsx";
 import AmenitiesSection from "./AmenitiesSection.jsx";
@@ -18,54 +13,43 @@ import PriceDetailsSection from "./PriceDetailsSection.jsx";
 import DocumentSection from "./PropertyDocument.jsx";
 import NearbyProperties from "../../../components/cards/NearByProperties.jsx";
 
-// ============================================================
-// Right-side components
-// ============================================================
 import Enquiry from "./Enquiry.jsx";
 import PostInformation from "./PostInformation.jsx";
 import PlanDetails from "../../../components/cards/SubscriptionCard.jsx";
+
 import images from "../../../config/Images.jsx";
-import TabListing from "../properties/TabListing.jsx";
+
+import {
+  getIndividualProperties,
+  getNearByProperties,
+} from "../../../api/getProperties.api.js";
 
 const PropertyDetails = () => {
-  const Heading = {
-    title: "Ragavaa Commercial Land For Sale",
-    propertyId: "2345678",
-    location: "Pollachi, Coimbatore, Tamil Nadu",
-  };
-  const mockPropertyImages = [
-    {
-      id: 1,
-      url: images.farmLand,
-      alt: "Building exterior",
-    },
-    {
-      id: 2,
-      url: images.farmLand,
-      alt: "Aerial city view",
-    },
-    {
-      id: 3,
-      url: images.farmLand,
-      alt: "Aerial village view",
-    },
-    { id: 4, url: images.farmLand, alt: "Landmark" },
-    {
-      id: 5,
-      url: images.farmLand,
-      alt: "Street view",
-    },
-    {
-      id: 6,
-      url: images.farmLand,
-      alt: "Extra photo 1",
-    },
-    {
-      id: 7,
-      url: images.farmLand,
-      alt: "Extra photo 2",
-    },
-  ];
+  // ==========================================================
+  // PROPERTY ID FROM URL
+  // ==========================================================
+
+  const { propertyId } = useParams();
+
+  const currentPropertyId = propertyId;
+
+  // ==========================================================
+  // PAGE DATA
+  // ==========================================================
+
+  const [propertyData, setPropertyData] = useState({});
+  const [showPriceDetails, setShowPriceDetails] = useState(null);
+
+  // Nearby properties
+  const [nearByFields, setNearByFields] = useState([]);
+
+  // Plan details visibility
+  const [showPlanDetails, setShowPlanDetails] = useState(false);
+
+  // ==========================================================
+  // TABS
+  // ==========================================================
+
   const tabs = [
     {
       key: "overview",
@@ -76,10 +60,6 @@ const PropertyDetails = () => {
       label: "Location",
     },
     {
-      key: "locality-guides",
-      label: "Locality Guides",
-    },
-    {
       key: "amenities",
       label: "Amenities",
     },
@@ -87,141 +67,459 @@ const PropertyDetails = () => {
       key: "property-highlight",
       label: "Property Highlight",
     },
+    // {
+    //   key: "price-details",
+    //   label: "Price Details",
+    // },
     {
-      key: "gallery",
-      label: "Gallery",
+      key: "document",
+      label: "Document",
     },
     {
       key: "Near-by-properties",
       label: "Near By Properties",
     },
   ];
-  const overviewFields = [
-    { label: "Project Name", value: "Muthvive's Agriculture Land For Sale" },
-    { label: "Property Category", value: "Agricultural Land" },
-    { label: "Area Unit", value: "Acre" },
-    { label: "Property Area", value: "200" },
-    { label: "Road Plan", value: "Interior" },
-    { label: "Pathway Available", value: "Available" },
-    { label: "Pathway Length", value: "200  Sq.Ft" },
-    { label: "Pathway Length", value: "123 Sq.Ft" },
-    { label: "HP (Horsepower)", value: "2000HP" },
-    { label: "Electricity Available", value: "Individual Electricity" },
-    { label: "Construction", value: "Commercial Building" },
-    { label: "Property Facing", value: "North" },
-  ];
-  const locationFields = [
-    { label: "State", value: "Tamil Nadu" },
-    { label: "District", value: "Coimbatore" },
-    { label: "Taluk", value: "Pollachi" },
-    { label: "Village", value: "Anaimalai" },
-    { label: "Locality", value: "Sethumadai Road" },
-    { label: "Pincode", value: "642104" },
-  ];
-  const amenitiesFields = [
-    "Borewell/Tank",
-    "Swimming Pool",
-    "Garden",
-    "Security / Firm Alarm",
-  ];
-  const highlightsFields = [
-    { label: "State", value: "Tamil Nadu" },
-    { label: "District", value: "Coimbatore" },
-    { label: "Taluk", value: "Pollachi" },
-    { label: "Village", value: "Anaimalai" },
-    { label: "Locality", value: "Sethumadai Road" },
-    { label: "Pincode", value: "642104" },
-  ];
-  const priceDetailsFields = [
-    { label: "Expected Price", value: "₹4,50,00,000" },
-    { label: "Price Per Acre", value: "₹90,00,000" },
-    { label: "Price Negotiable", value: "Yes" },
-    { label: "Additional Charges", value: "₹1,00,000" },
-  ];
-  const documentsFields = [
-    { id: 1, url: images.propertydocument, alt: "Document" },
-    { id: 2, url: images.propertydocument, alt: "Document" },
-    { id: 3, url: images.propertydocument, alt: "Document" },
-  ];
-  const nearByFields = [
-    {
-      id: 1,
-      image: images.agricultureLand,
-      category: "Agriculture-land",
-      title: "Boutique Space On Greenville Road",
-      price: "₹ 12,00,000 / Per Acre",
-      address:
-        "Sri Venkateshwara Towers, FCI Rd, Opp. Fire Station, Gandhimaa Nagar, Peelamedu, Coimbatore, Tamil Nadu 64...",
-      area: "5000 Sf",
-      hospitals: "Hospitals",
-      schools: "Schools",
-    },
-    {
-      id: 2,
-      image: images.agricultureLand,
-      category: "Agriculture-land",
-      title: "Boutique Space On Greenville Road",
-      price: "₹ 12,00,000 / Per Acre",
-      address:
-        "Sri Venkateshwara Towers, FCI Rd, Opp. Fire Station, Gandhimaa Nagar, Peelamedu, Coimbatore, Tamil Nadu 64...",
-      area: "5000 Sf",
-      hospitals: "Hospitals",
-      schools: "Schools",
-    },
-    {
-      id: 3,
-      image: images.agricultureLand,
-      category: "Agriculture-land",
-      title: "Boutique Space On Greenville Road",
-      price: "₹ 12,00,000 / Per Acre",
-      address:
-        "Sri Venkateshwara Towers, FCI Rd, Opp. Fire Station, Gandhimaa Nagar, Peelamedu, Coimbatore, Tamil Nadu 64...",
-      area: "5000 Sf",
-      hospitals: "Hospitals",
-      schools: "Schools",
-    },
-    {
-      id: 4,
-      image: images.agricultureLand,
-      category: "Agriculture-land",
-      title: "Boutique Space On Greenville Road",
-      price: "₹ 12,00,000 / Per Acre",
-      address:
-        "Sri Venkateshwara Towers, FCI Rd, Opp. Fire Station, Gandhimaa Nagar, Peelamedu, Coimbatore, Tamil Nadu 64...",
-      area: "5000 Sf",
-      hospitals: "Hospitals",
-      schools: "Schools",
-    },
-    {
-      id: 5,
-      image: images.agricultureLand,
-      category: "Agriculture-land",
-      title: "Boutique Space On Greenville Road",
-      price: "₹ 12,00,000 / Per Acre",
-      address:
-        "Sri Venkateshwara Towers, FCI Rd, Opp. Fire Station, Gandhimaa Nagar, Peelamedu, Coimbatore, Tamil Nadu 64...",
-      area: "5000 Sf",
-      hospitals: "Hospitals",
-      schools: "Schools",
-    },
-    {
-      id: 6,
-      image: images.agricultureLand,
-      category: "Agriculture-land",
-      title: "Boutique Space On Greenville Road",
-      price: "₹ 12,00,000 / Per Acre",
-      address:
-        "Sri Venkateshwara Towers, FCI Rd, Opp. Fire Station, Gandhimaa Nagar, Peelamedu, Coimbatore, Tamil Nadu 64...",
-      area: "5000 Sf",
-      hospitals: "Hospitals",
-      schools: "Schools",
-    },
-  ];
+
+  // ==========================================================
+  // FETCH INDIVIDUAL PROPERTY
+  // THEN FETCH NEARBY PROPERTIES
+  // ==========================================================
+
+  useEffect(() => {
+    const fetchPropertyDetails = async () => {
+      if (!currentPropertyId) {
+        console.error("Property ID not found in URL");
+        return;
+      }
+
+      // Clear old nearby properties when property changes
+      setNearByFields([]);
+
+      // Clear old plan visibility when property changes
+      setShowPlanDetails(false);
+
+      try {
+        // ======================================================
+        // 1. INDIVIDUAL PROPERTY API
+        // ======================================================
+
+        const response = await getIndividualProperties({
+          prop_id: currentPropertyId,
+          user_id: 1,
+        });
+
+        const apiData = response;
+
+        const property = apiData;
+
+        setShowPriceDetails(property);
+
+        // ======================================================
+        // CHECK PLAN DETAILS
+        //
+        // Show PlanDetails only when both user_id and is_plan
+        // are available in the individual property response.
+        // ======================================================
+
+        const hasPlanDetails =
+          property?.user_id != null && property?.is_plan != null;
+
+        setShowPlanDetails(hasPlanDetails);
+
+        // ======================================================
+        // HEADING
+        // ======================================================
+
+        const Heading = {
+          title: property?.prop_name,
+
+          propertyId: property?.prop_id?.toString(),
+
+          location: [property?.city, property?.district, property?.state]
+            .filter(Boolean)
+            .join(", "),
+
+          bookmark: property?.is_bookmarked,
+
+          price: property?.min_price,
+
+          area: property?.area_unit,
+
+          category: property?.category,
+        };
+
+        // ======================================================
+        // IMAGES
+        // ======================================================
+
+        const apiImages = [];
+
+        // Cover image
+        if (property?.media?.cover) {
+          apiImages.push({
+            id: property?.media?.cover?.id || "cover",
+
+            url: property?.media?.cover?.url,
+
+            alt: "Property cover",
+          });
+        }
+
+        // Property images
+        if (Array.isArray(property?.media?.images)) {
+          property.media.images.forEach((image, index) => {
+            const imageUrl = image?.url;
+
+            if (imageUrl) {
+              apiImages.push({
+                id: image?.id ?? `image-${index + 1}`,
+
+                url: imageUrl,
+
+                alt: `Property image ${index + 1}`,
+              });
+            }
+          });
+        }
+
+        const mockPropertyImages = apiImages.length > 0 ? apiImages : "";
+
+        // ======================================================
+        // VIDEOS
+        // ======================================================
+
+        const apiVideos = [];
+
+        if (Array.isArray(property?.media?.videos)) {
+          property.media.videos.forEach((video, index) => {
+            const videoUrl = video?.url || video?.path;
+
+            if (videoUrl) {
+              apiVideos.push({
+                id: video?.id ?? `video-${index + 1}`,
+
+                url: videoUrl,
+
+                alt: `Property video ${index + 1}`,
+
+                mime_type: video?.mime_type,
+
+                media_type: video?.media_type || "video",
+              });
+            }
+          });
+        }
+
+        const mockPropertyVideos = apiVideos;
+
+        // ======================================================
+        // OVERVIEW
+        // ======================================================
+
+        const overviewFields = [
+          {
+            label: "Project Name",
+            value: property?.prop_name || "",
+          },
+          {
+            label: "Property Category",
+            value:
+              property?.category === 1
+                ? "Agriculture Land"
+                : property?.category === 2
+                  ? "Commercial Land"
+                  : property?.category === 3
+                    ? "Investment Land"
+                    : property?.category === 4
+                      ? "Commercial / Residential Buildings"
+                      : property?.category === 5
+                        ? "Dtcp"
+                        : property?.category === 6
+                          ? "Farmland"
+                          : "",
+          },
+          {
+            label: "Area Unit",
+            value: property?.area_unit || "NA",
+          },
+          {
+            label: "Property Area",
+            value: property?.prop_area ?? property?.property_area ?? "NA",
+          },
+          {
+            label: "Road Plan",
+            value:
+              property?.road_plan === "on"
+                ? "On Road"
+                : property?.road_plan === "off"
+                  ? "Interior"
+                  : property?.road_plan || "NA",
+          },
+          {
+            label: "Pathway Available",
+            value:
+              property?.path_way === 1
+                ? "Available"
+                : property?.path_way === 0
+                  ? "Not Available"
+                  : property?.path_way || "NA",
+          },
+          {
+            label: "Pathway Length",
+            value: property?.length
+              ? `${property.length} ${property?.length_unit || ""}`
+              : "NIL",
+          },
+          {
+            label: "Road Length",
+            value: property?.road_length
+              ? `${property.road_length} ${property?.road_length_unit || ""}`
+              : "NIL",
+          },
+          {
+            label: "HP (Horsepower)",
+            value: property?.hp ? `${property.hp}HP` : "NIL",
+          },
+          {
+            label: "Electricity Available",
+            value:
+              property?.electricity === 1
+                ? "Individual"
+                : property?.electricity === 0
+                  ? "Not Available"
+                  : property?.electricity === 2
+                    ? "Common"
+                    : property?.electricity || "",
+          },
+          {
+            label: "Construction",
+            value:
+              property?.construct === 0
+                ? property?.construct_type || "NA"
+                : property?.construct === 1
+                  ? "shed"
+                  : property?.construct === 2
+                    ? "Commercial Building"
+                    : property?.construct === 3
+                      ? "Home"
+                      : property?.construct || "others",
+          },
+          {
+            label: "Property Facing",
+            value:
+              property?.facing === 1
+                ? "North"
+                : property?.facing === 2
+                  ? "South"
+                  : property?.facing === 3
+                    ? "East"
+                    : property?.facing === 4
+                      ? "West"
+                      : property?.facing === 5
+                        ? "North East"
+                        : property?.facing === 6
+                          ? "North West"
+                          : property?.facing === 7
+                            ? "South East"
+                            : property?.facing === 8
+                              ? "South West"
+                              : "",
+          },
+
+          ...([5, 6].includes(Number(property?.category))
+            ? [
+                {
+                  label: "Price",
+                  value: property?.min_price
+                    ? `${Number(property.min_price).toLocaleString("en-IN")}`
+                    : "NIL",
+                },
+              ]
+            : []),
+        ];
+
+        // ======================================================
+        // LOCATION
+        // ======================================================
+
+        const locationFields = [
+          {
+            label: "State",
+            value: property?.state || "",
+          },
+          {
+            label: "District",
+            value: property?.district || "",
+          },
+          {
+            label: "City",
+            value: property?.city || "",
+          },
+          {
+            label: "Country",
+            value: property?.country || "India",
+          },
+          {
+            label: "Map",
+            value: property?.map || null,
+          },
+        ];
+
+        // ======================================================
+        // AMENITIES
+        // ======================================================
+
+        const amenitiesFields = Array.isArray(property?.amenities)
+          ? property.amenities
+              .map((item) => (typeof item === "object" ? item?.name : item))
+              .filter(Boolean)
+          : [];
+
+        // ======================================================
+        // PROPERTY HIGHLIGHTS
+        // ======================================================
+
+        const highlightsFields = Array.isArray(property?.property_highs)
+          ? property.property_highs
+              .map((item) => {
+                if (typeof item === "object") {
+                  return {
+                    value: item?.name || "",
+                  };
+                }
+
+                return {
+                  label: "Highlight",
+                  value: item,
+                };
+              })
+              .filter((item) => item.value)
+          : [];
+
+        // ======================================================
+        // PRICE DETAILS
+        // ======================================================
+
+        const priceDetailsFields = [
+          {
+            label: "Expected Price",
+            value: property?.expected_price ?? property?.price ?? "",
+          },
+          {
+            label: "Price Per Acre",
+            value: property?.price_per_acre ?? "",
+          },
+          {
+            label: "Price Negotiable",
+            value: property?.price_negotiable ?? "",
+          },
+          {
+            label: "Additional Charges",
+            value: property?.additional_charges ?? "",
+          },
+        ];
+
+        // ======================================================
+        // DOCUMENTS
+        // ======================================================
+
+        const documentsFields = Array.isArray(property?.media?.documents)
+          ? property.media.documents.map((document, index) => ({
+              id: document?.id ?? index + 1,
+
+              url: document?.url || document?.path || document,
+
+              alt: "Document",
+
+              mime_type: document?.mime_type,
+
+              media_type: document?.media_type,
+            }))
+          : [];
+
+        // ======================================================
+        // 2. NEARBY PROPERTY API
+        //
+        // This runs only after the individual property
+        // API above has successfully completed.
+        // ======================================================
+
+        try {
+          const nearbyResponse = await getNearByProperties({
+            prop_id: currentPropertyId,
+          });
+
+          setNearByFields(Array.isArray(nearbyResponse) ? nearbyResponse : []);
+        } catch (nearbyError) {
+          console.error("Failed to fetch nearby properties:", nearbyError);
+
+          setNearByFields([]);
+        }
+
+        // ======================================================
+        // UPDATE COMPLETE PROPERTY PAGE DATA
+        // ======================================================
+
+        setPropertyData((prev) => ({
+          ...prev,
+
+          Heading,
+
+          mockPropertyImages,
+
+          mockPropertyVideos,
+
+          overviewFields,
+
+          locationFields,
+
+          amenitiesFields,
+
+          highlightsFields,
+
+          priceDetailsFields,
+
+          documentsFields,
+        }));
+      } catch (error) {
+        console.error("Failed to fetch property details:", error);
+
+        // Individual property failed
+        setNearByFields([]);
+
+        // Hide PlanDetails if property API fails
+        setShowPlanDetails(false);
+      }
+    };
+
+    fetchPropertyDetails();
+  }, [currentPropertyId]);
+
+  // ==========================================================
+  // EXTRACT DATA
+  // ==========================================================
+
+  const {
+    Heading,
+    mockPropertyImages,
+    mockPropertyVideos,
+    overviewFields,
+    locationFields,
+    amenitiesFields,
+    highlightsFields,
+    priceDetailsFields,
+    documentsFields,
+  } = propertyData;
+
+  // ==========================================================
+  // TAB SCROLL
+  // ==========================================================
 
   const handleTabChange = (key) => {
     const section = document.getElementById(key);
+
     const header = document.getElementById("main-header");
-    // console.log(header);
 
     if (!section) return;
 
@@ -239,56 +537,71 @@ const PropertyDetails = () => {
     <main className="w-[90%] mx-auto min-h-screen bg-white">
       {/* ============================================================
           PROPERTY HEADER
-          Full Width
           ============================================================ */}
+
       <PropertyHeader data={Heading} />
 
       {/* ============================================================
           PROPERTY GALLERY
-          Full Width
           ============================================================ */}
-      <PropertyGallery data={mockPropertyImages} />
+
+      <PropertyGallery data={mockPropertyImages} videos={mockPropertyVideos} />
 
       {/* ============================================================
           PROPERTY TABS
-          Full Width
           ============================================================ */}
+
       <TabListing categories={tabs} onChange={handleTabChange} />
 
       {/* ============================================================
           MAIN PROPERTY CONTENT
-          Desktop  : 65% Left + 35% Right
-          Mobile   : Stacked
           ============================================================ */}
+
       <section className="w-full">
         <div className="w-[95%] lg:w-[90%] max-w-[1400px] mx-auto py-5">
           <div className="flex flex-col lg:flex-row gap-4 lg:gap-5">
             {/* ========================================================
                 LEFT SIDE - 65%
                 ======================================================== */}
+
             <div className="w-full lg:w-[65%] flex flex-col gap-4">
               {/* Property Overview */}
+
               <div id="overview">
                 <OverviewSection fields={overviewFields} />
               </div>
+
               {/* Property Location */}
+
               <div id="location">
                 <LocationSection fields={locationFields} />
               </div>
+
               {/* Amenities */}
+
               <div id="amenities">
                 <AmenitiesSection fields={amenitiesFields} />
               </div>
+
               {/* Property Highlights */}
+
               <div id="property-highlight">
                 <HighlightsSection fields={highlightsFields} />
               </div>
-              {/* Gallery */}{" "}
-              <div id="price-details">
-                <PriceDetailsSection fields={priceDetailsFields} />
-              </div>
-              {/* Gallery */}
-              <div id="gallery">
+
+              {/* Price Details */}
+
+              {/* {PriceDetails && (
+                <div id="price-details">
+                  <PriceDetailsSection
+                    fields={priceDetailsFields}
+                  />
+                </div>
+              )} */}
+
+              {/* Gallery / Documents */}
+
+              <div id="document">
                 <DocumentSection fields={documentsFields} />
               </div>
             </div>
@@ -296,21 +609,34 @@ const PropertyDetails = () => {
             {/* ========================================================
                 RIGHT SIDE - 35%
                 ======================================================== */}
+
             <aside className="w-full lg:w-[45%] xl:w-[35%] flex flex-col gap-4 items-end">
               {/* Enquiry Form */}
-              <Enquiry />
+
+              <Enquiry propertyId={propertyId} />
 
               {/* Property Post Information */}
+
               <PostInformation />
 
-              {/* Plan Details */}
-              <PlanDetails />
+              {/* Plan Details
+                  Show only when the individual-property
+                  response contains user_id and is_plan */}
+
+              {showPlanDetails && <PlanDetails />}
             </aside>
           </div>
-          {/* Nearby Properties */}
-          <div id="Near-by-properties">
-            <NearbyProperties properties={nearByFields} />
-          </div>
+
+          {/* ==========================================================
+              NEARBY PROPERTIES
+              SHOW ONLY WHEN API RETURNS DATA
+              ========================================================== */}
+
+          {Array.isArray(nearByFields) && nearByFields.length > 0 && (
+            <div id="Near-by-properties">
+              <NearbyProperties properties={nearByFields} />
+            </div>
+          )}
         </div>
       </section>
     </main>

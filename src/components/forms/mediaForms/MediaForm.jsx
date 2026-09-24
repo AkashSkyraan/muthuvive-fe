@@ -33,9 +33,22 @@ import StatusMessage, { showStatusMessage } from "../../common/MessagePopup";
 // FILE SIZE LIMITS
 // ============================================================
 
-const IMAGE_MAX_SIZE = 3 * 1024 * 1024;
+const IMAGE_MAX_SIZE = 10 * 1024 * 1024;
 const VIDEO_MAX_SIZE = 20 * 1024 * 1024;
-const DOCUMENT_MAX_SIZE = 5 * 1024 * 1024;
+const DOCUMENT_MAX_SIZE = 10 * 1024 * 1024;
+
+// ============================================================
+// MEDIA COUNT LIMITS
+// ============================================================
+
+const IMAGE_MIN_COUNT = 3;
+const IMAGE_MAX_COUNT = 5;
+
+const VIDEO_MIN_COUNT = 1;
+const VIDEO_MAX_COUNT = 2;
+
+const DOCUMENT_MIN_COUNT = 1;
+const DOCUMENT_MAX_COUNT = 2;
 
 // ============================================================
 // COVER IMAGE CROP SETTINGS
@@ -773,7 +786,32 @@ const MediaUploadForm = () => {
   const handleImagesChange = (e) => {
     const files = Array.from(e.target.files || []);
 
-    const newImages = files.map((file) => ({
+    if (!files.length) {
+      return;
+    }
+
+    const remainingSlots = IMAGE_MAX_COUNT - images.length;
+
+    if (remainingSlots <= 0) {
+      showStatusMessage({
+        type: "error",
+        text: `Maximum ${IMAGE_MAX_COUNT} property images are allowed`,
+      });
+
+      e.target.value = "";
+      return;
+    }
+
+    if (files.length > remainingSlots) {
+      showStatusMessage({
+        type: "error",
+        text: `You can upload a maximum of ${IMAGE_MAX_COUNT} property images`,
+      });
+    }
+
+    const allowedFiles = files.slice(0, remainingSlots);
+
+    const newImages = allowedFiles.map((file) => ({
       id: `${file.name}-${file.lastModified}-${Math.random()}`,
 
       file,
@@ -796,7 +834,6 @@ const MediaUploadForm = () => {
 
     e.target.value = "";
   };
-
   // ==========================================================
   // VIDEOS
   // ==========================================================
@@ -804,7 +841,32 @@ const MediaUploadForm = () => {
   const handleVideosChange = (e) => {
     const files = Array.from(e.target.files || []);
 
-    const newVideos = files.map((file) => ({
+    if (!files.length) {
+      return;
+    }
+
+    const remainingSlots = VIDEO_MAX_COUNT - videos.length;
+
+    if (remainingSlots <= 0) {
+      showStatusMessage({
+        type: "error",
+        text: `Maximum ${VIDEO_MAX_COUNT} property videos are allowed`,
+      });
+
+      e.target.value = "";
+      return;
+    }
+
+    if (files.length > remainingSlots) {
+      showStatusMessage({
+        type: "error",
+        text: `You can upload a maximum of ${VIDEO_MAX_COUNT} property videos`,
+      });
+    }
+
+    const allowedFiles = files.slice(0, remainingSlots);
+
+    const newVideos = allowedFiles.map((file) => ({
       id: `${file.name}-${file.lastModified}-${Math.random()}`,
 
       file,
@@ -827,7 +889,6 @@ const MediaUploadForm = () => {
 
     e.target.value = "";
   };
-
   // ==========================================================
   // DOCUMENTS
   // ==========================================================
@@ -835,7 +896,32 @@ const MediaUploadForm = () => {
   const handleDocumentsChange = (e) => {
     const files = Array.from(e.target.files || []);
 
-    const newDocs = files.map((file) => ({
+    if (!files.length) {
+      return;
+    }
+
+    const remainingSlots = DOCUMENT_MAX_COUNT - documents.length;
+
+    if (remainingSlots <= 0) {
+      showStatusMessage({
+        type: "error",
+        text: `Maximum ${DOCUMENT_MAX_COUNT} property documents are allowed`,
+      });
+
+      e.target.value = "";
+      return;
+    }
+
+    if (files.length > remainingSlots) {
+      showStatusMessage({
+        type: "error",
+        text: `You can upload a maximum of ${DOCUMENT_MAX_COUNT} property documents`,
+      });
+    }
+
+    const allowedFiles = files.slice(0, remainingSlots);
+
+    const newDocs = allowedFiles.map((file) => ({
       id: `${file.name}-${file.lastModified}-${Math.random()}`,
 
       file,
@@ -856,7 +942,6 @@ const MediaUploadForm = () => {
 
     e.target.value = "";
   };
-
   // ==========================================================
   // REMOVE COVER
   // ==========================================================
@@ -952,7 +1037,15 @@ const MediaUploadForm = () => {
   // ==========================================================
 
   const isSubmitDisabled =
-    hasInvalidMedia || images.length === 0 || isSubmitting;
+    hasInvalidMedia ||
+    !coverImage ||
+    images.length < IMAGE_MIN_COUNT ||
+    images.length > IMAGE_MAX_COUNT ||
+    videos.length < VIDEO_MIN_COUNT ||
+    videos.length > VIDEO_MAX_COUNT ||
+    documents.length < DOCUMENT_MIN_COUNT ||
+    documents.length > DOCUMENT_MAX_COUNT ||
+    isSubmitting;
 
   // ==========================================================
   // UPLOAD ONE FILE
@@ -991,19 +1084,94 @@ const MediaUploadForm = () => {
       return;
     }
 
-    // Don't submit without at least one property image
-    if (images.length === 0) {
+    // ------------------------------------------------------
+    // Cover image - exactly one is allowed
+    // ------------------------------------------------------
+
+    if (!coverImage) {
       showStatusMessage({
         type: "error",
-        text: "Please upload at least one property image",
+        text: "Please upload a cover image",
       });
 
       return;
     }
 
+    // ------------------------------------------------------
+    // Property images - minimum 3, maximum 5
+    // ------------------------------------------------------
+
+    if (images.length < IMAGE_MIN_COUNT) {
+      showStatusMessage({
+        type: "error",
+        text: `Please upload at least ${IMAGE_MIN_COUNT} property images`,
+      });
+
+      return;
+    }
+
+    if (images.length > IMAGE_MAX_COUNT) {
+      showStatusMessage({
+        type: "error",
+        text: `Maximum ${IMAGE_MAX_COUNT} property images are allowed`,
+      });
+
+      return;
+    }
+
+    // ------------------------------------------------------
+    // Property videos - minimum 1, maximum 2
+    // ------------------------------------------------------
+
+    if (videos.length < VIDEO_MIN_COUNT) {
+      showStatusMessage({
+        type: "error",
+        text: `Please upload at least ${VIDEO_MIN_COUNT} property video`,
+      });
+
+      return;
+    }
+
+    if (videos.length > VIDEO_MAX_COUNT) {
+      showStatusMessage({
+        type: "error",
+        text: `Maximum ${VIDEO_MAX_COUNT} property videos are allowed`,
+      });
+
+      return;
+    }
+
+    // ------------------------------------------------------
+    // Property documents - minimum 1, maximum 2
+    // ------------------------------------------------------
+
+    if (documents.length < DOCUMENT_MIN_COUNT) {
+      showStatusMessage({
+        type: "error",
+        text: `Please upload at least ${DOCUMENT_MIN_COUNT} property document`,
+      });
+
+      return;
+    }
+
+    if (documents.length > DOCUMENT_MAX_COUNT) {
+      showStatusMessage({
+        type: "error",
+        text: `Maximum ${DOCUMENT_MAX_COUNT} property documents are allowed`,
+      });
+
+      return;
+    }
+    // ------------------------------------------------------
+    // Prevent duplicate submit
+    // ------------------------------------------------------
+
     if (isSubmitting) {
       return;
     }
+    // ------------------------------------------------------
+    // Property ID check
+    // ------------------------------------------------------
 
     if (!propertyId) {
       console.error("Property ID is missing");
@@ -1084,7 +1252,7 @@ const MediaUploadForm = () => {
 
         pr_doc: documentIds,
 
-        status: "inprogress",
+        status: "requested",
       };
 
       console.log("Final Media Payload:", payload);

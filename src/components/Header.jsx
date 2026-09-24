@@ -187,8 +187,13 @@ const Header = () => {
       icon: icons.investmentIcon,
     },
     {
-      key: "commercial-residential-building",
-      label: "Commercial / Residential Buildings",
+      key: "commercial-building",
+      label: "Commercial Buildings",
+      icon: icons.commercialLandIcon,
+    },
+    {
+      key: "residential-building",
+      label: "Residential Buildings",
       icon: icons.commercialResidentialIcon,
     },
   ];
@@ -418,7 +423,7 @@ const Header = () => {
 
   const accountPopoverContent = isLoggedIn
     ? loggedInPopoverContent
-    : loggedOutPopoverContent;
+    : loggedInPopoverContent;
 
   // ---------------------------------------------------------
   // Properties Popover Content

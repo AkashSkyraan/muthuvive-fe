@@ -39,11 +39,13 @@ import safetyIcon from "../assets/icons/safety.png";
 import deliveryIcon from "../assets/icons/delivery.png";
 import solutionsIcon from "../assets/icons/solutions.png";
 import bookmarkIcon2 from "../assets/icons/bookmark-2.png";
+import bookmarkIconFilled from "../assets/icons/bookmark-filled.png";
 import sentIcon from "../assets/icons/sent.png";
 import copyIcon from "../assets/icons/copy.png";
 import diamondIcon from "../assets/icons/diamond.png";
 
 export const icons = {
+  bookmarkIconFilled,
   diamondIcon,
   bookmarkIcon2,
   copyIcon,

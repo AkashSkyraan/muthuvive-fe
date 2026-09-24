@@ -1,10 +1,12 @@
 import React from "react";
 import icons from "../../config/Icons.jsx";
-import { IndianRupee, LeafyGreen } from "lucide-react";
+import { CircleSmall } from "lucide-react";
 
 // Renders a singling card. Pass one `listing` object with
 // { id, image, category, title, price, address, area, hospitals, schools }.
 const ProjectCard = ({ listing }) => {
+  console.log("inside project card", listing);
+
   return (
     <div className="bg-white rounded-lg overflow-hidden border border-gray-100 cursor-pointer">
       <div className="relative h-48 sm:h-44 lg:h-48">
@@ -27,6 +29,7 @@ const ProjectCard = ({ listing }) => {
         <h3 className="text-base font-semibold text-gray-900">
           {listing.prop_name}
         </h3>
+
         {/* Show price only if category_name is dtcp or farmland */}
         {(listing.category_name === "dtcp" ||
           listing.category_name === "farmland") && (
@@ -38,6 +41,7 @@ const ProjectCard = ({ listing }) => {
             </span>
           </p>
         )}
+
         <div className="flex items-start gap-x-2 mt-3">
           <img
             src={icons.locationBlackIcon}
@@ -49,21 +53,29 @@ const ProjectCard = ({ listing }) => {
           </p>
         </div>
 
-        <div className="flex items-center flex-wrap gap-x-4 gap-y-2 mt-3 pt-4 justify-between">
-          <div className="flex items-center gap-x-1.5">
-            {/* <img src={icons.areaIcon} alt="area" className="w-4 h-4" /> */}
-            <LeafyGreen className="w-4 h-4" />
-            <span className="text-sm text-gray-500">{listing.area}</span>
+        <div className="flex items-center flex-wrap gap-x-4 gap-y-2 mt-3 pt-4 justify-around">
+          {/* Highlight */}
+          <div className="flex items-center gap-x-1.5 max-w-[45%]">
+            <CircleSmall className="w-5 h-5 shrink-0" />
+
+            <span
+              className="text-sm text-gray-500 truncate"
+              title={listing?.highlights?.name}
+            >
+              {listing?.highlights?.name}
+            </span>
           </div>
-          <div className="flex items-center gap-x-1.5">
-            {/* <img src={icons.areaIcon} alt="hospitals" className="w-4 h-4" /> */}
-            <LeafyGreen className="w-4 h-4" />
-            <span className="text-sm text-gray-500">{listing.hospitals}</span>
-          </div>
-          <div className="flex items-center gap-x-1.5">
-            {/* <img src={icons.areaIcon} alt="schools" className="w-4 h-4" /> */}
-            <LeafyGreen className="w-4 h-4" />
-            <span className="text-sm text-gray-500">{listing.schools}</span>
+
+          {/* Amenity */}
+          <div className="flex items-center gap-x-1.5 max-w-[45%]">
+            <CircleSmall className="w-5 h-5 shrink-0" />
+
+            <span
+              className="text-sm text-gray-500 truncate"
+              title={listing?.amenities?.name}
+            >
+              {listing?.amenities?.name}
+            </span>
           </div>
         </div>
       </div>

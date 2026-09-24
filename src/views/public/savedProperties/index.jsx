@@ -6,6 +6,8 @@ import Pagination from "../../../components/common/pagination/Pagination";
 import CategoryFilter from "../myProperties/CategoryFilter";
 import images from "../../../config/Images";
 
+import { getBookmarkedProperties } from "../../../api/getProperties.api";
+
 const MyProperties = () => {
   const filterOptions = [
     {
@@ -29,118 +31,49 @@ const MyProperties = () => {
       value: "commercial-residential-buildings",
     },
   ];
-  const mockProperties = [
-    {
-      id: 1,
-      image: images.agricultureLand,
-      category: "Agriculture Land",
-      title: "Boutique Space On Greenville Road",
-      price: "₹ 12,00,000 / Per Acre",
-      address:
-        "Sri Venkateswara Towers, FCI Rd, Opp. Fire Station, Gandhinagar Nagar, Peelamedu, Coimbatore, Tamil Nadu 64...",
-      area: "5000 SF",
-      hospitals: "5 Hospitals",
-      schools: "6 Schools",
-    },
 
-    {
-      id: 2,
-      image: images.agricultureLand,
-      category: "Agriculture Land",
-      title: "Boutique Space On Greenville Road",
-      price: "₹ 12,00,000 / Per Acre",
-      address:
-        "Sri Venkateswara Towers, FCI Rd, Opp. Fire Station, Gandhinagar Nagar, Peelamedu, Coimbatore, Tamil Nadu 64...",
-      area: "5000 SF",
-      hospitals: "5 Hospitals",
-      schools: "5 Schools",
-    },
-
-    {
-      id: 3,
-      image: images.agricultureLand,
-      category: "Agriculture Land",
-      title: "Boutique Space On Greenville Road",
-      price: "₹ 12,00,000 / Per Acre",
-      address:
-        "Sri Venkateswara Towers, FCI Rd, Opp. Fire Station, Gandhinagar Nagar, Peelamedu, Coimbatore, Tamil Nadu 64...",
-      area: "5000 SF",
-      hospitals: "5 Hospitals",
-      schools: "6 Schools",
-    },
-
-    {
-      id: 4,
-      image: images.agricultureLand,
-      category: "Agriculture Land",
-      title: "Boutique Space On Greenville Road",
-      price: "₹ 12,00,000 / Per Acre",
-      address:
-        "Sri Venkateswara Towers, FCI Rd, Opp. Fire Station, Gandhinagar Nagar, Peelamedu, Coimbatore, Tamil Nadu 64...",
-      area: "5000 SF",
-      hospitals: "5 Hospitals",
-      schools: "6 Schools",
-    },
-
-    {
-      id: 5,
-      image: images.agricultureLand,
-      category: "Agriculture Land",
-      title: "Boutique Space On Greenville Road",
-      price: "₹ 12,00,000 / Per Acre",
-      address:
-        "Sri Venkateswara Towers, FCI Rd, Opp. Fire Station, Gandhinagar Nagar, Peelamedu, Coimbatore, Tamil Nadu 64...",
-      area: "5000 SF",
-      hospitals: "5 Hospitals",
-      schools: "5 Schools",
-    },
-
-    {
-      id: 6,
-      image: images.agricultureLand,
-      category: "Agriculture Land",
-      title: "Boutique Space On Greenville Road",
-      price: "₹ 12,00,000 / Per Acre",
-      address:
-        "Sri Venkateswara Towers, FCI Rd, Opp. Fire Station, Gandhinagar Nagar, Peelamedu, Coimbatore, Tamil Nadu 64...",
-      area: "5000 SF",
-      hospitals: "5 Hospitals",
-      schools: "5 Schools",
-    },
-  ];
   const requestCategories = [
-    { label: "All Requests", value: "all" },
-    { label: "Requested", value: "requested" },
-    { label: "Approved", value: "approved" },
-    { label: "Posted", value: "posted" },
-    { label: "Sold", value: "sold" },
-    { label: "Expired", value: "expired" },
-    { label: "Rejected", value: "rejected" },
+    { value: "all", label: "All" },
+    { value: 6, label: "farmland" },
+    { value: 1, label: "agriculture" },
+    { value: 5, label: "dtcp" },
+    { value: 3, label: "investment" },
+    { value: 2, label: "commercial-land" },
+    { value: 4, label: "Commercial-buildings" },
+    { value: 7, label: "residential-buildings" },
   ];
 
-  console.log("properties", mockProperties);
-  // Selected property categories
+  // ============================================================
+  // FILTER STATES
+  // ============================================================
+
   const [selectedFilters, setSelectedFilters] = useState([]);
 
   // Search text
   const [search, setSearch] = useState("");
 
-  // Properties returned from API
+  // Active category
+  const [activeCategory, setActiveCategory] = useState("all");
+
+  // ============================================================
+  // PROPERTY DATA
+  // ============================================================
+
   const [properties, setProperties] = useState([]);
 
   // API loading state
   const [loading, setLoading] = useState(false);
 
-  // ACTIVE CATEGORY
-  const [activeCategory, setActiveCategory] = useState("all");
+  // ============================================================
+  // PAGINATION
+  // ============================================================
+
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const [totalPages, setTotalPages] = useState(0);
 
   // ============================================================
   // FILTER CHANGE
-  // ============================================================
-  // This function will be passed to Header.
-  //
-  // Header does not directly manage the main page state.
-  // It simply tells this page when the user changes a filter.
   // ============================================================
 
   const handleFilterChange = (values) => {
@@ -149,13 +82,28 @@ const MyProperties = () => {
 
   const handleSearch = (value) => {
     setSearch(value);
+    setCurrentPage(1);
   };
 
   // ============================================================
-  // FETCH PROPERTIES
+  // CATEGORY CHANGE
   // ============================================================
-  // Whenever selectedFilters or search changes,
-  // this API call will run again.
+
+  const handleCategoryChange = (value) => {
+    setActiveCategory(value);
+    setCurrentPage(1);
+  };
+
+  // ============================================================
+  // PAGINATION CHANGE
+  // ============================================================
+
+  const handlePageChange = (page) => {
+    setCurrentPage(Number(page));
+  };
+
+  // ============================================================
+  // FETCH SAVED PROPERTIES
   // ============================================================
 
   useEffect(() => {
@@ -163,34 +111,48 @@ const MyProperties = () => {
       try {
         setLoading(true);
 
-        // Data we are sending to the backend
         const payload = {
-          categories: selectedFilters,
+          user_id: 1,
           search: search,
+          page: Number(currentPage),
+          limit: 1,
+          type: activeCategory,
+          // categories: selectedFilters,
         };
 
-        // API call
-        // const response = await getMyProperties(payload);
+        // ------------------------------------------------------
+        // API CALL
+        // ------------------------------------------------------
 
-        // Store API response in state
-        // setProperties(response.data);
+        const response = await getBookmarkedProperties(payload);
+
+        const data = response[0] || response || {};
+        // console.log(data?.pagination?.totalPages);
+
+        setProperties(data?.properties || []);
+        setTotalPages(data?.pagination?.totalPages || 0);
+
+        // ------------------------------------------------------
+        // TEMPORARY
+        // ------------------------------------------------------
+
+        // setProperties([]);
+        // setTotalPages(0);
       } catch (error) {
         console.error("Failed to fetch properties:", error);
 
-        // If API fails, clear the properties
         setProperties([]);
+        setTotalPages(0);
       } finally {
         setLoading(false);
       }
     };
 
     fetchProperties();
-  }, [selectedFilters, search]);
+  }, [currentPage, activeCategory, search, selectedFilters]);
 
   // ============================================================
   // SELL PROPERTY
-  // ============================================================
-  // This can later use navigate("/sell-property")
   // ============================================================
 
   const handleSellProperty = () => {
@@ -199,8 +161,6 @@ const MyProperties = () => {
 
   // ============================================================
   // SORT
-  // ============================================================
-  // We can add sorting functionality later.
   // ============================================================
 
   const handleSort = () => {
@@ -211,12 +171,12 @@ const MyProperties = () => {
     <div className="w-full">
       <div className="w-[95%] mx-auto my-5 text-start">
         <Header
-          filterOptions={filterOptions}
-          selectedFilters={selectedFilters}
-          onFilterChange={handleFilterChange}
           onSearch={handleSearch}
-          onSellProperty={handleSellProperty}
-          onSortClick={handleSort}
+          // filterOptions={filterOptions}
+          // selectedFilters={selectedFilters}
+          // onFilterChange={handleFilterChange}
+          // onSellProperty={handleSellProperty}
+          // onSortClick={handleSort}
         />
 
         <div className="flex flex-col lg:flex-row gap-0 mt-6">
@@ -226,7 +186,7 @@ const MyProperties = () => {
             <CategoryFilter
               options={requestCategories}
               value={activeCategory}
-              onChange={setActiveCategory}
+              onChange={handleCategoryChange}
             />
           </div>
 
@@ -240,7 +200,7 @@ const MyProperties = () => {
 
               {loading ? (
                 <div className="flex justify-center py-10">Loading...</div>
-              ) : mockProperties.length === 0 ? (
+              ) : properties.length === 0 ? (
                 /* ================================================
                    EMPTY STATE
                    ================================================ */
@@ -254,14 +214,25 @@ const MyProperties = () => {
                    ================================================ */
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {mockProperties.map((property) => (
+                  {properties.map((property) => (
                     <ProjectCard key={property.id} listing={property} />
                   ))}
                 </div>
               )}
-              <div>
-                <Pagination />
-              </div>
+
+              {/* ==================================================
+                  PAGINATION
+                  ================================================== */}
+
+              {totalPages > 0 && (
+                <div>
+                  <Pagination
+                    current={currentPage}
+                    totalPages={totalPages}
+                    onChange={handlePageChange}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>

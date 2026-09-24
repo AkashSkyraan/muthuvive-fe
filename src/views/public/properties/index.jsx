@@ -42,12 +42,34 @@ const categoryData = {
       { key: "sold", label: "Sold Projects" },
     ],
   },
-  "commercial-residential-building": {
+  "commercial-building": {
     id: 3,
     slug: "residential",
     name: "Residential Properties",
     hero: {
-      title: "Commercial / Residential Buildings",
+      title: "Commercial Buildings",
+      description:
+        "Discover verified properties that match your lifestyle, budget, and location. Buy, sell, or rent your perfect property with confidence.",
+      image: images.residentialBannerImage,
+    },
+    tabs: [
+      { key: "available", label: "Available Projects" },
+      { key: "sold", label: "Sold Projects" },
+    ],
+    categories: [
+      { key: "Office Space", label: "Office Space" },
+      { key: "Showrooms", label: "Showrooms" },
+      { key: "Godowns", label: "Godowns" },
+      { key: "Office-in-IT-Park", label: "Office in IT Park" },
+      { key: "Shops", label: "Shops" },
+    ],
+  },
+  "residential-building": {
+    id: 4,
+    slug: "residential",
+    name: "Residential Properties",
+    hero: {
+      title: "Residential Buildings",
       description:
         "Discover verified properties that match your lifestyle, budget, and location. Buy, sell, or rent your perfect property with confidence.",
       image: images.residentialBannerImage,
@@ -65,7 +87,7 @@ const categoryData = {
     ],
   },
   "commercial-land": {
-    id: 4,
+    id: 5,
     slug: "commercial",
     name: "Commercial Properties",
     hero: {
@@ -80,7 +102,7 @@ const categoryData = {
     ],
   },
   "dtcp-approved": {
-    id: 4,
+    id: 6,
     slug: "commercial",
     name: "Commercial Properties",
     hero: {
@@ -95,7 +117,7 @@ const categoryData = {
     ],
   },
   construction: {
-    id: 4,
+    id: 7,
     slug: "commercial",
     name: "Commercial Properties",
     hero: {
@@ -110,7 +132,7 @@ const categoryData = {
     ],
   },
   "investment-land": {
-    id: 4,
+    id: 8,
     slug: "commercial",
     name: "Commercial Properties",
     hero: {
@@ -129,10 +151,11 @@ const categoryData = {
 const CATEGORY_TYPE_MAP = {
   "agriculture-land": 1,
   farmland: 6,
-  "commercial-residential-building": 4,
+  "commercial-building": 4,
   "commercial-land": 2,
   "dtcp-approved": 5,
   "investment-land": 3,
+  "residential-building": 7,
 };
 
 // ============================================================
@@ -140,7 +163,7 @@ const CATEGORY_TYPE_MAP = {
 // ============================================================
 
 const TAB_STATUS_MAP = {
-  available: "inprogress",
+  available: "available",
   sold: "sold",
 
   // For your commercial/residential tabs
@@ -152,7 +175,7 @@ const TAB_STATUS_MAP = {
 // API LIMIT
 // ============================================================
 
-const LIMIT = 9;
+const LIMIT = 2;
 
 // ============================================================
 // COMPONENT
@@ -170,7 +193,6 @@ const Properties = () => {
   // ----------------------------------------------------------
 
   const selectedCategory = categoryData[categorySlug];
-  console.log(selectedCategory);
 
   // ----------------------------------------------------------
   // API properties
@@ -196,7 +218,7 @@ const Properties = () => {
   // Total properties
   // ----------------------------------------------------------
 
-  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   // ----------------------------------------------------------
   // Loading
@@ -259,13 +281,12 @@ const Properties = () => {
         const data = response?.data || response || {};
 
         setProperties(data?.properties || []);
-
-        setTotal(data?.total || 0);
+        setTotalPages(data?.pagination?.totalPages);
       } catch (error) {
         console.error("Failed to fetch properties:", error);
 
         setProperties([]);
-        setTotal(0);
+        setTotalPages(1);
       } finally {
         setLoading(false);
       }
@@ -310,7 +331,6 @@ const Properties = () => {
   // ==========================================================
   // UI
   // ==========================================================
-
   return (
     <main className="w-full min-h-screen bg-white">
       {/* ======================================================
@@ -357,14 +377,15 @@ const Properties = () => {
               PAGINATION
           ================================================== */}
 
-          <div className="flex justify-center py-8 sm:py-10">
-            <Pagination
-              current={currentPage}
-              total={total}
-              pageSize={LIMIT}
-              onChange={handlePageChange}
-            />
-          </div>
+          {totalPages > 0 && (
+            <div className="flex justify-center py-8 sm:py-10">
+              <Pagination
+                current={currentPage}
+                totalPages={totalPages}
+                onChange={handlePageChange}
+              />
+            </div>
+          )}
         </div>
       </section>
     </main>
