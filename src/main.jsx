@@ -9,19 +9,22 @@ import { SignupProvider } from "./context/SignupContext.jsx";
 import { AuthProvider } from "./context/UserContext.jsx";
 import { SearchProvider } from "./context/SearchContext.jsx";
 import { LoginModalProvider } from "./context/LoginModalContext.jsx";
+import { LoaderProvider } from "./context/LoaderContext.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
-      <SignupProvider>
-        <AuthProvider>
-          <SearchProvider>
-            <LoginModalProvider>
-              <App />
-            </LoginModalProvider>
-          </SearchProvider>
-        </AuthProvider>
-      </SignupProvider>
+      <LoaderProvider>
+        <SignupProvider>
+          <AuthProvider>
+            <SearchProvider>
+              <LoginModalProvider>
+                <App />
+              </LoginModalProvider>
+            </SearchProvider>
+          </AuthProvider>
+        </SignupProvider>
+      </LoaderProvider>
     </BrowserRouter>
-  </StrictMode>
+  </StrictMode>,
 );

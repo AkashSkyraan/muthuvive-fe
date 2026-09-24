@@ -126,9 +126,9 @@ const ProjectCard = ({ listing, user }) => {
 
             <span
               className="text-sm text-gray-500 truncate"
-              title={listing?.highlights[0]?.name}
+              title={listing?.highlights?.name}
             >
-              {listing?.highlights[0]?.name}
+              {listing?.highlights?.name}
             </span>
           </div>
 
@@ -138,9 +138,9 @@ const ProjectCard = ({ listing, user }) => {
 
             <span
               className="text-sm text-gray-500 truncate"
-              title={listing?.amenities[0]?.name}
+              title={listing?.amenities?.name}
             >
-              {listing?.amenities[0]?.name}
+              {listing?.amenities?.name}
             </span>
           </div>
         </div>
