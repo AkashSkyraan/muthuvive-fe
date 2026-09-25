@@ -5,6 +5,8 @@ import ForgotPassword from "../views/auth/ForgotPassword";
 import Signup from "../views/auth/Signup";
 import VerifyOTP from "../views/auth/VerifyOTP";
 import ChangePassword from "../views/auth/ChangePassword";
+import VerifyPassword from "../views/auth/VerifyPassword";
+import Change from "../views/auth/Change";
 
 const AuthRoutes = (
   <Route element={<AuthLayout />}>
@@ -13,6 +15,8 @@ const AuthRoutes = (
     <Route path="/signup" element={<Signup />} />
     <Route path="/verify-otp" element={<VerifyOTP />} />
     <Route path="/reset-password" element={<ChangePassword />} />
+    <Route path="/verify-password" element={<VerifyPassword />} />
+    <Route path="/change" element={<Change />} />
   </Route>
 );
 

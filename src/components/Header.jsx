@@ -59,8 +59,6 @@ const Header = () => {
 
         const response = await axiosInstance.get("/user/get-user");
 
-      
-
         if (response?.data?.success === 1 && response?.data?.data?.length > 0) {
           setUser(response.data.data[0]);
         } else {
@@ -336,6 +334,9 @@ const Header = () => {
           <li>
             <Link
               to="/forgot-password"
+              state={{
+                type: "change-password",
+              }}
               onClick={closeAccountPopover}
               className="block px-1 py-1.5 !text-[#3E3E3E] font-semibold"
             >

@@ -1,79 +1,61 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 import PlanCard from "../../../components/cards/PlanCard";
 import PlanDetailsCard from "../../../components/cards/SubscriptionCard";
+import { useAuth } from "../../../context/UserContext";
+import { getMyPlans } from "../../../api/subscriptionPlans.api";
 
 const MyPlans = () => {
-  const plans = [
-    {
-      id: 4,
-      name: "Plan 04",
-      status: "Active Plan",
-      paidDate: "23-04-2026, Wednesday, 02:12 PM",
-      expiryDate: "23-04-2027, Wednesday, 02:12 PM",
-      new_amount: 3999,
-      old_amount: 6999,
-      duration: "Year",
-      features: [
-        "365 Days Listing",
-        "Wider Visibility",
-        "Property Promotion",
-        "Regular Verification",
-        "Better Selling Opportunity",
-      ],
-    },
+  const { user } = useAuth();
+  const location = useLocation();
 
-    {
-      id: 3,
-      name: "Plan 03",
-      status: "Expired",
-      paidDate: "23-04-2025, Wednesday, 03:12 PM",
-      expiryDate: "23-04-2026, Wednesday, 03:12 PM",
-      price: 3999,
-      originalPrice: 6999,
-      features: [
-        "365 Days Listing",
-        "Wider Visibility",
-        "Property Promotion",
-        "Regular Verification",
-        "Better Selling Opportunity",
-      ],
-    },
+  const [plans, setPlans] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-    {
-      id: 2,
-      name: "Plan 02",
-      status: "Expired",
-      paidDate: "23-04-2024, Wednesday, 03:12 PM",
-      expiryDate: "23-04-2025, Wednesday, 03:12 PM",
-      price: 3999,
-      originalPrice: 6999,
-      features: [
-        "365 Days Listing",
-        "Wider Visibility",
-        "Property Promotion",
-        "Regular Verification",
-        "Better Selling Opportunity",
-      ],
-    },
+  // Change this line if prop_id comes from another source
+  const propId = location.state?.prop_id;
 
-    {
-      id: 1,
-      name: "Plan 01",
-      status: "Expired",
-      paidDate: "23-04-2023, Wednesday, 03:12 PM",
-      expiryDate: "23-04-2024, Wednesday, 03:12 PM",
-      price: 3999,
-      originalPrice: 6999,
-      features: [
-        "365 Days Listing",
-        "Wider Visibility",
-        "Property Promotion",
-        "Regular Verification",
-        "Better Selling Opportunity",
-      ],
-    },
-  ];
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        setLoading(true);
+
+        const payload = {
+          user_id: 15,
+          prop_id: "PLJm9G610",
+          // user_id: user?.id,
+          // prop_id: propId,
+        };
+
+        console.log("My Plans Payload:", payload);
+
+        const response = await getMyPlans(payload);
+
+        console.log("My Plans Response:", response);
+
+        const responsePlans = Array.isArray(response)
+          ? response
+          : Array.isArray(response?.data)
+            ? response.data
+            : [];
+
+        setPlans(responsePlans);
+      } catch (error) {
+        console.error("My Plans API Error:", error);
+        setPlans([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPlans();
+    // if (user?.id && propId) {
+    //   fetchPlans();
+    // } else {
+    //   setPlans([]);
+    //   setLoading(false);
+    // }
+  }, [user?.id, propId]);
 
   return (
     <main className="w-[90%] mx-auto py-6">
@@ -82,24 +64,22 @@ const MyPlans = () => {
         My Plans Activity
       </h1>
 
-      {/* Plans Content - map here, but pass each plan wrapped in a
-          single-item array ([plan], not plan) so PlanCard and
-          PlanDetailsCard don't need ANY internal changes - they still
-          receive a `plans` array and still run their own .map() over
-          it, it just happens to iterate exactly once per call. Because
-          each call is now its own direct grid child (not one giant
-          column doing all 4 internally), native CSS Grid pairs "Plan
-          04"'s card with "Plan 04"'s details card into the same row and
-          stretches both to match heights automatically - no manual
-          height sync needed. */}
-      <div className="grid grid-cols-1 lg:grid-cols-[40%_60%] gap-4 text-start">
-        {plans.map((plan) => (
-          <React.Fragment key={plan.id}>
-            <PlanCard plans={[plan]} />
-            <PlanDetailsCard plans={[plan]} />
-          </React.Fragment>
-        ))}
-      </div>
+      {loading ? (
+        <div className="text-start text-sm text-gray-500">Loading plans...</div>
+      ) : plans.length === 0 ? (
+        <div className="py-10 text-center text-sm text-gray-500">
+          No plans found
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-[40%_60%] gap-4 text-start">
+          {plans.map((plan) => (
+            <React.Fragment key={plan.id}>
+              <PlanCard plans={[plan]} />
+              <PlanDetailsCard plans={[plan]} />
+            </React.Fragment>
+          ))}
+        </div>
+      )}
     </main>
   );
 };

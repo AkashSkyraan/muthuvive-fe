@@ -45,11 +45,10 @@ const Hero = () => {
 
       <div className="relative w-[95%] mx-auto py-6 md:py-10">
         {/* Search bar */}
-    
 
-          <div className="flex-1 flex items-center  rounded-lg px-3">
-            <SearchPage />
-          </div>
+        <div className="flex-1 flex items-center  rounded-lg px-3">
+          <SearchPage />
+        </div>
 
         {/* Heading */}
         <div className="mt-10 max-w-full md:max-w-[70%]">
@@ -64,10 +63,7 @@ const Hero = () => {
 
           <div className="flex flex-wrap items-center gap-4 mt-6 !z-[1]">
             <Link to="/search">
-              <Button
-                className=" !z-[1] !bg-white !text-secondary !border-2 !border-transparent !font-medium !py-5 !px-9 !text-base"
-              
-              >
+              <Button className=" !z-[1] !bg-white !text-secondary !border-2 !border-transparent !font-medium !py-5 !px-9 !text-base">
                 Explore
               </Button>
             </Link>

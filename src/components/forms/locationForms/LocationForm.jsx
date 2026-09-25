@@ -503,7 +503,7 @@ const LocationForm = () => {
         ====================================================== */}
 
         <Form.Item
-          label={fieldLabel("City", isCityEnabled)}
+          label={fieldLabel("Area", isCityEnabled)}
           name="city"
           rules={[
             {

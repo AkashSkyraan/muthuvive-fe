@@ -10,6 +10,10 @@ function ForgotPassword() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const flowType = location.state?.type;
+  const isChangePassword = flowType === "change-password";
+  // console.log(flowType);
+
   const [identifier, setIdentifier] = useState(
     location.state?.identifier || "",
   );
@@ -82,7 +86,7 @@ function ForgotPassword() {
       </div>
 
       <h5 className="mt-8 text-4xl font-[400px] tracking-tight text-gray-900">
-        Forgot Password
+        {isChangePassword ? "Change Password" : "Forgot Password"}
       </h5>
 
       <p className="mt-3 text-sm leading-5 text-gray-500">

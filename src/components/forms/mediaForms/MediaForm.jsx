@@ -1237,6 +1237,9 @@ const MediaUploadForm = () => {
       // 6. FINAL PAYLOAD
       // ------------------------------------------------------
 
+      const now = new Date();
+
+      const requestedAt = now.toISOString().slice(0, 19).replace("T", " ");
       const payload = {
         step: 4,
 
@@ -1253,6 +1256,8 @@ const MediaUploadForm = () => {
         pr_doc: documentIds,
 
         status: "requested",
+
+        requested_at: requestedAt,
       };
 
       console.log("Final Media Payload:", payload);
@@ -1265,7 +1270,7 @@ const MediaUploadForm = () => {
 
       console.log("Final Media Response:", response);
 
-      navigate("/", {
+      navigate("/properties/my-properties", {
         state: {
           showSuccessMessage: true,
           message: "Property added successfully",

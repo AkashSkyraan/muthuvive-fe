@@ -98,7 +98,6 @@ export const LoginModalProvider = ({ children }) => {
             </div>
 
             {/* Footer text */}
-           
           </div>
         </div>
       </Modal>

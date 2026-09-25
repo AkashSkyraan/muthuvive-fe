@@ -7,9 +7,12 @@ import { useEnquiry } from "../../../context/EnquiryContext";
 import StatusMessage, {
   showStatusMessage,
 } from "../../../components/common/MessagePopup";
+import { useLoginModal } from "../../../context/LoginModalContext";
+import { useAuth } from "../../../context/UserContext";
 
 const EnquiryForm = ({ propertyId = 0, onSubmit }) => {
-  console.log(propertyId);
+  const { user } = useAuth();
+  const { openLoginModal } = useLoginModal();
   const [form] = Form.useForm();
 
   const { formData, setFormData, resetFormData } = useEnquiry();
@@ -35,6 +38,10 @@ const EnquiryForm = ({ propertyId = 0, onSubmit }) => {
     Boolean(isFormFilled) && areTermsAccepted && !submitting;
 
   const handleFinish = async (values) => {
+    if (!user) {
+      openLoginModal();
+      return;
+    }
     const updatedFormData = {
       ...formData,
       name: values.fullName,

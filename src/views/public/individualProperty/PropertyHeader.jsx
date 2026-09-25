@@ -6,11 +6,15 @@ import { useAboutUs } from "../../../context/AboutusContext.jsx";
 import { showStatusMessage } from "../../../components/common/MessagePopup.jsx";
 import { postBookmark } from "../../../api/getProperties.api.js";
 import { IndianRupee } from "lucide-react";
+import { useAuth } from "../../../context/UserContext.jsx";
+import { useLoginModal } from "../../../context/LoginModalContext.jsx";
 
 const PropertyHeader = ({ data = {} }) => {
   const { title, propertyId, location, bookmark, price, area, category } = data;
 
   const { aboutUs } = useAboutUs();
+  const { user } = useAuth();
+  const { openLoginModal } = useLoginModal();
 
   const [showPrice, setShowPrice] = useState(false);
 
@@ -24,7 +28,7 @@ const PropertyHeader = ({ data = {} }) => {
   // BOOKMARK STATE
   // ============================================================
 
-  const [isBookmarked, setIsBookmarked] = useState(Number(bookmark) === 1);
+  const [isBookmarked, setIsBookmarked] = useState(Number(bookmark) === 0);
 
   // Sync local bookmark state when API data arrives/changes
   useEffect(() => {
@@ -110,7 +114,10 @@ const PropertyHeader = ({ data = {} }) => {
 
   const handleBookmark = async () => {
     const next = !isBookmarked;
-
+    if (!user) {
+      openLoginModal();
+      return;
+    }
     try {
       const response = await postBookmark({
         user_id: 1,

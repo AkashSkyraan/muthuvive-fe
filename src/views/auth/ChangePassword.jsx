@@ -58,6 +58,11 @@ function ChangePassword() {
       return;
     }
 
+    if (password.length < 8) {
+      message.error("Password must be at least 8 characters");
+      return;
+    }
+
     if (!confirmPassword) {
       message.error("Please confirm your new password");
       return;
@@ -121,6 +126,7 @@ function ChangePassword() {
       <div className="flex h-[10px] w-full items-center justify-center">
         <img src={images.logo} alt="Logo" className="w-[180px]" />
       </div>
+
       <h4 className="mt-8 text-4xl font-bold tracking-tight text-gray-900">
         Change Password
       </h4>
@@ -151,7 +157,11 @@ function ChangePassword() {
               autoComplete="new-password"
               required
               onKeyDown={preventInvalidSpaces}
-              className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 pr-11 text-sm text-gray-900 outline-none transition placeholder:text-gray-400"
+              className={`h-10 w-full rounded-lg border bg-white px-3 pr-11 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 ${
+                password && password.length < 8
+                  ? "border-red-400"
+                  : "border-gray-200"
+              }`}
             />
 
             <Button
@@ -163,6 +173,12 @@ function ChangePassword() {
               <EyeIcon visible={showPassword} />
             </Button>
           </div>
+
+          {password && password.length < 8 && (
+            <p className="mt-2 text-xs text-red-500">
+              Password must be at least 8 characters
+            </p>
+          )}
         </div>
 
         {/* Confirm Password */}
