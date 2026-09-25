@@ -110,3 +110,12 @@ export const updateProfile = async (payload = {}) => {
     throw error;
   }
 };
+export const verifyPassword = async (payload = {}) => {
+  try {
+    const response = await axiosInstance.post("/auth/verify-password", payload);
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

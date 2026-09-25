@@ -51,21 +51,11 @@ const PropertyCard = ({
 
         {/* BOOKMARK */}
         <Tooltip
-          title={
-            isBookmarked
-              ? "Remove from favorites"
-              : "Add to favorites"
-          }
+          title={isBookmarked ? "Remove from favorites" : "Add to favorites"}
         >
           <Button
             type="text"
-            icon={
-              isBookmarked ? (
-                <HeartFilled />
-              ) : (
-                <HeartOutlined />
-              )
-            }
+            icon={isBookmarked ? <HeartFilled /> : <HeartOutlined />}
             onClick={(e) => {
               e.stopPropagation();
               onBookmark?.(property);
@@ -116,7 +106,6 @@ const PropertyCard = ({
 
       {/* CONTENT */}
       <div className="px-4 pb-4 pt-4">
-
         {/* TITLE */}
         <Text
           strong
@@ -134,11 +123,7 @@ const PropertyCard = ({
         {/* PRICE */}
         <div className="mt-3 text-[17px] font-semibold text-primary">
           ₹ {price}
-
-          <span className="text-[15px] font-medium">
-            {" "}
-            / {priceUnit}
-          </span>
+          <span className="text-[15px] font-medium"> / {priceUnit}</span>
         </div>
 
         {/* LOCATION */}
@@ -165,15 +150,11 @@ const PropertyCard = ({
 
         {/* DETAILS */}
         <div className="mt-3 flex items-center justify-between gap-2">
-
           {/* AREA */}
           <div className="flex min-w-0 items-center gap-1.5">
             <BorderOutlined className="shrink-0 !text-[#17213D]" />
 
-            <Text
-              type="secondary"
-              className="truncate !text-[12px]"
-            >
+            <Text type="secondary" className="truncate !text-[12px]">
               {area}
             </Text>
           </div>
@@ -182,10 +163,7 @@ const PropertyCard = ({
           <div className="flex min-w-0 items-center gap-1.5">
             <BankOutlined className="shrink-0 !text-[#17213D]" />
 
-            <Text
-              type="secondary"
-              className="truncate !text-[12px]"
-            >
+            <Text type="secondary" className="truncate !text-[12px]">
               {hospitals} Hospitals
             </Text>
           </div>
@@ -194,14 +172,10 @@ const PropertyCard = ({
           <div className="flex min-w-0 items-center gap-1.5">
             <HomeOutlined className="shrink-0 !text-[#17213D]" />
 
-            <Text
-              type="secondary"
-              className="truncate !text-[12px]"
-            >
+            <Text type="secondary" className="truncate !text-[12px]">
               {schools} Schools
             </Text>
           </div>
-
         </div>
       </div>
     </Card>

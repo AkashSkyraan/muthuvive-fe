@@ -112,6 +112,19 @@ function VerifyOTP() {
   };
 
   const handleBack = () => {
+    // from profile
+    if (from === "profile") {
+      navigate("/change", {
+        state: {
+          editing: true,
+          type,
+          identifier,
+        },
+      });
+
+      return;
+    }
+
     if (from === "signup" || purpose === 1) {
       if (type === "email") {
         resetEmailVerification();
@@ -227,6 +240,31 @@ function VerifyOTP() {
       if (response?.success === 1) {
         message.success("OTP verified successfully");
 
+        // new number or email change
+        if (from === "profile") {
+          if (type === "mobile") {
+            navigate("/profile", {
+              replace: true,
+              state: {
+                type: type,
+                mobileVerified: true,
+                verifiedMobile: identifier,
+              },
+            });
+            return;
+          }
+          navigate("/profile", {
+            replace: true,
+            state: {
+              type: type,
+              emailVerified: true,
+              verifiedEmail: identifier,
+            },
+          });
+
+          return;
+        }
+
         // Signup OTP
         if (purpose === 1) {
           if (type === "email") {
@@ -281,7 +319,6 @@ function VerifyOTP() {
           return;
         }
 
-       
         navigate("/forgot-password", {
           replace: true,
           state: {

@@ -28,14 +28,16 @@ const StatusMessage = ({ placement = "top-right" }) => {
       setMessage(null);
     };
 
-    window.addEventListener("click", closePopup);
-    // window.addEventListener("keydown", closePopup);
-    window.addEventListener("scroll", closePopup);
-    window.addEventListener("touchstart", closePopup);
+    const timer = setTimeout(() => {
+      window.addEventListener("click", closePopup);
+      window.addEventListener("scroll", closePopup);
+      window.addEventListener("touchstart", closePopup);
+    }, 0);
 
     return () => {
+      clearTimeout(timer);
+
       window.removeEventListener("click", closePopup);
-      // window.removeEventListener("keydown", closePopup);
       window.removeEventListener("scroll", closePopup);
       window.removeEventListener("touchstart", closePopup);
     };

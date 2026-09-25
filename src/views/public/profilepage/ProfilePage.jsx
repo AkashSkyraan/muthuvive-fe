@@ -1,36 +1,154 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Input } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { showStatusMessage } from "../../../components/common/MessagePopup.jsx";
-
-// Replace this with your actual profile API function
 import { updateProfile } from "../../../api/auth.api.js";
 import { useAuth } from "../../../context/UserContext.jsx";
-
-// Mock async "update" - swap this out for your real API call.
-// Resolves or rejects so both success and failure paths through
-// showStatusMessage can be demonstrated/tested.
-const mockUpdateField = () =>
-  new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const succeeded = Math.random() > 0.15;
-      succeeded ? resolve() : reject();
-    }, 600);
-  });
+import { useNavigate, useLocation } from "react-router-dom";
 
 const ProfilePage = () => {
   const { user, setUser } = useAuth();
+  const navigate = useNavigate();
+
+  const location = useLocation();
+
+  const { type, emailVerified, mobileVerified, verifiedEmail, verifiedMobile } =
+    location.state || {};
+
   console.log("user details", user);
-  const [savedFullName, setSavedFullName] = useState("Muthvive's Properties");
+  console.log("Profile Route State:", location.state);
+
+  const [savedFullName, setSavedFullName] = useState(user?.user_name);
 
   const [fullName, setFullName] = useState(savedFullName);
   const [isEditingName, setIsEditingName] = useState(false);
 
-  const [mobileNumber, setMobileNumber] = useState("9234675890");
+  const [mobileNumber, setMobileNumber] = useState(user?.mobile);
   const [isChangingMobile, setIsChangingMobile] = useState(false);
 
-  const [email, setEmail] = useState("muthuvivesmroducts@gmail.com");
+  const [email, setEmail] = useState(user?.email);
   const [isChangingEmail, setIsChangingEmail] = useState(false);
+
+  useEffect(() => {
+    const updateVerifiedContact = async () => {
+      const isMobileUpdate =
+        type === "mobile" && mobileVerified === true && verifiedMobile;
+
+      const isEmailUpdate =
+        type === "email" && emailVerified === true && verifiedEmail;
+
+      if (!isMobileUpdate && !isEmailUpdate) {
+        return;
+      }
+
+      try {
+        if (isMobileUpdate) {
+          setIsChangingMobile(true);
+
+          const payload = {
+            // user_id: user?.id,
+            mobile: verifiedMobile,
+            user_id: 15,
+          };
+
+          console.log("Update Mobile Payload:", payload);
+
+          const response = await updateProfile(payload);
+
+          console.log("Update Mobile Response:", response);
+
+          if (response?.success !== 1) {
+            showStatusMessage({
+              type: "error",
+              text: "Mobile Number Change Failed",
+            });
+
+            return;
+          }
+
+          setMobileNumber(verifiedMobile);
+
+          setUser((prevUser) => ({
+            ...prevUser,
+            mobile: verifiedMobile,
+          }));
+
+          showStatusMessage({
+            type: "success",
+            text: "Mobile Number Changed Successfully",
+          });
+        }
+
+        if (isEmailUpdate) {
+          setIsChangingEmail(true);
+
+          const payload = {
+            // user_id: user?.id,
+            email: verifiedEmail,
+            user_id: 15,
+          };
+
+          console.log("Update Email Payload:", payload);
+
+          const response = await updateProfile(payload);
+
+          console.log("Update Email Response:", response);
+
+          if (response?.success !== 1) {
+            showStatusMessage({
+              type: "error",
+              text: "Email Change Failed",
+            });
+
+            return;
+          }
+
+          setEmail(verifiedEmail);
+
+          setUser((prevUser) => ({
+            ...prevUser,
+            email: verifiedEmail,
+          }));
+
+          showStatusMessage({
+            type: "success",
+            text: "Email Changed Successfully",
+          });
+        }
+      } catch (error) {
+        console.error("Contact update failed:", error);
+
+        showStatusMessage({
+          type: "error",
+          text:
+            type === "mobile"
+              ? "Mobile Number Change Failed"
+              : "Email Change Failed",
+        });
+      } finally {
+        setIsChangingMobile(false);
+        setIsChangingEmail(false);
+
+        // Clear the verification state so the API is not called
+        // again if the Profile page is rendered again.
+        navigate(location.pathname, {
+          replace: true,
+          state: null,
+        });
+      }
+    };
+
+    updateVerifiedContact();
+  }, [
+    type,
+    emailVerified,
+    mobileVerified,
+    verifiedEmail,
+    verifiedMobile,
+    navigate,
+    location.pathname,
+    setUser,
+  ]);
 
   const handleEditName = () => {
     setIsEditingName(true);
@@ -44,11 +162,10 @@ const ProfilePage = () => {
   const handleSaveName = async () => {
     try {
       const payload = {
-        user_id: 13,
+        // user_id: user?.id,
         name: fullName,
+        user_id: 15,
       };
-
-      console.log("Update Profile Payload:", payload);
 
       const response = await updateProfile(payload);
       setUser(fullName);
@@ -82,41 +199,19 @@ const ProfilePage = () => {
   };
 
   const handleChangeMobile = () => {
-    setIsChangingMobile(true);
-
-    mockUpdateField()
-      .then(() => {
-        showStatusMessage({
-          type: "success",
-          text: "Mobile Number Changed Successfully",
-        });
-      })
-      .catch(() => {
-        showStatusMessage({
-          type: "error",
-          text: "Mobile Number Change Failed",
-        });
-      })
-      .finally(() => setIsChangingMobile(false));
+    navigate("/verify-password", {
+      state: {
+        field: "mobile",
+      },
+    });
   };
 
   const handleChangeEmail = () => {
-    setIsChangingEmail(true);
-
-    mockUpdateField()
-      .then(() => {
-        showStatusMessage({
-          type: "success",
-          text: "Email Changed Successfully",
-        });
-      })
-      .catch(() => {
-        showStatusMessage({
-          type: "error",
-          text: "Email Change Failed",
-        });
-      })
-      .finally(() => setIsChangingEmail(false));
+    navigate("/verify-password", {
+      state: {
+        field: "email",
+      },
+    });
   };
 
   return (

@@ -767,10 +767,20 @@ const CommercialPropertyDetailsForm = () => {
             >
               <Input
                 placeholder="20"
+                maxLength={5}
+                inputMode="numeric"
                 className="!rounded-xl !bg-gray-100 !border-gray-200 !px-5 !py-3 !text-sm !text-gray-900"
-                onChange={(e) =>
-                  handleFieldChange("total_floor", e.target.value)
-                }
+                onChange={(e) => {
+                  const value = e.target.value;
+
+                  // Allow only digits and a maximum of 5 digits
+                  const digitsOnly = value.replace(/\D/g, "").slice(0, 6);
+
+                  handleFieldChange("total_floor", digitsOnly);
+
+                  // Keep AntD Form value in sync with the restricted value
+                  form.setFieldValue("total_floor", digitsOnly);
+                }}
                 autoComplete="off"
               />
             </Form.Item>
