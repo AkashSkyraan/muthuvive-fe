@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Button, Drawer } from "antd";
 import { FilterOutlined } from "@ant-design/icons";
@@ -6,155 +6,351 @@ import { FilterOutlined } from "@ant-design/icons";
 import SearchBar from "./SearhPage.jsx";
 import ProjectCard from "../../../components/cards/ProjectCard";
 import Pagination from "../../../components/common/pagination/Pagination";
-import images from "../../../config/Images";
 import SearchFilters from "./SearchFilter.jsx";
+
 import { getAmenities, getPropertyTypes } from "../../../api/search.api.js";
+
 import axiosInstance from "../../../api/axios";
-import { useSearch } from "../../../context/SearchContext.jsx";
+
+const DEFAULT_FILTERS = {
+  sortBy: [],
+  propertyType: [],
+  ownershipType: [],
+  amenities: [],
+  facingDirection: [],
+  priceMin: null,
+  priceMax: null,
+};
 
 const PropertySearchResults = () => {
-  // ============================================================
-  // Filter option definitions
-  // ============================================================
-  const sortByOptions = [
-    { label: "Available", value: "available" },
-    { label: "Sold", value: "sold" },
-  ];
+  const [searchParams] = useSearchParams();
 
-  const ownershipTypeOptions = [
-    { label: "Freehold", value: "freehold" },
-    { label: "Leasehold", value: "leasehold" },
-    { label: "Co-operative Society", value: "co-operative-society" },
-    { label: "Power of Attorney", value: "power-of-attorney" },
-  ];
+  const urlLocation = searchParams.get("location")?.trim() || "";
+  const urlPropertyType = searchParams.get("propertyType")?.trim() || "";
 
-  const facingDirectionOptions = [
-    { label: "North Facing", value: 1 },
-    { label: "North East Facing", value: 2 },
-    { label: "East Facing", value: 3 },
-    { label: "South East Facing", value: 4 },
-    { label: "South Facing", value: 5 },
-    { label: "South West Facing", value: 6 },
-    { label: "West Facing", value: 7 },
-    { label: "North West Facing", value: 8 },
-  ];
+  // ============================================================
+  // FILTER OPTIONS
+  // ============================================================
+  const sortByOptions = useMemo(
+    () => [
+      { label: "Available", value: "available" },
+      { label: "Sold", value: "sold" },
+    ],
+    [],
+  );
+
+  const ownershipTypeOptions = useMemo(
+    () => [
+      { label: "Freehold", value: "freehold" },
+      { label: "Leasehold", value: "leasehold" },
+      {
+        label: "Co-operative Society",
+        value: "co-operative-society",
+      },
+      {
+        label: "Power of Attorney",
+        value: "power-of-attorney",
+      },
+    ],
+    [],
+  );
+
+  const facingDirectionOptions = useMemo(
+    () => [
+      { label: "North Facing", value: 1 },
+      { label: "North East Facing", value: 2 },
+      { label: "East Facing", value: 3 },
+      { label: "South East Facing", value: 4 },
+      { label: "South Facing", value: 5 },
+      { label: "South West Facing", value: 6 },
+      { label: "West Facing", value: 7 },
+      { label: "North West Facing", value: 8 },
+    ],
+    [],
+  );
 
   const [propertyTypeOptions, setPropertyTypeOptions] = useState([]);
   const [amenitiesOptions, setAmenitiesOptions] = useState([]);
 
   // ============================================================
-  // URL params — source of truth for API fetch
+  // FILTER STATE
   // ============================================================
-  const [searchParams] = useSearchParams();
-
-  const urlLocation = searchParams.get("location") || "";
-  const urlPropertyType = searchParams.get("propertyType") || "";
+  const [filters, setFilters] = useState(DEFAULT_FILTERS);
 
   // ============================================================
-  // Local sidebar filters
+  // RESULT STATE
   // ============================================================
-  const [filters, setFilters] = useState({
-    sortBy: [],
-    propertyType: [],
-    ownershipType: [],
-    amenities: [],
-    facingDirection: [],
-    priceMin: null,
-    priceMax: null,
-  });
-
   const [properties, setProperties] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [totalResults, setTotalResults] = useState(0);
 
+  const [loading, setLoading] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const handleChipFilterChange = (filterKey, values) => {
-    setFilters((prev) => ({ ...prev, [filterKey]: values }));
-  };
-
-  const handlePriceChange = (priceMin, priceMax) => {
-    setFilters((prev) => ({ ...prev, priceMin, priceMax }));
-  };
-
-  const handleClearAllFilters = () => {
-    setFilters({
-      sortBy: [],
-      propertyType: [],
-      ownershipType: [],
-      amenities: [],
-      facingDirection: [],
-      priceMin: null,
-      priceMax: null,
-    });
-  };
+  // ============================================================
+  // PAGINATION
+  // ============================================================
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(5);
 
   // ============================================================
-  // FETCH PROPERTIES — URL params + filters change aanaa re-run
+  // RESET PAGE WHEN SEARCH/FILTER CHANGES
   // ============================================================
   useEffect(() => {
+    setPage(1);
+  }, [
+    urlLocation,
+    urlPropertyType,
+    filters.sortBy,
+    filters.propertyType,
+    filters.ownershipType,
+    filters.amenities,
+    filters.facingDirection,
+    filters.priceMin,
+    filters.priceMax,
+  ]);
+
+  // ============================================================
+  // SYNC PROPERTY TYPE FROM URL
+  // ============================================================
+  useEffect(() => {
+    if (!urlPropertyType) {
+      setFilters((prev) => ({
+        ...prev,
+        propertyType: [],
+      }));
+
+      return;
+    }
+
+    setFilters((prev) => {
+      if (
+        prev.propertyType.length === 1 &&
+        String(prev.propertyType[0]) === String(urlPropertyType)
+      ) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        propertyType: [urlPropertyType],
+      };
+    });
+  }, [urlPropertyType]);
+
+  // ============================================================
+  // FILTER CHANGE
+  // ============================================================
+  const handleChipFilterChange = (filterKey, values) => {
+    setFilters((prev) => ({
+      ...prev,
+      [filterKey]: Array.isArray(values) ? values : [],
+    }));
+  };
+
+  // ============================================================
+  // PRICE CHANGE
+  // ============================================================
+  const handlePriceChange = (priceMin, priceMax) => {
+    setFilters((prev) => ({
+      ...prev,
+      priceMin: priceMin === "" || priceMin === undefined ? null : priceMin,
+      priceMax: priceMax === "" || priceMax === undefined ? null : priceMax,
+    }));
+  };
+
+  // ============================================================
+  // CLEAR FILTERS
+  // ============================================================
+  const handleClearAllFilters = () => {
+    setFilters({
+      ...DEFAULT_FILTERS,
+      propertyType: urlPropertyType ? [urlPropertyType] : [],
+    });
+
+    setPage(1);
+  };
+
+  // ============================================================
+  // CONVERT ARRAY TO API VALUE
+  // ============================================================
+  const arrayToParam = (value) => {
+    if (!Array.isArray(value) || value.length === 0) {
+      return undefined;
+    }
+
+    return value.join(",");
+  };
+
+  // ============================================================
+  // FETCH PROPERTIES
+  // ============================================================
+  useEffect(() => {
+    let cancelled = false;
+
     const fetchProperties = async () => {
       try {
         setLoading(true);
 
-        const response = await axiosInstance.get("/property/list", {
-          params: {
-            ...(urlLocation && { location: urlLocation }),
-            ...(urlPropertyType && { propertyType: urlPropertyType }),
-            ...filters,
-          },
+        const params = {
+          page,
+          limit,
+
+          ...(urlLocation && {
+            location: urlLocation,
+          }),
+
+          ...(filters.propertyType.length > 0 && {
+            type: arrayToParam(filters.propertyType),
+          }),
+
+          ...(filters.sortBy.length > 0 && {
+            status: arrayToParam(filters.sortBy),
+          }),
+
+          ...(filters.ownershipType.length > 0 && {
+            ownershipType: arrayToParam(filters.ownershipType),
+          }),
+
+          ...(filters.amenities.length > 0 && {
+            amenities: arrayToParam(filters.amenities),
+          }),
+
+          ...(filters.facingDirection.length > 0 && {
+            facingDirection: arrayToParam(filters.facingDirection),
+          }),
+
+          ...(filters.priceMin !== null && {
+            priceMin: filters.priceMin,
+          }),
+
+          ...(filters.priceMax !== null && {
+            priceMax: filters.priceMax,
+          }),
+        };
+
+        console.log("API PARAMS:", params);
+
+        const response = await axiosInstance.get("/property/get-property", {
+          params,
         });
 
-        const data = response?.data?.data || [];
-        setProperties(data);
+        if (cancelled) return;
 
-        // Fallback mock (until API ready)
-        // setProperties([]);
-      } catch (err) {
-        console.error("Fetch properties error:", err);
+        const responseData = response?.data?.data;
+
+        console.log("API RESPONSE:", responseData);
+
+        const data = Array.isArray(responseData?.properties)
+          ? responseData.properties
+          : [];
+
+        const total = Number(responseData?.pagination?.total) || data.length;
+
+        setProperties(data);
+        setTotalResults(total);
+      } catch (error) {
+        if (cancelled) return;
+
+        console.error(
+          "Fetch properties error:",
+          error?.response?.data || error,
+        );
+
         setProperties([]);
+        setTotalResults(0);
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
 
-    // fetchProperties();
-  }, [urlLocation, urlPropertyType, filters]);
+    fetchProperties();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    page,
+    limit,
+    urlLocation,
+    filters.propertyType,
+    filters.sortBy,
+    filters.ownershipType,
+    filters.amenities,
+    filters.facingDirection,
+    filters.priceMin,
+    filters.priceMax,
+  ]);
 
   // ============================================================
-  // Fetch filter options
+  // FETCH FILTER OPTIONS
   // ============================================================
   useEffect(() => {
-    (async () => {
+    let mounted = true;
+
+    const fetchFilterOptions = async () => {
       try {
         const [amenities, types] = await Promise.all([
           getAmenities(),
           getPropertyTypes(),
         ]);
-        setAmenitiesOptions(amenities || []);
-        console.log(types , "type")
-        setPropertyTypeOptions(types || []);
-      } catch (err) {
-        console.error("Filter options fetch error:", err);
+
+        if (!mounted) return;
+
+        setAmenitiesOptions(Array.isArray(amenities) ? amenities : []);
+
+        setPropertyTypeOptions(Array.isArray(types) ? types : []);
+      } catch (error) {
+        console.error("Filter options fetch error:", error);
+
+        if (!mounted) return;
+
+        setAmenitiesOptions([]);
+        setPropertyTypeOptions([]);
       }
-    })();
+    };
+
+    fetchFilterOptions();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   // ============================================================
-  // Breadcrumb
+  // PAGE CHANGE
   // ============================================================
-  const breadcrumbParts = [
-    propertyTypeOptions.find((o) => o.value === filters.propertyType[0])?.label,
-    facingDirectionOptions.find((o) => o.value === filters.facingDirection[0])
-      ?.label,
-  ].filter(Boolean);
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  // ============================================================
+  // LIMIT CHANGE
+  // ============================================================
+  const handleLimitChange = (newLimit) => {
+    setLimit(Number(newLimit) || 5);
+    setPage(1);
+  };
+
+  // ============================================================
+  // RESULT COUNT
+  // ============================================================
+  const resultCount = totalResults || properties.length;
+  console.log(totalResults, "pp");
 
   return (
     <div className="w-full">
       <div className="w-[95%] mx-auto my-5 text-start">
-        {/* SEARCH BAR — no props, reads from context */}
+     
         <SearchBar />
 
-        {/* MOBILE FILTER BUTTON */}
+        
         <div className="flex lg:hidden justify-start mt-4">
           <Button
             type="default"
@@ -166,22 +362,27 @@ const PropertySearchResults = () => {
           </Button>
         </div>
 
+        {/* =====================================================
+            MAIN CONTENT
+        ====================================================== */}
         <div className="flex flex-col lg:flex-row gap-6 my-6">
-          {/* LEFT — Desktop Filters (STICKY) */}
+          {/* ===================================================
+              DESKTOP FILTER
+          ==================================================== */}
           <aside
             className="
-      hidden
-      lg:block
-      w-full
-      lg:w-[30%]
-      shrink-0
-      lg:sticky
-      lg:top-[80px]
-      lg:self-start
-      lg:max-h-[calc(100vh-100px)]
-      lg:overflow-y-auto
-      pr-1
-    "
+              hidden
+              lg:block
+              w-full
+              lg:w-[30%]
+              shrink-0
+              lg:sticky
+              lg:top-[80px]
+              lg:self-start
+              lg:max-h-[calc(100vh-100px)]
+              lg:overflow-y-auto
+              pr-1
+            "
           >
             <SearchFilters
               sortByOptions={sortByOptions}
@@ -196,50 +397,94 @@ const PropertySearchResults = () => {
             />
           </aside>
 
-          {/* RIGHT — Results */}
+          {/* ===================================================
+              RESULTS
+          ==================================================== */}
           <div className="w-full lg:w-[65%] mx-auto">
-            <p className="text-sm text-gray-700 mb-4">
-              <span className="font-semibold text-gray-900">
-                {properties.length} Results
-              </span>
-              {/* 
-              {breadcrumbParts.length > 0 && (
-                <span className="text-black font-semibold">
-                  {" "}
-                  / {breadcrumbParts.join(" / ")}
-                </span>
-              )} */}
-            </p>
+            {/* RESULT COUNT */}
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-sm text-gray-700">
+                <span className="font-semibold text-gray-900">
+                  {resultCount}
+                </span>{" "}
+                {resultCount === 1 ? "Result" : "Results"}
+              </p>
+            </div>
 
+            {/* LOADING */}
             {loading ? (
-              <div className="flex justify-center py-10">Loading...</div>
+              <div className="flex justify-center py-16">
+                <div className="flex flex-col items-center gap-3">
+                  <div
+                    className="
+                      h-8
+                      w-8
+                      animate-spin
+                      rounded-full
+                      border-4
+                      border-gray-200
+                      border-t-blue-600
+                    "
+                  />
+
+                  <p className="text-sm text-gray-500">Loading properties...</p>
+                </div>
+              </div>
             ) : properties.length === 0 ? (
-              <div className="flex justify-center py-10 text-gray-500">
-                No properties found
+              /* NO RESULTS */
+              <div className="flex flex-col items-center justify-center py-16">
+                <p className="text-base font-medium text-gray-700">
+                  No properties found
+                </p>
+
+                <p className="mt-1 text-sm text-gray-500">
+                  Try changing your search or filters.
+                </p>
               </div>
             ) : (
+              /* PROPERTY GRID */
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {properties.map((property) => (
-                  <ProjectCard key={property.id} listing={property} />
+                {properties.map((property, index) => (
+                  <ProjectCard
+                    key={property.id ?? property.prop_id ?? index}
+                    listing={property}
+                  />
                 ))}
               </div>
             )}
 
-            <div className="mt-6">
-              <Pagination />
-            </div>
+            {/* =================================================
+                PAGINATION
+            ================================================== */}
+            {totalResults > 0 && (
+              <div className="mt-8 flex justify-center">
+                <Pagination
+                  current={page}
+                  pageSize={limit}
+                  total={totalResults}
+                  onChange={handlePageChange}
+                  onShowSizeChange={(_, size) => handleLimitChange(size)}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* MOBILE FILTER DRAWER */}
+      {/* =====================================================
+          MOBILE FILTER DRAWER
+      ====================================================== */}
       <Drawer
-        title={<span className="text-base">Filters</span>}
+        title={<span className="text-base font-semibold">Filters</span>}
         placement="left"
         size="90%"
         open={isFilterOpen}
         onClose={() => setIsFilterOpen(false)}
-        styles={{ body: { padding: 16 } }}
+        styles={{
+          body: {
+            padding: 16,
+          },
+        }}
       >
         <SearchFilters
           sortByOptions={sortByOptions}
@@ -256,7 +501,12 @@ const PropertySearchResults = () => {
         <Button
           type="primary"
           block
-          className="!mt-5 !h-10 !rounded-md !text-base"
+          className="
+            !mt-5
+            !h-10
+            !rounded-md
+            !text-base
+          "
           onClick={() => setIsFilterOpen(false)}
         >
           Apply Filters

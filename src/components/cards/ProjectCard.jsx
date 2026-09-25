@@ -7,6 +7,8 @@ import { useLoginModal } from "../../context/LoginModalContext.jsx";
 // { id, image, category, title, price, address, area, hospitals, schools }.
 const ProjectCard = ({ listing, user }) => {
 
+
+  console.log( "list")
   const { openLoginModal } = useLoginModal();
 
  

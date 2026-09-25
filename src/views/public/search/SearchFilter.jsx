@@ -32,11 +32,14 @@ const FilterSection = ({ title, isOpen, onToggle, children }) => (
 // Multi-select 2-column grid of toggle buttons, shared by every
 // checkbox-style section (Sort By, Types Of Property, Ownership Type,
 // Amenities, Facing Direction).
-const ToggleGrid = ({ options, selectedValues, onToggle }) => (
+
+const ToggleGrid = ({ options, selectedValues = [], onToggle }) => (
   <div className="grid grid-cols-2 gap-2">
     {options.map((option) => {
-      console.log(option)
-      const isActive = selectedValues.includes(option.value);
+      const isActive = selectedValues.some(
+        (value) => Number(value) === Number(option.value),
+      );
+
       return (
         <button
           key={option.value}
@@ -67,8 +70,6 @@ const PropertyFilters = ({
   onClearAll,
 }) => {
   const { propertyType: contextPropertyType, setPropertyType } = useSearch();
-
-
 
   useEffect(() => {
     if (contextPropertyType) {
@@ -163,38 +164,87 @@ const PropertyFilters = ({
   return (
     <div className="bg-white border border-gray-100 rounded-xl p-4">
       {/* Filter By - active chips + Clear All */}
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-gray-900">Filter By</h3>
-        {activeChips.length > 0 && (
-          <button
-            type="button"
-            onClick={onClearAll}
-            className="text-sm font-medium text-[#d41010]"
-          >
-            Clear All
-          </button>
-        )}
-      </div>
 
-      {activeChips.length > 0 && (
-        <div className="flex flex-wrap gap-2 mt-3">
-          {activeChips.map((chip) => (
-            <span
-              key={`${chip.key}-${chip.value}`}
-              className="inline-flex items-center gap-x-1.5 bg-white border border-gray-500 text-sm text-gray-700 pl-3 pr-2 py-2 rounded-md"
-            >
-              {chip.label}
+      <div>
+        {/* Header */}
+
+        <div>
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-gray-900">Filter By</h3>
+
+            {activeChips.length > 0 && (
               <button
                 type="button"
-                onClick={() => handleRemoveChip(chip.key, chip.value)}
-                className="text-gray-400 hover:text-gray-600"
+                onClick={onClearAll}
+                className="text-sm font-medium text-[#d41010] hover:underline"
               >
-                <CloseOutlined className="text-[12px]" />
+                Clear All
               </button>
-            </span>
-          ))}
+            )}
+          </div>
+
+          {activeChips.length > 0 && (
+            <div
+              className="
+        mt-3
+        max-h-[120px]
+        overflow-auto
+        pr-1
+        scrollbar-thin
+        scrollbar-thumb-gray-300
+        scrollbar-track-transparent
+      "
+            >
+              <div className="flex flex-wrap gap-2 w-max min-w-full">
+                {activeChips.map((chip) => (
+                  <span
+                    key={`${chip.key}-${chip.value}`}
+                    className="
+              inline-flex
+              items-center
+              gap-2
+              w-fit
+              whitespace-nowrap
+              shrink-0
+              bg-[#165BEF]
+              text-white
+              text-sm
+              font-medium
+              pl-3
+              pr-2
+              py-2
+              rounded-md
+              shadow-sm
+              hover:bg-[#0f4fd6]
+              transition-colors
+            "
+                  >
+                    <span>{chip.label}</span>
+
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveChip(chip.key, chip.value)}
+                      className="
+                flex
+                items-center
+                justify-center
+                w-5
+                h-5
+                rounded-full
+                text-white
+                hover:bg-white/20
+                transition-colors
+              "
+                    >
+                      <CloseOutlined className="text-[11px] text-white" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-      )}
+      </div>
 
       <div className="mt-4 flex flex-col gap-4">
         <FilterSection
@@ -281,7 +331,6 @@ const PropertyFilters = ({
             selectedValues={filters.propertyType}
             onToggle={(value) => {
               onChipChange("propertyType", [value]);
-              setPropertyType(value);
             }}
           />
         </FilterSection>
