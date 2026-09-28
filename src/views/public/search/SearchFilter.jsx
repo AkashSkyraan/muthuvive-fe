@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Select } from "antd";
 import { CloseOutlined, DownOutlined, UpOutlined } from "@ant-design/icons";
 import { useSearch } from "../../../context/SearchContext";
+import { getPriceRange } from "../../../api/search.api";
 
 // Local only - not covered by index.jsx state since price uses plain
 // min/max values, not an options array like the other sections.
@@ -29,15 +30,36 @@ const FilterSection = ({ title, isOpen, onToggle, children }) => (
   </div>
 );
 
-// Multi-select 2-column grid of toggle buttons, shared by every
-// checkbox-style section (Sort By, Types Of Property, Ownership Type,
-// Amenities, Facing Direction).
+// const ToggleGrid = ({ options, selectedValues = [], onToggle }) => (
+//   <div className="grid grid-cols-2 gap-2">
+//     {options.map((option) => {
+//       const isActive = selectedValues.some(
+//         (value) => Number(value) === Number(option.value),
+//       );
+
+//       return (
+//         <button
+//           key={option.value}
+//           type="button"
+//           onClick={() => onToggle(option.value)}
+//           className={`px-3 py-2 rounded-lg border text-sm text-center transition-colors cursor-pointer ${
+//             isActive
+//               ? "bg-blue-50 border-secondary text-secondary"
+//               : "bg-white border-[#3e3e3e] text-gray-600"
+//           }`}
+//         >
+//           {option.label}
+//         </button>
+//       );
+//     })}
+//   </div>
+// );
 
 const ToggleGrid = ({ options, selectedValues = [], onToggle }) => (
   <div className="grid grid-cols-2 gap-2">
     {options.map((option) => {
       const isActive = selectedValues.some(
-        (value) => Number(value) === Number(option.value),
+        (value) => String(value) === String(option.value),
       );
 
       return (
@@ -57,7 +79,6 @@ const ToggleGrid = ({ options, selectedValues = [], onToggle }) => (
     })}
   </div>
 );
-
 const PropertyFilters = ({
   sortByOptions,
   propertyTypeOptions,
@@ -68,17 +89,10 @@ const PropertyFilters = ({
   onChipChange,
   onPriceChange,
   onClearAll,
+  onPropertyTypeChange,
 }) => {
-  const { propertyType: contextPropertyType, setPropertyType } = useSearch();
-
-  useEffect(() => {
-    if (contextPropertyType) {
-      onChipChange("propertyType", [contextPropertyType]);
-    } else {
-      onChipChange("propertyType", []);
-    }
-  }, [contextPropertyType]);
-
+  const { propertyType, setPropertyType, clearPropertyType } = useSearch();
+  const priceEnabled = Number(propertyType) === 1 || Number(propertyType) === 2;
   const [openSections, setOpenSections] = useState({
     sortBy: true,
     price: true,
@@ -89,6 +103,19 @@ const PropertyFilters = ({
   });
 
   const [priceRange, setPriceRange] = useState(null);
+
+  const [priceInput, setPriceInput] = useState({
+    min: "",
+    max: "",
+  });
+
+  useEffect(() => {
+    setPriceInput({
+      min: filters.min_price ?? "",
+      max: filters.max_price ?? "",
+    });
+  }, [filters.min_price, filters.max_price]);
+
   const [priceRangeLoading, setPriceRangeLoading] = useState(false);
 
   const toggleSection = (key) =>
@@ -96,11 +123,7 @@ const PropertyFilters = ({
 
   const groups = [
     { key: "sortBy", title: "Sort By", options: sortByOptions },
-    {
-      key: "propertyType",
-      title: "Types Of Property",
-      options: propertyTypeOptions,
-    },
+
     {
       key: "ownershipType",
       title: "Ownership Type",
@@ -114,30 +137,68 @@ const PropertyFilters = ({
     },
   ];
 
-  const activeChips = groups.flatMap(({ key, options }) =>
-    filters[key].map((value) => ({
-      key,
-      value,
-      label: options.find((option) => option.value === value)?.label ?? value,
-    })),
-  );
+  const activeChips = [
+    ...groups.flatMap(({ key, options }) =>
+      (filters[key] || []).map((value) => ({
+        key,
+        value,
+        label:
+          options.find((option) => Number(option.value) === Number(value))
+            ?.label ?? value,
+      })),
+    ),
+
+    ...(propertyType
+      ? [
+          {
+            key: "propertyType",
+            value: propertyType,
+            label:
+              propertyTypeOptions.find(
+                (option) => Number(option.value) === Number(propertyType),
+              )?.label ?? propertyType,
+          },
+        ]
+      : []),
+  ];
 
   const handleRemoveChip = (key, value) => {
+    if (key === "propertyType") {
+      clearPropertyType();
+      return;
+    }
+
     onChipChange(
       key,
-      filters[key].filter((v) => v !== value),
+      (filters[key] || []).filter((v) => v !== value),
     );
   };
 
   useEffect(() => {
     const fetchRange = async () => {
+      if (!propertyType) {
+        setPriceRange(null);
+        return;
+      }
+
       setPriceRangeLoading(true);
-      const data = await getPriceRange();
-      setPriceRange(data);
-      setPriceRangeLoading(false);
+
+      try {
+        console.log(propertyType, "ptype");
+
+        const data = await getPriceRange(propertyType);
+
+        setPriceRange(data);
+      } catch (error) {
+        console.error("Price range fetch error:", error);
+        setPriceRange(null);
+      } finally {
+        setPriceRangeLoading(false);
+      }
     };
+
     fetchRange();
-  }, []);
+  }, [propertyType]);
 
   // Format ₹ Indian style
   const formatINR = (value) => {
@@ -149,18 +210,6 @@ const PropertyFilters = ({
     }).format(value);
   };
 
-  // Text input -> number
-  const handleMinChange = (e) => {
-    const raw = e.target.value.replace(/[^0-9]/g, "");
-    const num = raw ? Number(raw) : null;
-    onPriceChange(num, filters.priceMax);
-  };
-
-  const handleMaxChange = (e) => {
-    const raw = e.target.value.replace(/[^0-9]/g, "");
-    const num = raw ? Number(raw) : null;
-    onPriceChange(filters.priceMin, num);
-  };
   return (
     <div className="bg-white border border-gray-100 rounded-xl p-4">
       {/* Filter By - active chips + Clear All */}
@@ -268,57 +317,105 @@ const PropertyFilters = ({
         >
           <div className="grid grid-cols-2 gap-2">
             <input
+              type="text"
               placeholder="Min"
-              value={filters.priceMin ?? ""}
-              onChange={handleMinChange}
+              value={priceInput.min}
+              onChange={(e) => {
+                const value = e.target.value.replace(/[^0-9]/g, "");
+
+                setPriceInput((prev) => ({
+                  ...prev,
+                  min: value,
+                }));
+              }}
               inputMode="numeric"
-              prefix="₹"
               className="
-              !h-10
-              !rounded-lg
-              !border-gray-300
-              hover:!border-blue-500
-              focus:!border-blue-500
-            "
-            ></input>
+        h-10
+        w-full
+        rounded-lg
+        border
+        border-gray-300
+        px-3
+        outline-none
+        focus:border-blue-500
+      "
+            />
 
             <input
+              type="text"
               placeholder="Max"
-              value={filters.priceMax ?? ""}
-              onChange={handleMaxChange}
+              value={priceInput.max}
+              onChange={(e) => {
+                const value = e.target.value.replace(/[^0-9]/g, "");
+
+                setPriceInput((prev) => ({
+                  ...prev,
+                  max: value,
+                }));
+              }}
               inputMode="numeric"
-              prefix="₹"
               className="
-              !h-10
-              !rounded-lg
-              !border-gray-300
-              hover:!border-blue-500
-              focus:!border-blue-500
-            "
-            ></input>
+        h-10
+        w-full
+        rounded-lg
+        border
+        border-gray-300
+        px-3
+        outline-none
+        focus:border-blue-500
+      "
+            />
           </div>
 
-          {/* ============================================================
-            API RANGE DISPLAY
-        ============================================================ */}
-          <div className="mt-3 text-xs text-gray-500 leading-relaxed">
-            {priceRangeLoading ? (
-              <span>Loading price range...</span>
-            ) : priceRange ? (
-              <span>
-                Available range:{" "}
-                <span className="font-medium text-gray-700">
-                  {formatINR(priceRange.min)}
-                </span>{" "}
-                –{" "}
-                <span className="font-medium text-gray-700">
-                  {formatINR(priceRange.max)}
+          <button
+            type="button"
+            disabled={!priceEnabled}
+            onClick={() => {
+              const minPrice = priceInput.min ? Number(priceInput.min) : null;
+
+              const maxPrice = priceInput.max ? Number(priceInput.max) : null;
+
+              onPriceChange(minPrice, maxPrice);
+            }}
+            className="
+      mt-3
+      w-full
+      h-10
+      rounded-lg
+      bg-secondary
+      text-white
+      text-sm
+      font-medium
+      hover:opacity-90
+      transition
+       disabled:bg-gray-300
+        disabled:text-gray-500
+        disabled:cursor-not-allowed
+    "
+          >
+            Apply
+          </button>
+
+          {priceEnabled && (
+            <div className="mt-3 text-xs text-gray-500 leading-relaxed">
+              {priceRangeLoading ? (
+                <span>Loading price range...</span>
+              ) : priceRange ? (
+                <span>
+                  Available range:{" "}
+                  <span className="font-medium text-gray-700">
+                    {formatINR(priceRange.minPrice)}
+                  </span>{" "}
+                  –{" "}
+                  <span className="font-medium text-gray-700">
+                    {formatINR(priceRange.maxPrice)}
+                  </span>
                 </span>
-              </span>
-            ) : (
-              <span className="text-gray-400">Price range unavailable</span>
-            )}
-          </div>
+              ) : (
+                <span className="text-gray-400">Price range unavailable</span>
+              )}
+            </div>
+          )}
         </FilterSection>
 
         <FilterSection
@@ -328,9 +425,18 @@ const PropertyFilters = ({
         >
           <ToggleGrid
             options={propertyTypeOptions}
-            selectedValues={filters.propertyType}
+            selectedValues={propertyType ? [propertyType] : []}
             onToggle={(value) => {
-              onChipChange("propertyType", [value]);
+              const numericId = Number(value);
+
+              if (numericId === Number(propertyType)) {
+                clearPropertyType();
+                onPropertyTypeChange(null);
+                return;
+              }
+
+              setPropertyType(numericId);
+              onPropertyTypeChange(numericId);
             }}
           />
         </FilterSection>

@@ -32,11 +32,17 @@ export const getPropertyTypes = async () => {
   }
 };
 
-export const getPriceRange = async () => {
+export const getPriceRange = async (propertyType) => {
   try {
-    const response = await axiosInstance.get("/property/price-range");
+    const status = null;
+    const response = await axiosInstance.get("/property/price-range", {
+      params: {
+        type : propertyType,
+        status,
+      },
+    });
 
-    return response?.data?.data || response?.data || null;
+    return response?.data?.data[0] || response?.data || null;
   } catch (error) {
     console.error("Price range fetch error:", error);
     return null;

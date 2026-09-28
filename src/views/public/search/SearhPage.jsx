@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useSearch } from "../../../context/SearchContext";
 import Button from "../../../components/common/Button";
 import axiosInstance from "../../../api/axios";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function LocationIcon() {
   return (
@@ -72,6 +72,7 @@ function SearchIcon() {
 
 function SearchPage() {
   const navigate = useNavigate();
+  const routerLocation = useLocation();
 
   const {
     location,
@@ -85,6 +86,43 @@ function SearchPage() {
   // =========================
   // STATES
   // =========================
+
+  useEffect(() => {
+    const params = new URLSearchParams(routerLocation.search);
+    const queryPropertyType = params.get("propertyType");
+
+    if (!queryPropertyType) {
+      return;
+    }
+
+    const numericId = Number(queryPropertyType);
+
+    if (!Number.isNaN(numericId) && Number(propertyType) !== numericId) {
+      setPropertyType(numericId);
+    }
+  }, [routerLocation.search]);
+
+  const handlePropertyTypeChange = (id) => {
+    const numericId = Number(id);
+
+    setPropertyType(numericId);
+    setOpenPropertyType(false);
+
+    const params = new URLSearchParams(routerLocation.search);
+
+    if (numericId) {
+      params.set("propertyType", String(numericId));
+    } else {
+      params.delete("propertyType");
+    }
+
+    const query = params.toString();
+
+    navigate(query ? `/search?${query}` : "/search", {
+      replace: true,
+    });
+  };
+
   const [propertyTypes, setPropertyTypes] = useState([]);
   const [openPropertyType, setOpenPropertyType] = useState(false);
 
@@ -172,10 +210,7 @@ function SearchPage() {
         setShowLocationSuggestions(true);
         setLocationSearched(true);
       } catch (error) {
-        if (
-          error?.name !== "CanceledError" &&
-          error?.code !== "ERR_CANCELED"
-        ) {
+        if (error?.name !== "CanceledError" && error?.code !== "ERR_CANCELED") {
           console.error("Location search error:", error);
 
           setLocationSuggestions([]);
@@ -234,12 +269,41 @@ function SearchPage() {
   const handleSearchClick = () => {
     const params = new URLSearchParams();
 
-    if (location?.trim()) params.set("location", location.trim());
-    if (propertyType?.trim()) params.set("propertyType", propertyType.trim());
+    if (location?.trim()) {
+      params.set("search_loc", location.trim());
+    }
+
+    if (propertyType) {
+      params.set("propertyType", propertyType);
+    }
 
     const qs = params.toString();
+
     navigate(qs ? `/search?${qs}` : "/search");
   };
+
+  useEffect(() => {
+    const params = new URLSearchParams(routerLocation.search);
+
+    const queryLocation = params.get("search_loc");
+    const queryPropertyType = params.get("propertyType");
+
+    if (queryLocation && location !== queryLocation) {
+      setLocation(queryLocation);
+    }
+
+    if (!queryLocation && location) {
+      clearLocation();
+    }
+
+    if (queryPropertyType) {
+      const numericId = Number(queryPropertyType);
+
+      if (!Number.isNaN(numericId) && Number(propertyType) !== numericId) {
+        setPropertyType(numericId);
+      }
+    }
+  }, [routerLocation.search]);
 
   return (
     <div
@@ -487,24 +551,6 @@ function SearchPage() {
                 ))}
               </div>
             )}
-{/* 
-            {!loadingLocations &&
-              locationSearched &&
-              locationSuggestions.length === 0 && (
-                <div className="px-5 py-6 text-center">
-                  <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-500">
-                    <LocationIcon />
-                  </div>
-
-                  <p className="text-sm font-medium text-gray-700">
-                    No locations found
-                  </p>
-
-                  <p className="mt-1 text-xs text-gray-500">
-                    Try another location
-                  </p>
-                </div>
-              )} */}
           </div>
         )}
       </div>
@@ -554,7 +600,9 @@ function SearchPage() {
             "
           >
             <span className="truncate">
-              {propertyType || "Select property type"}
+              {propertyTypes.find(
+                (type) => Number(type.id) === Number(propertyType),
+              )?.name || "Select property type"}
             </span>
           </button>
 
@@ -564,17 +612,17 @@ function SearchPage() {
               onClick={clearPropertyType}
               aria-label="Clear property type"
               className="
-                ml-2
-                flex
-                h-9
-                w-9
-                shrink-0
-                items-center
-                justify-center
-                rounded-full
-                text-[#17213D]
-                hover:bg-gray-100
-              "
+      ml-2
+      flex
+      h-9
+      w-9
+      shrink-0
+      items-center
+      justify-center
+      rounded-full
+      text-[#17213D]
+      hover:bg-gray-100
+    "
             >
               <CloseIcon />
             </button>
@@ -621,34 +669,31 @@ function SearchPage() {
             "
           >
             {propertyTypes.length > 0 ? (
-              propertyTypes?.map((type) => (
+              propertyTypes.map((type) => (
                 <button
                   key={type.id}
                   type="button"
-                  onClick={() => {
-                    setPropertyType(type.name);
-                    setOpenPropertyType(false);
-                  }}
+                  onClick={() => handlePropertyTypeChange(type.id)}
                   className={`
-                    flex
-                    min-h-[48px]
-                    w-full
-                    items-center
-                    px-4
-                    py-3
-                    text-left
-                    text-[15px]
-                    transition
-                    hover:bg-gray-50
-                    active:bg-gray-100
-                    sm:px-5
-                    sm:text-base
-                    ${
-                      propertyType === type.name
-                        ? "bg-blue-50 font-medium text-blue-600"
-                        : "text-gray-800"
-                    }
-                  `}
+        flex
+        min-h-[48px]
+        w-full
+        items-center
+        px-4
+        py-3
+        text-left
+        text-[15px]
+        transition
+        hover:bg-gray-50
+        active:bg-gray-100
+        sm:px-5
+        sm:text-base
+       ${
+         Number(propertyType) === Number(type.id)
+           ? "bg-blue-50 font-medium text-blue-600"
+           : "text-gray-800"
+       }
+      `}
                 >
                   {type.name}
                 </button>

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { Button, Drawer } from "antd";
 import { FilterOutlined } from "@ant-design/icons";
 
@@ -13,27 +13,32 @@ import { getAmenities, getPropertyTypes } from "../../../api/search.api.js";
 import axiosInstance from "../../../api/axios";
 
 const DEFAULT_FILTERS = {
-  sortBy: [],
+  sortBy: ["posted", "sold"],
   propertyType: [],
   ownershipType: [],
   amenities: [],
   facingDirection: [],
-  priceMin: null,
-  priceMax: null,
+  min_price: null,
+  max_price: null,
 };
 
 const PropertySearchResults = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const routerLocation = useLocation();
 
+  const params = new URLSearchParams(routerLocation.search);
   const urlLocation = searchParams.get("location")?.trim() || "";
   const urlPropertyType = searchParams.get("propertyType")?.trim() || "";
+
+  // console.log(urlLocation , urlPropertyType)
 
   // ============================================================
   // FILTER OPTIONS
   // ============================================================
   const sortByOptions = useMemo(
     () => [
-      { label: "Available", value: "available" },
+      { label: "Available", value: "posted" },
       { label: "Sold", value: "sold" },
     ],
     [],
@@ -140,22 +145,51 @@ const PropertySearchResults = () => {
   // ============================================================
   // FILTER CHANGE
   // ============================================================
-  const handleChipFilterChange = (filterKey, values) => {
+  const handleChipFilterChange = (key, values) => {
     setFilters((prev) => ({
       ...prev,
-      [filterKey]: Array.isArray(values) ? values : [],
+      [key]: values,
     }));
+
+    const params = new URLSearchParams(window.location.search);
+
+    if (values?.length > 0) {
+      params.set(key, values.join(","));
+    } else {
+      params.delete(key);
+    }
+
+    navigate(`/search?${params.toString()}`, {
+      replace: true,
+    });
   };
 
+  const handlePropertyTypeChange = (value) => {
+    const params = new URLSearchParams(routerLocation.search);
+
+    if (value !== null && value !== undefined) {
+      params.set("propertyType", String(Number(value)));
+    } else {
+      params.delete("propertyType");
+    }
+
+    const query = params.toString();
+
+    navigate(query ? `/search?${query}` : "/search", {
+      replace: true,
+    });
+  };
   // ============================================================
   // PRICE CHANGE
   // ============================================================
-  const handlePriceChange = (priceMin, priceMax) => {
+  const handlePriceChange = (minPrice, maxPrice) => {
     setFilters((prev) => ({
       ...prev,
-      priceMin: priceMin === "" || priceMin === undefined ? null : priceMin,
-      priceMax: priceMax === "" || priceMax === undefined ? null : priceMax,
+      min_price: minPrice,
+      max_price: maxPrice,
     }));
+
+    setPage(1);
   };
 
   // ============================================================
@@ -219,13 +253,15 @@ const PropertySearchResults = () => {
             facingDirection: arrayToParam(filters.facingDirection),
           }),
 
-          ...(filters.priceMin !== null && {
-            priceMin: filters.priceMin,
-          }),
+          ...(filters.min_price !== null &&
+            filters.min_price !== undefined && {
+              min_price: filters.min_price,
+            }),
 
-          ...(filters.priceMax !== null && {
-            priceMax: filters.priceMax,
-          }),
+          ...(filters.max_price !== null &&
+            filters.max_price !== undefined && {
+              max_price: filters.max_price,
+            }),
         };
 
         console.log("API PARAMS:", params);
@@ -237,8 +273,6 @@ const PropertySearchResults = () => {
         if (cancelled) return;
 
         const responseData = response?.data?.data;
-
-        console.log("API RESPONSE:", responseData);
 
         const data = Array.isArray(responseData?.properties)
           ? responseData.properties
@@ -279,8 +313,8 @@ const PropertySearchResults = () => {
     filters.ownershipType,
     filters.amenities,
     filters.facingDirection,
-    filters.priceMin,
-    filters.priceMax,
+     filters.min_price,
+  filters.max_price,
   ]);
 
   // ============================================================
@@ -342,15 +376,12 @@ const PropertySearchResults = () => {
   // RESULT COUNT
   // ============================================================
   const resultCount = totalResults || properties.length;
-  console.log(totalResults, "pp");
 
   return (
     <div className="w-full">
       <div className="w-[95%] mx-auto my-5 text-start">
-     
         <SearchBar />
 
-        
         <div className="flex lg:hidden justify-start mt-4">
           <Button
             type="default"
@@ -394,6 +425,7 @@ const PropertySearchResults = () => {
               onChipChange={handleChipFilterChange}
               onPriceChange={handlePriceChange}
               onClearAll={handleClearAllFilters}
+              onPropertyTypeChange={handlePropertyTypeChange}
             />
           </aside>
 
