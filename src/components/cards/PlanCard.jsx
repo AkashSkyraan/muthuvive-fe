@@ -46,48 +46,38 @@ const PlanCard = ({ plans = [], onDownloadInvoice }) => {
   };
 
   // ---------------------------------------------------------
-  // Calculate remaining calendar days
-  // > 0  → Active
-  // <= 0 → Expired
+  // Check whether plan is expired
+  //
+  // expired_at === today → Expired
+  // expired_at < today    → Expired
+  // expired_at > today    → Active
   // ---------------------------------------------------------
-  const getRemainingDays = (expiredAt) => {
+  const isPlanExpired = (expiredAt) => {
     if (!expiredAt) {
-      return 0;
+      return true;
     }
 
-    const expiredDate = new Date(expiredAt);
-
-    if (Number.isNaN(expiredDate.getTime())) {
-      return 0;
-    }
+    // API value:
+    // "2026-04-23 15:12:00"
+    // Take only:
+    // "2026-04-23"
+    const expiredDate = String(expiredAt).slice(0, 10);
 
     const today = new Date();
 
-    const todayOnly = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      today.getDate(),
-    );
+    const todayDate =
+      `${today.getFullYear()}-` +
+      `${String(today.getMonth() + 1).padStart(2, "0")}-` +
+      `${String(today.getDate()).padStart(2, "0")}`;
 
-    const expiredDateOnly = new Date(
-      expiredDate.getFullYear(),
-      expiredDate.getMonth(),
-      expiredDate.getDate(),
-    );
-
-    const differenceInMs = expiredDateOnly - todayOnly;
-
-    return Math.floor(differenceInMs / (1000 * 60 * 60 * 24));
+    return expiredDate <= todayDate;
   };
 
   return (
     <div className="flex flex-col gap-4">
       {plans.map((plan) => {
-        const remainingDays = getRemainingDays(plan.expired_at);
-
-        const isActive = remainingDays > 0;
-
-        const status = isActive ? "Active Plan" : "Expired";
+        const isExpired = isPlanExpired(plan.expired_at);
+        const status = isExpired ? "Expired" : "Active Plan";
 
         return (
           <article key={plan.id} className="w-full h-full flex flex-col">
@@ -101,9 +91,9 @@ const PlanCard = ({ plans = [], onDownloadInvoice }) => {
 
                 <span
                   className={`rounded-sm px-2 py-0.5 text-xs font-medium ${
-                    isActive
-                      ? "bg-green-100 text-green-600"
-                      : "bg-gray-200 text-gray-500"
+                    isExpired
+                      ? "bg-gray-200 text-gray-500"
+                      : "bg-green-100 text-green-600"
                   }`}
                 >
                   {status}
@@ -114,18 +104,26 @@ const PlanCard = ({ plans = [], onDownloadInvoice }) => {
               <div className="px-3 py-3">
                 {/* Paid Date */}
                 <div className="mb-3">
-                  <p className="text-xs text-gray-400">Paid & Post On</p>
+                  <p className="text-base text-gray-400 font-medium">
+                    Paid & Post On
+                  </p>
 
-                  <p className="mt-1 text-sm font-medium text-gray-900">
+                  <p className="mt-1 text-sm font-semibold text-gray-900">
                     {formatDate(plan.purchased_at)}
                   </p>
                 </div>
 
                 {/* Expiry Date */}
                 <div>
-                  <p className="text-xs text-gray-400">Plan Expired On</p>
+                  <p className="text-base text-gray-400 font-medium">
+                    {isExpired ? "Plan Expired On" : "Plan Expires In"}
+                  </p>
 
-                  <p className={`mt-1 text-sm font-medium text-[#d41010]`}>
+                  <p
+                    className={`mt-1 text-sm font-semibold ${
+                      isExpired ? "text-[#d41010]" : "text-gray-900"
+                    }`}
+                  >
                     {formatDate(plan.expired_at)}
                   </p>
                 </div>
@@ -136,7 +134,7 @@ const PlanCard = ({ plans = [], onDownloadInvoice }) => {
             <button
               type="button"
               onClick={() => onDownloadInvoice?.(plan)}
-              className="mt-2.5 w-full rounded-md bg-blue-600 px-3 py-3 text-xs font-medium text-white transition-colors hover:bg-blue-700"
+              className="mt-2.5 w-full rounded-md bg-blue-600 px-3 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700 cursor-pointer"
             >
               Download Invoice
             </button>

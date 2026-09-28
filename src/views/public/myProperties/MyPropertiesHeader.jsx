@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { Button, Checkbox, Input, Popover, Spin } from "antd";
 import { SearchOutlined, SortAscendingOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
+import { useAuth } from "../../../context/UserContext";
+import { useLoginModal } from "../../../context/LoginModalContext";
+import { useNavigate } from "react-router-dom";
 
 const MyPropertiesHeader = ({
   // ============================================================
@@ -12,12 +15,17 @@ const MyPropertiesHeader = ({
   selectedFilters = [],
 
   // ============================================================
-  // Functions coming from MyProperties/index.jsx
+  // State setters coming from MyProperties/index.jsx
   // ============================================================
 
-  onFilterChange = () => {},
-  onSearch = () => {},
-  onSellProperty = () => {},
+  setSelectedFilters,
+  setSearch,
+
+  // ============================================================
+  // Other functions coming from MyProperties/index.jsx
+  // ============================================================
+
+  // onSellProperty = () => {},
   onSortClick = () => {},
 
   // ============================================================
@@ -26,49 +34,45 @@ const MyPropertiesHeader = ({
 
   loadingFilters = false,
 }) => {
-  // ============================================================
-  // Local State
-  // ============================================================
-  // This state belongs only to the Header.
-  //
-  // It controls whether the filter Popover is open or closed.
-  //
-  // We do NOT keep selectedFilters or searchValue here because
-  // those states are managed by MyProperties/index.jsx.
-  // ============================================================
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { openLoginModal } = useLoginModal();
+
+  const handleSellProperty = () => {
+    if (!user?.user_id) {
+      openLoginModal();
+      return;
+    }
+
+    navigate("/sell-property");
+  };
 
   const [popoverOpen, setPopoverOpen] = useState(false);
 
   // ============================================================
   // Search Handler
   // ============================================================
-  // User types something in the search box.
-  //
-  // We don't store the value here.
-  // We send it directly to index.jsx.
-  // ============================================================
 
   const handleSearch = (event) => {
     const value = event.target.value;
 
-    onSearch(value);
+    if (value.trim().length >= 3 || value.trim().length === 0) {
+      setSearch(value);
+    }
   };
 
   // ============================================================
   // Filter Handler
   // ============================================================
-  // User selects/unselects a checkbox.
-  //
-  // Ant Design gives us the selected values.
-  //
-  // Example:
-  // ["agriculture-land", "commercial-land"]
-  //
-  // We send those values to index.jsx.
-  // ============================================================
 
-  const handleFilterChange = (checkedValues) => {
-    onFilterChange(checkedValues);
+  const handleFilterChange = (option, checked) => {
+    setSelectedFilters(() => {
+      if (checked) {
+        return [option.id];
+      }
+
+      return [];
+    });
   };
 
   const filterContent = (
@@ -78,71 +82,49 @@ const MyPropertiesHeader = ({
         max-w-[calc(100vw-32px)]
       "
     >
-      {/* ======================================================
-          Loading
-      ======================================================= */}
-
       {loadingFilters ? (
         <div className="flex items-center justify-center py-6">
           <Spin size="small" />
         </div>
       ) : filterOptions.length === 0 ? (
-        /* ====================================================
-           Empty State
-        ===================================================== */
-
         <div className="py-5 text-center text-sm text-gray-500">
           No options available
         </div>
       ) : (
-        /* ====================================================
-           Filter Options
-        ===================================================== */
+        <div className="flex w-full flex-col gap-1">
+          {filterOptions.map((option) => {
+            const isSelected = selectedFilters.includes(option.id);
 
-        <Checkbox.Group
-          value={selectedFilters}
-          onChange={handleFilterChange}
-          className="w-full"
-        >
-          <div className="flex w-full flex-col gap-1">
-            {filterOptions.map((option) => (
+            return (
               <label
                 key={option.id}
                 className="
-                  flex
-                  w-full
-                  cursor-pointer
-                  items-center
-                  justify-between
-                  gap-4
-                  rounded-md
-                  px-1
-                  py-2
-
-                  text-sm
-                  text-gray-900
-
-                  transition-colors
-                  duration-150
-
-                  hover:bg-gray-50
-                "
+        flex
+        w-full
+        cursor-pointer
+        items-center
+        justify-between
+        gap-4
+        rounded-md
+        px-1
+        py-2
+        text-sm
+        text-gray-900
+        transition-colors
+        duration-150
+        hover:bg-gray-50
+      "
               >
-                {/* ==================================================
-                    Option Name
-                =================================================== */}
-
                 <span className="flex-1 leading-5">{option.name}</span>
 
-                {/* ==================================================
-                    Checkbox
-                =================================================== */}
-
-                <Checkbox value={option.value} />
+                <Checkbox
+                  checked={isSelected}
+                  onChange={(e) => handleFilterChange(option, e.target.checked)}
+                />
               </label>
-            ))}
-          </div>
-        </Checkbox.Group>
+            );
+          })}
+        </div>
       )}
     </div>
   );
@@ -155,7 +137,6 @@ const MyPropertiesHeader = ({
           w-full
           flex-col
           gap-4
-
           lg:flex-row
           lg:items-center
           lg:gap-5
@@ -172,7 +153,6 @@ const MyPropertiesHeader = ({
               font-semibold
               leading-tight
               text-black
-
               sm:text-2xl
             "
           >
@@ -190,10 +170,8 @@ const MyPropertiesHeader = ({
             w-full
             flex-col
             gap-3
-
             sm:flex-row
             sm:items-center
-
             lg:flex-1
             lg:justify-end
           "
@@ -210,10 +188,9 @@ const MyPropertiesHeader = ({
             className="
               h-10
               w-full
-            !bg-[#f7f7f7]
+              !bg-[#f7f7f7]
               sm:flex-1
               !text-base
-
               lg:max-w-[510px]
             "
           />
@@ -228,7 +205,6 @@ const MyPropertiesHeader = ({
               w-full
               items-center
               gap-3
-
               sm:w-auto
             "
           >
@@ -252,16 +228,14 @@ const MyPropertiesHeader = ({
                 type="default"
                 icon={<SortAscendingOutlined className="text-base" />}
                 onClick={onSortClick}
-                className={`
+                className={` 
                   h-10
                   flex-1
                   rounded-lg
                   px-4
                   text-sm
-
                   sm:flex-none
                   sm:px-5
-
                   ${
                     popoverOpen
                       ? "border-[#1557E8] text-[#1557E8]"
@@ -269,33 +243,30 @@ const MyPropertiesHeader = ({
                   }
                 `}
               >
-                Short By
+                Sort By
               </Button>
             </Popover>
 
             {/* ==================================================
                 Sell My Properties
             =================================================== */}
-            <Link to="/sell-property">
-              <Button
-                type="primary"
-                onClick={onSellProperty}
-                className="
-                h-10
-                flex-1
-                rounded-lg
-                px-4
 
-                sm:flex-none
-                sm:px-5
-
-                text-sm
-                font-medium
-              "
-              >
-                Sell my Properties
-              </Button>
-            </Link>
+            <Button
+              type="primary"
+              onClick={handleSellProperty}
+              className="
+                  h-10
+                  flex-1
+                  rounded-lg
+                  px-4
+                  sm:flex-none
+                  sm:px-5
+                  text-sm
+                  font-medium
+                "
+            >
+              Sell my Properties
+            </Button>
           </div>
         </div>
       </div>

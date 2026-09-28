@@ -28,7 +28,7 @@ const Pagination = ({ current = 1, totalPages = 1, onChange }) => {
   // console.log(current, totalPages);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 369px)");
+    const mediaQuery = window.matchMedia("(max-width: 420px)");
 
     const handleChange = (event) => {
       setIsMobile(event.matches);

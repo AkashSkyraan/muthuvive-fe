@@ -17,7 +17,11 @@ import Enquiry from "./Enquiry.jsx";
 import PostInformation from "./PostInformation.jsx";
 import PlanDetails from "../../../components/cards/SubscriptionCard.jsx";
 
+import PaidAndPost from "./PaidAndPost.jsx";
+
 import images from "../../../config/Images.jsx";
+
+import { useAuth } from "../../../context/UserContext.jsx";
 
 import {
   getIndividualProperties,
@@ -26,6 +30,8 @@ import {
 
 // Replace this with your actual plan API
 import { getSubscriptionPlans } from "../../../api/subscriptionPlans.api.js";
+import PlanActivity from "./PlanActivity.jsx";
+import PropertyActivity from "./PropertyActivity.jsx";
 
 const PropertyDetails = () => {
   // ==========================================================
@@ -33,7 +39,8 @@ const PropertyDetails = () => {
   // ==========================================================
 
   const { propertyId } = useParams();
-
+  // const { user } = useAuth();
+  const user = { user_id: 1 };
   const currentPropertyId = propertyId;
 
   // ==========================================================
@@ -51,6 +58,10 @@ const PropertyDetails = () => {
 
   // Plan details data
   const [planDetailsData, setPlanDetailsData] = useState(null);
+
+  // right section condition based so theese are the states
+  const [propertyStatus, setPropertyStatus] = useState(null);
+  const [propertyUserId, setPropertyUserId] = useState(null);
 
   // ==========================================================
   // TABS
@@ -107,6 +118,9 @@ const PropertyDetails = () => {
       setShowPlanDetails(false);
       setPlanDetailsData(null);
 
+      setPropertyStatus(null);
+      setPropertyUserId(null);
+
       try {
         // ======================================================
         // 1. INDIVIDUAL PROPERTY API
@@ -122,6 +136,9 @@ const PropertyDetails = () => {
         const property = apiData;
 
         setShowPriceDetails(property);
+
+        setPropertyStatus(property?.status ?? null);
+        setPropertyUserId(property?.user_id ?? null);
 
         // ======================================================
         // 2. CHECK PLAN DETAILS
@@ -559,6 +576,22 @@ const PropertyDetails = () => {
     });
   };
 
+  const showEnquiry =
+    user?.user_id != null &&
+    propertyUserId != null &&
+    Number(user?.user_id) !== Number(propertyUserId);
+
+  const showPropertyActivity =
+    user?.user_id != null &&
+    propertyUserId != null &&
+    Number(user?.user_id) === Number(propertyUserId);
+
+  const showPaidAndPost =
+    user?.user_id != null &&
+    propertyUserId != null &&
+    Number(user.user_id) === Number(propertyUserId) &&
+    propertyStatus === "approved";
+
   return (
     <main className="w-[90%] mx-auto min-h-screen bg-white">
       {/* ============================================================
@@ -639,7 +672,16 @@ const PropertyDetails = () => {
             <aside className="w-full lg:w-[45%] xl:w-[35%] flex flex-col gap-4 items-end">
               {/* Enquiry Form */}
 
-              <Enquiry propertyId={propertyId} />
+              {showEnquiry && <Enquiry propertyId={propertyId} />}
+
+              {/* Plan Activity */}
+              {showPropertyActivity && <PropertyActivity />}
+
+              {/* Paid and Post Button */}
+              {showPaidAndPost && <PaidAndPost />}
+
+              {/* Plan Activity */}
+              <PlanActivity />
 
               {/* Property Post Information */}
 
