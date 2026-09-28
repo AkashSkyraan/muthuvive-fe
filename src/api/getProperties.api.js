@@ -12,6 +12,8 @@ export const getIndividualProperties = async (filters = {}) => {
   });
   return response.data.data;
 };
+
+
 export const postBookmark = async (payload) => {
   const response = await axiosInstance.post("/property/add-bookmark", payload);
   return response.data;

@@ -1,18 +1,10 @@
 import React, { useState, useEffect } from "react";
 
 // CategoryFilter
-// - options: [{ label: "All Requests", value: "all" }, ...]
-// - value: currently selected option's value (controlled - lives in the parent)
-// - onChange: called with the clicked option's value
-//
-// Desktop/tablet-large (lg+): vertical stack of individual pill buttons,
-// tightly spaced, matching the design screenshot - each option is its
-// own rounded-full bordered pill, selected one gets a blue border + blue
-// bold text, rest stay thin gray border + gray text.
-// Mobile/tablet (below lg): same pill styling, laid out horizontally in
-// a scrollable strip since the vertical stack doesn't fit that width.
+// - options: [{ id, label, value }, ...]
+// - value: currently selected option's id (controlled - lives in parent)
+// - onChange: called with the clicked option's id
 const CategoryFilter = ({ options = [], value, onChange }) => {
-  if (!options.length) return null;
   const [topOffset, setTopOffset] = useState(0);
 
   useEffect(() => {
@@ -24,10 +16,8 @@ const CategoryFilter = ({ options = [], value, onChange }) => {
       setTopOffset(element.getBoundingClientRect().height);
     };
 
-    // Get initial height
     updateOffset();
 
-    // Watch for height changes
     const observer = new ResizeObserver(updateOffset);
 
     observer.observe(element);
@@ -40,12 +30,16 @@ const CategoryFilter = ({ options = [], value, onChange }) => {
   if (!options.length) return null;
 
   const renderPill = (option) => {
-    const isSelected = option.value === value;
+    const selectedId = option.id ?? option.value;
+
+    const isSelected =
+      option.value === "all" ? value === null : selectedId === value;
+
     return (
       <button
-        key={option.value}
+        key={selectedId}
         type="button"
-        onClick={() => onChange?.(option.value)}
+        onClick={() => onChange?.(option.value === "all" ? null : selectedId)}
         className={`cursor-pointer w-full rounded-xl border px-5 py-2.5 text-sm text-center transition-colors ${
           isSelected
             ? "border-2 border-blue-500 font-semibold text-blue-600"
@@ -59,14 +53,9 @@ const CategoryFilter = ({ options = [], value, onChange }) => {
 
   return (
     <>
-      {/* Mobile & tablet - horizontal scroll strip. w-full + min-w-0
-          constrain this to its parent's actual width first - without
-          that, a row of fixed-width pills renders at its natural full
-          width and pushes past the viewport, giving the whole PAGE a
-          horizontal scrollbar instead of just this strip scrolling
-          internally. */}
+      {/* Mobile & tablet */}
       <div
-        className="lg:hidden flex items-center gap-2 overflow-x-auto pb-1 w-full min-w-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="lg:hidden flex items-center gap-2 mb-5 overflow-x-auto pb-1 w-full min-w-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         style={{
           position: "sticky",
           top: `${topOffset}px`,
@@ -74,13 +63,13 @@ const CategoryFilter = ({ options = [], value, onChange }) => {
         }}
       >
         {options.map((option) => (
-          <div key={option.value} className="shrink-0 w-36">
+          <div key={option.id ?? option.value} className="shrink-0 w-36">
             {renderPill(option)}
           </div>
         ))}
       </div>
 
-      {/* Desktop - vertical stack of pills */}
+      {/* Desktop */}
       <div
         className="hidden lg:flex lg:flex-col lg:gap-1.5 lg:gap-y-5 w-48"
         style={{
@@ -90,7 +79,7 @@ const CategoryFilter = ({ options = [], value, onChange }) => {
         }}
       >
         {options.map((option) => (
-          <div key={option.value}>{renderPill(option)}</div>
+          <div key={option.id ?? option.value}>{renderPill(option)}</div>
         ))}
       </div>
     </>

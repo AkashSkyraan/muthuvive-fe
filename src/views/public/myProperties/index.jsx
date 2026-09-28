@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from "react";
+import { useAuth } from "../../../context/UserContext";
 
 import MyPropertyCard from "../../../components/cards/MyProperties";
 import Header from "./MyPropertiesHeader";
 import Pagination from "../../../components/common/pagination/Pagination";
 import CategoryFilter from "./CategoryFilter";
-import images from "../../../config/Images";
 
-// 123
-
-// ============================================================
-// API Service
-// ============================================================
-// import { getMyProperties } from "../../../services/propertyService";
+import { getProperties } from "../../../api/getProperties.api";
 
 const MyProperties = () => {
+  const { user } = useAuth();
+
+  // ==========================================================
+  // Property Filter Options
+  // ==========================================================
+
   const filterOptions = [
     {
       id: 1,
@@ -36,62 +37,11 @@ const MyProperties = () => {
       value: "commercial-residential-buildings",
     },
   ];
-  const mockProperties = [
-    {
-      id: 1,
-      image: images.farmLand,
-      title: "Green Valley Agricultural Land",
-      category: "Agriculture Land",
-      location: "Thanjavur, Tamil Nadu",
-      area: "2.5 Acres",
-      hospitals: "2 Hospitals nearby",
-      schools: "4 Schools nearby",
 
-      statusLabel: "Posted On",
-      statusDate: "02-03-2026",
-      isRejected: false,
+  // ==========================================================
+  // Request Categories
+  // ==========================================================
 
-      plan: "365 days plan",
-      expiredInDays: "25",
-      rejectedReason: "Personal details has been shared",
-    },
-    {
-      id: 2,
-      image: images.thanjavur,
-      title: "Green Valley Agricultural Land",
-      category: "Agriculture Land",
-      location: "Thanjavur, Tamil Nadu",
-      area: "2.5 Acres",
-      hospitals: "2 Hospitals nearby",
-      schools: "4 Schools nearby",
-
-      statusLabel: "Posted On",
-      statusDate: "02-03-2026",
-      isRejected: false,
-
-      plan: "365 days plan",
-      expiredInDays: "25",
-      rejectedReason: undefined,
-    },
-    {
-      id: 3,
-      image: images.agricultureLand,
-      title: "Green Valley Agricultural Land",
-      category: "Agriculture Land",
-      location: "Thanjavur, Tamil Nadu",
-      area: "2.5 Acres",
-      hospitals: "2 Hospitals nearby",
-      schools: "4 Schools nearby",
-
-      statusLabel: "Posted On",
-      statusDate: "02-03-2026",
-      isRejected: false,
-
-      plan: "365 days plan",
-      expiredInDays: "25",
-      rejectedReason: undefined,
-    },
-  ];
   const requestCategories = [
     { label: "All Requests", value: "all" },
     { label: "Requested", value: "requested" },
@@ -102,65 +52,104 @@ const MyProperties = () => {
     { label: "Rejected", value: "rejected" },
   ];
 
-  // Selected property categories
+  // ==========================================================
+  // Selected Property Categories
+  // ==========================================================
+
   const [selectedFilters, setSelectedFilters] = useState([]);
 
-  // Search text
-  const [search, setSearch] = useState("");
+  // ==========================================================
+  // Search
+  // ==========================================================
 
-  // Properties returned from API
+  const [search, setSearch] = useState(null);
+
+  // ==========================================================
+  // Active Request Category
+  // ==========================================================
+
+  const [activeCategory, setActiveCategory] = useState(null);
+
+  // ----------------------------------------------------------
+  // Pagination
+  // ----------------------------------------------------------
+
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // ----------------------------------------------------------
+  // Total properties
+  // ----------------------------------------------------------
+
+  const [totalPages, setTotalPages] = useState(0);
+
+  // ==========================================================
+  // Properties
+  // ==========================================================
+
   const [properties, setProperties] = useState([]);
 
-  // API loading state
+  // ==========================================================
+  // Loading
+  // ==========================================================
+
   const [loading, setLoading] = useState(false);
 
-  // ACTIVE CATEGORY
-  const [activeCategory, setActiveCategory] = useState("all");
+  const handlePageChange = (page) => {
+    setCurrentPage(Number(page));
+  };
 
-  // ============================================================
-  // FILTER CHANGE
-  // ============================================================
-  // This function will be passed to Header.
+  // ==========================================================
+  // Category Change
+  // ==========================================================
+
+  const handleCategoryChange = (value) => {
+    setActiveCategory(value);
+  };
+
+  // ==========================================================
+  // Fetch Properties
+  // ==========================================================
   //
-  // Header does not directly manage the main page state.
-  // It simply tells this page when the user changes a filter.
-  // ============================================================
-
-  const handleFilterChange = (values) => {
-    setSelectedFilters(values);
-  };
-
-  const handleSearch = (value) => {
-    setSearch(value);
-  };
-
-  // ============================================================
-  // FETCH PROPERTIES
-  // ============================================================
-  // Whenever selectedFilters or search changes,
-  // this API call will run again.
-  // ============================================================
+  // API runs whenever:
+  //
+  // 1. User changes property checkbox filter
+  // 2. User changes search
+  // 3. User changes request category
+  // 4. User changes
+  //
+  // ==========================================================
 
   useEffect(() => {
     const fetchProperties = async () => {
+      // if (!user?.id) {
+      //   setProperties([]);
+      //   return;
+      // }
+
       try {
         setLoading(true);
 
-        // Data we are sending to the backend
         const payload = {
-          categories: selectedFilters,
+          user_id: 1,
+          type: selectedFilters,
           search: search,
+          status: activeCategory,
+          limit: 6,
+          page: Number(currentPage),
         };
 
-        // API call
-        // const response = await getMyProperties(payload);
+        const response = await getProperties(payload);
 
-        // Store API response in state
-        // setProperties(response.data);
+        // console.log("My Properties Response:", response);
+
+        const responseProperties = response?.properties;
+        const responsePagination = response?.pagination;
+
+        setProperties(responseProperties);
+        setTotalPages(responsePagination?.totalPages);
       } catch (error) {
         console.error("Failed to fetch properties:", error);
 
-        // If API fails, clear the properties
         setProperties([]);
       } finally {
         setLoading(false);
@@ -168,23 +157,19 @@ const MyProperties = () => {
     };
 
     fetchProperties();
-  }, [selectedFilters, search]);
+  }, [selectedFilters, search, activeCategory, currentPage]);
 
-  // ============================================================
-  // SELL PROPERTY
-  // ============================================================
-  // This can later use navigate("/sell-property")
-  // ============================================================
+  // ==========================================================
+  // Sell Property
+  // ==========================================================
 
   const handleSellProperty = () => {
     // console.log("Sell my property");
   };
 
-  // ============================================================
-  // SORT
-  // ============================================================
-  // We can add sorting functionality later.
-  // ============================================================
+  // ==========================================================
+  // Sort
+  // ==========================================================
 
   const handleSort = () => {
     // console.log("Sort clicked");
@@ -196,20 +181,20 @@ const MyProperties = () => {
         <Header
           filterOptions={filterOptions}
           selectedFilters={selectedFilters}
-          onFilterChange={handleFilterChange}
-          onSearch={handleSearch}
+          setSelectedFilters={setSelectedFilters}
+          setSearch={setSearch}
           onSellProperty={handleSellProperty}
           onSortClick={handleSort}
         />
 
         <div className="flex flex-col lg:flex-row gap-0 mt-6">
-          {/* LEFT SIDE - 35%*/}
+          {/* LEFT SIDE - 35% */}
 
           <div className="w-full lg:w-[30%] shrink-0 justify-items-center">
             <CategoryFilter
               options={requestCategories}
               value={activeCategory}
-              onChange={setActiveCategory}
+              onChange={handleCategoryChange}
             />
           </div>
 
@@ -217,34 +202,28 @@ const MyProperties = () => {
 
           <div className="w-full lg:w-[70%]">
             <div className="bg-white border border-gray-100 rounded-xl min-h-[400px] p-4">
-              {/* ==================================================
-                  LOADING
-                  ================================================== */}
-
               {loading ? (
                 <div className="flex justify-center py-10">Loading...</div>
-              ) : mockProperties.length === 0 ? (
-                /* ================================================
-                   EMPTY STATE
-                   ================================================ */
-
+              ) : properties.length === 0 ? (
                 <div className="flex justify-center py-10 text-gray-500">
                   No properties found
                 </div>
               ) : (
-                /* ================================================
-                   PROPERTY LIST
-                   ================================================ */
-
                 <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
-                  {mockProperties.map((property) => (
+                  {properties.map((property) => (
                     <MyPropertyCard key={property.id} data={property} />
                   ))}
                 </div>
               )}
-              <div>
-                <Pagination />
-              </div>
+              {totalPages > 0 && (
+                <div>
+                  <Pagination
+                    current={currentPage}
+                    totalPages={totalPages}
+                    onChange={handlePageChange}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>
