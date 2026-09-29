@@ -9,6 +9,7 @@ import images from "../../../config/Images";
 import { getBookmarkedProperties } from "../../../api/getProperties.api";
 import { Link } from "react-router-dom";
 import { useLoader } from "../../../context/LoaderContext";
+import { useAuth } from "../../../context/UserContext";
 
 const MyProperties = () => {
   const filterOptions = [

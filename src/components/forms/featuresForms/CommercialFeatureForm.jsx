@@ -8,6 +8,7 @@ import {
   getPropertyHighlight,
 } from "../../../api/propertyFormDropdown.api";
 import { postSellPropertyForm } from "../../../api/sellPropertyForm.api";
+import { useAuth } from "../../../context/UserContext";
 
 const roomCountOptions = [
   { value: "1", label: "1" },
@@ -106,6 +107,7 @@ const sectionLabel = (text) => (
 const CommercialPropertyFeaturesForm = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const { formData, propertyId, updateFormData } = useSellProperty();
 
@@ -312,7 +314,7 @@ const CommercialPropertyFeaturesForm = () => {
        */
       const payload = {
         step: 3,
-        user_id: 1,
+        user_id: user?.id,
         prop_id: propertyId,
 
         rooms: latestFeatures.rooms,
@@ -324,8 +326,8 @@ const CommercialPropertyFeaturesForm = () => {
         prop_highs: latestFeatures["prop_highs"],
       };
 
-      console.log("Commercial property features payload:", payload);
-      console.log("payload", payload);
+      // console.log("Commercial property features payload:", payload);
+      // console.log("payload", payload);
 
       const response = await postSellPropertyForm(payload);
 

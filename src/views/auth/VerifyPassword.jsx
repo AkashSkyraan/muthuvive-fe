@@ -66,9 +66,8 @@ function EnterPassword() {
       setError("");
 
       const payload = {
-        // user_id: user?.id,
+        user_id: user?.id,
         password,
-        user_id: 15,
       };
 
       // console.log("Verify Password Payload:", payload);

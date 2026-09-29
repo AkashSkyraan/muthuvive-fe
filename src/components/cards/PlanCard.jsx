@@ -1,7 +1,7 @@
 import React from "react";
 
 const PlanCard = ({ plans = [], onDownloadInvoice }) => {
-  console.log(plans);
+  // console.log(plans);
 
   if (!plans.length) {
     return (

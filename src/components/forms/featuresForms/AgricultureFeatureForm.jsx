@@ -8,6 +8,7 @@ import {
   getPropertyHighlight,
 } from "../../../api/propertyFormDropdown.api";
 import { postSellPropertyForm } from "../../../api/sellPropertyForm.api";
+import { useAuth } from "../../../context/UserContext";
 
 const VISIBLE_COUNT = 7;
 
@@ -70,6 +71,7 @@ const sectionLabel = (text) => (
 const PropertyFeaturesForm = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const { formData, propertyId, updateFormData } = useSellProperty();
 
@@ -101,7 +103,7 @@ const PropertyFeaturesForm = () => {
           return;
         }
 
-        console.log("amenities", response[0]);
+        // console.log("amenities", response[0]);
 
         const amenities = response || [];
 
@@ -198,13 +200,13 @@ const PropertyFeaturesForm = () => {
 
       const payload = {
         step: 3,
-        user_id: 1,
+        user_id: user?.id,
         prop_id: propertyId,
         amenities: latestFeatures.amenities,
         prop_highs: latestFeatures["prop_highs"],
       };
 
-      console.log("Property features payload:", payload);
+      // console.log("Property features payload:", payload);
 
       const response = await postSellPropertyForm(payload);
 
