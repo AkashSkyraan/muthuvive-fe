@@ -5,6 +5,7 @@ import FormNavigationButtons from "../../fornNavButtons";
 import { useNavigate } from "react-router-dom";
 import { useSellProperty } from "../../../context/SellPropertyContext";
 import { postSellPropertyForm } from "../../../api/sellPropertyForm.api";
+import { useAuth } from "../../../context/UserContext";
 
 // ---------------------------------------------------------
 // Options
@@ -223,6 +224,7 @@ const fieldLabel = (text) => (
 const PropertyDetailsForm = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const { formData, updateFormData, propertyId } = useSellProperty();
 
@@ -484,12 +486,12 @@ const PropertyDetailsForm = () => {
 
       const payload = {
         step: 2,
-        user_id: 1,
+        user_id: user?.id,
         prop_id: propertyId,
         ...latestPropertyDetails,
       };
 
-      console.log("Step 2 Payload:", payload);
+      // console.log("Step 2 Payload:", payload);
 
       // ---------------------------------------------------
       // API Call
@@ -497,7 +499,7 @@ const PropertyDetailsForm = () => {
 
       const response = await postSellPropertyForm(payload);
 
-      console.log("Step 2 Response:", response);
+      // console.log("Step 2 Response:", response);
 
       if (response?.success === 0) {
         console.error("Failed to update property details:", response?.error);
@@ -511,7 +513,7 @@ const PropertyDetailsForm = () => {
       navigate("/sell-property/features");
     } catch (error) {
       // AntD validation errors come here.
-      console.log("Property details validation failed:", error);
+      // console.log("Property details validation failed:", error);
     }
   };
 

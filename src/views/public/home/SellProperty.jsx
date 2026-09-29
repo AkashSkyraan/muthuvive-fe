@@ -33,7 +33,7 @@ const SellProperty = () => {
   useEffect(() => {
     const getCurrentUser = async () => {
       try {
-        setUserLoading(true);
+        // setUserLoading(true);
 
         const response = await axiosInstance.get("/user/get-user");
 
@@ -46,7 +46,7 @@ const SellProperty = () => {
         console.error("Get User Error:", error);
         setUser(null);
       } finally {
-        setUserLoading(false);
+        // setUserLoading(false);
       }
     };
 

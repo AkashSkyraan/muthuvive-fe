@@ -7,6 +7,7 @@ import { getLocationCategories } from "../../../api/propertyFormDropdown.api";
 import { useSellProperty } from "../../../context/SellPropertyContext";
 
 import { postSellPropertyForm } from "../../../api/sellPropertyForm.api";
+import { useAuth } from "../../../context/UserContext";
 
 // Dynamic data - replace with API response
 const countries = [{ value: "india", label: "India" }];
@@ -17,6 +18,7 @@ const selectClassName =
 const LocationForm = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const { formData, updateFormData, propertyId, setPropertyId } =
     useSellProperty();
@@ -326,7 +328,7 @@ const LocationForm = () => {
 
     const payload = {
       step: 1,
-      user_id: 1,
+      user_id: user?.id,
 
       ...formData.category,
 

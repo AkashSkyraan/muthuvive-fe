@@ -1295,7 +1295,7 @@ const MediaUploadForm = () => {
     navigate("/sell-property/features");
   };
 
-  console.log("changes done");
+  // console.log("changes done");
 
   return (
     <>

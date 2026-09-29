@@ -8,7 +8,6 @@ export const requestOTP = async ({ type, purpose, email, mobile }) => {
   };
 
   const response = await axiosInstance.post("/auth/request-otp", payload);
-  console.log(response.data?.data[0].otp);
 
   return response.data;
 };

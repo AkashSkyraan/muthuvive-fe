@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import FormNavigationButtons from "../../fornNavButtons";
 import { useSellProperty } from "../../../context/SellPropertyContext";
 import { postSellPropertyForm } from "../../../api/sellPropertyForm.api";
+import { useAuth } from "../../../context/UserContext";
 
 // ---------------------------------------------------------
 // Options
@@ -221,6 +222,7 @@ const fieldLabel = (text) => (
 const CommercialPropertyDetailsForm = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const { formData, updateFormData, propertyId, category } = useSellProperty();
 
@@ -547,13 +549,13 @@ const CommercialPropertyDetailsForm = () => {
 
       const payload = {
         step: 2,
-        user_id: 1,
+        user_id: user?.id,
         prop_id: propertyId,
 
         ...convertedPropertyDetails,
       };
 
-      console.log("Commercial Step 2 Payload:", payload);
+      // console.log("Commercial Step 2 Payload:", payload);
 
       // ---------------------------------------------------
       // API Call
@@ -561,7 +563,7 @@ const CommercialPropertyDetailsForm = () => {
 
       const response = await postSellPropertyForm(payload);
 
-      console.log("Commercial Step 2 Response:", response);
+      // console.log("Commercial Step 2 Response:", response);
 
       if (response?.success === 0) {
         console.error(
@@ -578,7 +580,7 @@ const CommercialPropertyDetailsForm = () => {
       navigate("/sell-property/features");
     } catch (error) {
       // AntD validation error
-      console.log("Commercial property details validation failed:", error);
+      // console.log("Commercial property details validation failed:", error);
     }
   };
 

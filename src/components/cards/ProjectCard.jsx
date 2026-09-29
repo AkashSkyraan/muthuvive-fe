@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import icons from "../../config/Icons.jsx";
 import { CircleSmall } from "lucide-react";
 import { useLoginModal } from "../../context/LoginModalContext.jsx";
+import { showStatusMessage } from "../common/MessagePopup.jsx";
 
 // Renders a singling card. Pass one `listing` object with
 // { id, image, category, title, price, address, area, hospitals, schools }.
@@ -40,13 +41,17 @@ const ProjectCard = ({ listing, user }) => {
       if (response?.data?.success === 1) {
         setIsBookmarked((prev) => !prev);
 
-        message.success(
-          isBookmarked
+        showStatusMessage({
+          type: "success",
+          text: isBookmarked
             ? "Property removed from bookmarks"
             : "Property added to bookmarks",
-        );
+        });
       } else {
-        message.error(response?.data?.message || "Unable to update bookmark");
+        showStatusMessage({
+          type: "error",
+          text: response?.data?.message || "Unable to update bookmark",
+        });
       }
     } catch (error) {
       console.error("Bookmark Error:", error);
