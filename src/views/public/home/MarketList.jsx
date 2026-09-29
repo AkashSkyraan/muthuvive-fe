@@ -18,7 +18,7 @@ const MarketListings = () => {
       try {
         const response = await getProperties({
           limit: 6,
-          status: "inprogress",
+          status: "posted",
         });
 
         const data = response?.data || response || [];
