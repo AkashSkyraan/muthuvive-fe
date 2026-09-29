@@ -25,10 +25,10 @@ function ChangeContact() {
   // type = "password"
   const field = fieldFromState || type;
 
-  console.log("Change Contact Route State:", location.state);
-  console.log("Field:", field);
-  console.log("Type:", type);
-  console.log("Identifier:", identifier);
+  // console.log("Change Contact Route State:", location.state);
+  // console.log("Field:", field);
+  // console.log("Type:", type);
+  // console.log("Identifier:", identifier);
 
   const [value, setValue] = useState(identifier || "");
   const [error, setError] = useState("");
@@ -66,7 +66,7 @@ function ChangeContact() {
         setLoading(true);
         setError("");
 
-        console.log("Change Password Identifier:", value.trim());
+        // console.log("Change Password Identifier:", value.trim());
 
         // Configure the route state as needed for your Verify OTP page.
         navigate("/verify-otp", {
@@ -99,11 +99,11 @@ function ChangeContact() {
             }),
       };
 
-      console.log("Change email Payload:", payload);
+      // console.log("Change email Payload:", payload);
 
       const response = await requestOTP(payload);
 
-      console.log("Change Contact Response:", response);
+      // console.log("Change Contact Response:", response);
 
       if (response?.success === true || response?.success === 1) {
         navigate("/verify-otp", {

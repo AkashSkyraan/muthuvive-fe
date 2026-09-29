@@ -28,11 +28,11 @@ const MyPlans = () => {
           // prop_id: propId,
         };
 
-        console.log("My Plans Payload:", payload);
+        // console.log("My Plans Payload:", payload);
 
         const response = await getMyPlans(payload);
 
-        console.log("My Plans Response:", response);
+        // console.log("My Plans Response:", response);
 
         const responsePlans = Array.isArray(response)
           ? response

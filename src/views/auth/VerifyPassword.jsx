@@ -44,8 +44,8 @@ function EnterPassword() {
 
   const { field } = location.state || {};
 
-  console.log("Verify Password Route State:", location.state);
-  console.log("Field:", field);
+  // console.log("Verify Password Route State:", location.state);
+  // console.log("Field:", field);
 
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
@@ -71,11 +71,11 @@ function EnterPassword() {
         user_id: 15,
       };
 
-      console.log("Verify Password Payload:", payload);
+      // console.log("Verify Password Payload:", payload);
 
       const response = await verifyPassword(payload);
 
-      console.log("Verify Password Response:", response);
+      // console.log("Verify Password Response:", response);
 
       if (response?.success === true || response?.success === 1) {
         if (field === "mobile") {

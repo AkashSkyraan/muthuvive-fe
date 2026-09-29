@@ -27,7 +27,7 @@ const defaultDocuments = [
 ];
 
 const Documents = ({ title = "Documents", fields = [] }) => {
-  console.log(fields);
+  // console.log(fields);
 
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewIndex, setPreviewIndex] = useState(0);

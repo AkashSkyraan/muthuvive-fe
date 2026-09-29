@@ -120,11 +120,11 @@ const PropertyHeader = ({ data = {} }) => {
     }
     try {
       const response = await postBookmark({
-        user_id: 1,
+        user_id: user?.id,
         prop_id: propertyId,
       });
 
-      console.log(response);
+      // console.log(response);
 
       if (response?.success !== 1) {
         showStatusMessage({

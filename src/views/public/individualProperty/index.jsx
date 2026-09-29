@@ -162,7 +162,7 @@ const PropertyDetails = () => {
             const planResponse = await getSubscriptionPlans({
               id: property.purchase_plan,
             });
-            console.log("Plan response:", planResponse);
+            // console.log("Plan response:", planResponse);
 
             setPlanDetailsData(planResponse);
           } catch (planError) {

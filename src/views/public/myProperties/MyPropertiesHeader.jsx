@@ -39,7 +39,7 @@ const MyPropertiesHeader = ({
   const { openLoginModal } = useLoginModal();
 
   const handleSellProperty = () => {
-    if (!user?.user_id) {
+    if (!user?.id) {
       openLoginModal();
       return;
     }

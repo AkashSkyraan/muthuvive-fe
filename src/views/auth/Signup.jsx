@@ -280,7 +280,7 @@ function Signup() {
 
       const response = await signup(payload);
 
-      console.log("SIGNUP RESPONSE:", response);
+      // console.log("SIGNUP RESPONSE:", response);
 
       if (response?.success === 1 || response?.success === true) {
         message.success(response?.message || "Signup successful");

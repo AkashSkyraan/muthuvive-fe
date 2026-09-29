@@ -22,7 +22,7 @@ const chunkIntoPairs = (items) => {
 
 const PropertyLocation = ({ title = "Property Highlights", fields = [] }) => {
   const rows = chunkIntoPairs(fields);
-  console.log("fields", fields);
+  // console.log("fields", fields);
   return (
     <div className="w-full text-start rounded-xl border border-gray-300 bg-white">
       <div className="border-b border-gray-100 px-5 py-4 sm:px-6">

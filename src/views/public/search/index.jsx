@@ -264,7 +264,7 @@ const PropertySearchResults = () => {
             }),
         };
 
-        console.log("API PARAMS:", params);
+        // console.log("API PARAMS:", params);
 
         const response = await axiosInstance.get("/property/get-property", {
           params,
