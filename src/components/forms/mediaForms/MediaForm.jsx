@@ -28,6 +28,7 @@ import { useSellProperty } from "../../../context/SellPropertyContext";
 import "../mediaForms/MediaForm.css";
 import { useNavigate } from "react-router-dom";
 import StatusMessage, { showStatusMessage } from "../../common/MessagePopup";
+import { useAuth } from "../../../context/UserContext";
 
 // ============================================================
 // FILE SIZE LIMITS
@@ -685,6 +686,8 @@ const CoverCropModal = ({ open, imageFile, onCancel, onSave }) => {
 const MediaUploadForm = () => {
   const navigate = useNavigate();
 
+  const { user } = useAuth();
+
   const { propertyId, updateFormData } = useSellProperty();
 
   const [coverImage, setCoverImage] = useState(null);
@@ -1243,7 +1246,7 @@ const MediaUploadForm = () => {
       const payload = {
         step: 4,
 
-        user_id: 1,
+        user_id: user?.id,
 
         prop_id: propertyId,
 

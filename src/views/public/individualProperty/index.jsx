@@ -39,8 +39,7 @@ const PropertyDetails = () => {
   // ==========================================================
 
   const { propertyId } = useParams();
-  // const { user } = useAuth();
-  const user = { user_id: 1 };
+  const { user } = useAuth();
   const currentPropertyId = propertyId;
 
   // ==========================================================
@@ -62,6 +61,8 @@ const PropertyDetails = () => {
   // right section condition based so theese are the states
   const [propertyStatus, setPropertyStatus] = useState(null);
   const [propertyUserId, setPropertyUserId] = useState(null);
+
+  const [propertyActivityData, setPropertyActivityData] = useState(null);
 
   // ==========================================================
   // TABS
@@ -128,7 +129,7 @@ const PropertyDetails = () => {
 
         const response = await getIndividualProperties({
           prop_id: currentPropertyId,
-          user_id: 1,
+          user_id: user?.id,
         });
 
         const apiData = response;
@@ -136,6 +137,8 @@ const PropertyDetails = () => {
         const property = apiData;
 
         setShowPriceDetails(property);
+
+        setPropertyActivityData(property);
 
         setPropertyStatus(property?.status ?? null);
         setPropertyUserId(property?.user_id ?? null);
@@ -533,6 +536,7 @@ const PropertyDetails = () => {
         setShowPlanDetails(false);
 
         setPlanDetailsData(null);
+        setPropertyActivityData(null);
       }
     };
 
@@ -577,20 +581,26 @@ const PropertyDetails = () => {
   };
 
   const showEnquiry =
-    user?.user_id != null &&
+    user?.id != null &&
     propertyUserId != null &&
-    Number(user?.user_id) !== Number(propertyUserId);
+    Number(user?.id) !== Number(propertyUserId);
 
   const showPropertyActivity =
-    user?.user_id != null &&
+    user?.id != null &&
     propertyUserId != null &&
-    Number(user?.user_id) === Number(propertyUserId);
+    Number(user?.id) === Number(propertyUserId);
 
   const showPaidAndPost =
-    user?.user_id != null &&
+    user?.id != null &&
     propertyUserId != null &&
-    Number(user.user_id) === Number(propertyUserId) &&
+    Number(user.id) === Number(propertyUserId) &&
     propertyStatus === "approved";
+
+  const showPlanActivity =
+    user?.id != null &&
+    propertyUserId != null &&
+    Number(user?.id) === Number(propertyUserId) &&
+    propertyStatus === "posted";
 
   return (
     <main className="w-[90%] mx-auto min-h-screen bg-white">
@@ -675,13 +685,15 @@ const PropertyDetails = () => {
               {showEnquiry && <Enquiry propertyId={propertyId} />}
 
               {/* Plan Activity */}
-              {showPropertyActivity && <PropertyActivity />}
+              {showPropertyActivity && (
+                <PropertyActivity activities={propertyActivityData} />
+              )}
 
               {/* Paid and Post Button */}
               {showPaidAndPost && <PaidAndPost />}
 
               {/* Plan Activity */}
-              <PlanActivity />
+              {showPlanActivity && <PlanActivity prop_id={currentPropertyId} />}
 
               {/* Property Post Information */}
 

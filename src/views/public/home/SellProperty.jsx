@@ -4,11 +4,14 @@ import SubscriptionCard from "../../../components/cards/SubscriptionCard.jsx";
 import { getSubscriptionPlans } from "../../../api/subscriptionPlans.api.js";
 import { useLoginModal } from "../../../context/LoginModalContext.jsx";
 import axiosInstance from "../../../api/axios.js";
+import { useNavigate } from "react-router-dom";
 
 const SellProperty = () => {
   const [plans, setPlans] = useState([]);
-  const [user, setUser] = useState(null);
-  const [userLoading, setUserLoading] = useState(true);
+  const [user, setUser] = useState({});
+  // const [userLoading, setUserLoading] = useState(true);
+
+  const navigate = useNavigate();
 
   const { openLoginModal } = useLoginModal();
 
@@ -32,14 +35,9 @@ const SellProperty = () => {
       try {
         setUserLoading(true);
 
-        const response = await axiosInstance.get(
-          "/user/get-user"
-        );
+        const response = await axiosInstance.get("/user/get-user");
 
-        if (
-          response?.data?.success === 1 &&
-          response?.data?.data?.length > 0
-        ) {
+        if (response?.data?.success === 1 && response?.data?.data?.length > 0) {
           setUser(response.data.data[0]);
         } else {
           setUser(null);
@@ -56,13 +54,13 @@ const SellProperty = () => {
   }, []);
 
   // If not logged in, show global login modal
-  useEffect(() => {
-    if (!userLoading && !user) {
-      openLoginModal();
-    }
-  }, [userLoading, user, openLoginModal]);
+  // useEffect(() => {
+  //   if (!user) {
+  //     openLoginModal();
+  //   }
+  // }, [user, openLoginModal]);
 
-  const isLoggedIn = !!user;
+  const isLoggedIn = user?.id;
 
   const handleSellProperty = () => {
     if (!isLoggedIn) {
@@ -71,14 +69,14 @@ const SellProperty = () => {
     }
 
     // Continue your sell property flow here
-    console.log("User can sell property");
+    // console.log("User can sell property");
+    navigate("/sell-property");
   };
 
   return (
     <div className="w-full py-16">
       <div className="w-[90%] mx-auto rounded-xl bg-gradient-to-r from-[#FFF6F6] via-[#EEF3FF] to-[#e8ecfb] p-6 md:p-10">
         <div className="flex flex-col lg:flex-row items-center gap-y-10 gap-x-16 text-start justify-center">
-
           {/* Left content */}
           <div className="lg:w-1/2 flex flex-col gap-y-2">
             <h2 className="text-2xl md:text-4xl font-bold text-gray-900">
@@ -106,7 +104,6 @@ const SellProperty = () => {
           <div className="w-full lg:w-1/3">
             <SubscriptionCard plans={plans} />
           </div>
-
         </div>
       </div>
     </div>

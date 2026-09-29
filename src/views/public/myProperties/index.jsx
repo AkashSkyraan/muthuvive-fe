@@ -121,16 +121,16 @@ const MyProperties = () => {
 
   useEffect(() => {
     const fetchProperties = async () => {
-      // if (!user?.id) {
-      //   setProperties([]);
-      //   return;
-      // }
+      if (!user?.id) {
+        setProperties([]);
+        return;
+      }
 
       try {
         setLoading(true);
 
         const payload = {
-          user_id: 1,
+          user_id: user?.id,
           type: selectedFilters,
           search: search,
           status: activeCategory,
