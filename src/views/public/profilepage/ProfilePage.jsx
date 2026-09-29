@@ -50,11 +50,11 @@ const ProfilePage = () => {
             mobile: verifiedMobile,
           };
 
-          console.log("Update Mobile Payload:", payload);
+          // console.log("Update Mobile Payload:", payload);
 
           const response = await updateProfile(payload);
 
-          console.log("Update Mobile Response:", response);
+          // console.log("Update Mobile Response:", response);
 
           if (response?.success !== 1) {
             showStatusMessage({
@@ -86,11 +86,11 @@ const ProfilePage = () => {
             email: verifiedEmail,
           };
 
-          console.log("Update Email Payload:", payload);
+          // console.log("Update Email Payload:", payload);
 
           const response = await updateProfile(payload);
 
-          console.log("Update Email Response:", response);
+          // console.log("Update Email Response:", response);
 
           if (response?.success !== 1) {
             showStatusMessage({
@@ -167,7 +167,7 @@ const ProfilePage = () => {
       const response = await updateProfile(payload);
       setUser(fullName);
 
-      console.log("Update Profile Response:", response);
+      // console.log("Update Profile Response:", response);
 
       if (response?.success !== 1) {
         showStatusMessage({

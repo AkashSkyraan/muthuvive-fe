@@ -113,7 +113,7 @@ const MyProperties = () => {
           limit: pagination.limit,
         });
 
-        console.log("Recent Views:", response);
+        // console.log("Recent Views:", response);
 
         if (response?.success === 1) {
           const recentData = response?.data?.[0];
@@ -157,7 +157,7 @@ const MyProperties = () => {
   // ============================================================
 
   const handleSellProperty = () => {
-    console.log("Sell my property");
+    // console.log("Sell my property");
   };
 
   // ============================================================
@@ -165,7 +165,7 @@ const MyProperties = () => {
   // ============================================================
 
   const handleSort = () => {
-    console.log("Sort clicked");
+    // console.log("Sort clicked");
   };
 
   // ============================================================

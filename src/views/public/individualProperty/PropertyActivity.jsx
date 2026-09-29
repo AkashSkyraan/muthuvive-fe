@@ -6,7 +6,7 @@ import {
 } from "@ant-design/icons";
 
 const PropertyActivity = ({ activities = {} }) => {
-  console.log("from property activity:", activities);
+  // console.log("from property activity:", activities);
 
   const [isOpen, setIsOpen] = useState(true);
 

@@ -13,7 +13,7 @@ function EmailOtpModal({ open, email, onClose, onVerified }) {
     try {
       setLoading(true);
 
-      console.log("OTP:", otp);
+      // console.log("OTP:", otp);
 
       // Verify OTP API call here
 
@@ -26,7 +26,7 @@ function EmailOtpModal({ open, email, onClose, onVerified }) {
   };
 
   const handleResend = () => {
-    console.log("Resend OTP:", email);
+    // console.log("Resend OTP:", email);
   };
 
   return (

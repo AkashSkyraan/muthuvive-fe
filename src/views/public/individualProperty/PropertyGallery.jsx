@@ -4,8 +4,8 @@ import { CloseOutlined, LeftOutlined, RightOutlined } from "@ant-design/icons";
 import "./PropertyGallery.css";
 
 const PropertyGallery = ({ data = [], videos = [] }) => {
-  console.log("from_gallery_images", data);
-  console.log("from_gallery_videos", videos);
+  // console.log("from_gallery_images", data);
+  // console.log("from_gallery_videos", videos);
 
   // ============================================================
   // MEDIA TYPE CHECK

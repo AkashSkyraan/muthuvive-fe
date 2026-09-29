@@ -184,7 +184,7 @@ const PropertyFilters = ({
       setPriceRangeLoading(true);
 
       try {
-        console.log(propertyType, "ptype");
+        // console.log(propertyType, "ptype");
 
         const data = await getPriceRange(propertyType);
 

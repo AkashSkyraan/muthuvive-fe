@@ -1263,7 +1263,7 @@ const MediaUploadForm = () => {
         requested_at: requestedAt,
       };
 
-      console.log("Final Media Payload:", payload);
+      // console.log("Final Media Payload:", payload);
 
       // ------------------------------------------------------
       // 7. SAVE PROPERTY
@@ -1271,7 +1271,7 @@ const MediaUploadForm = () => {
 
       const response = await postSellPropertyForm(payload);
 
-      console.log("Final Media Response:", response);
+      // console.log("Final Media Response:", response);
 
       navigate("/properties/my-properties", {
         state: {
@@ -1294,6 +1294,8 @@ const MediaUploadForm = () => {
   const handlePrevious = async () => {
     navigate("/sell-property/features");
   };
+
+  console.log("changes done");
 
   return (
     <>
