@@ -23,7 +23,12 @@ const getPageNumbers = (current, totalPages, maxVisible) => {
   return Array.from({ length: end - start + 1 }, (_, i) => start + i);
 };
 
-const Pagination = ({ current = 1, totalPages = 1, onChange }) => {
+const Pagination = ({ current = 1, totalPages, onChange }) => {
+
+  console.log(totalPages , 
+    "tt"
+  )
+  
   const [isMobile, setIsMobile] = useState(false);
   // console.log(current, totalPages);
 

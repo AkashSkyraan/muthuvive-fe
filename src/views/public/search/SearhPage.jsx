@@ -87,40 +87,11 @@ function SearchPage() {
   // STATES
   // =========================
 
-  useEffect(() => {
-    const params = new URLSearchParams(routerLocation.search);
-    const queryPropertyType = params.get("propertyType");
-
-    if (!queryPropertyType) {
-      return;
-    }
-
-    const numericId = Number(queryPropertyType);
-
-    if (!Number.isNaN(numericId) && Number(propertyType) !== numericId) {
-      setPropertyType(numericId);
-    }
-  }, [routerLocation.search]);
-
   const handlePropertyTypeChange = (id) => {
     const numericId = Number(id);
 
     setPropertyType(numericId);
     setOpenPropertyType(false);
-
-    const params = new URLSearchParams(routerLocation.search);
-
-    if (numericId) {
-      params.set("propertyType", String(numericId));
-    } else {
-      params.delete("propertyType");
-    }
-
-    const query = params.toString();
-
-    navigate(query ? `/search?${query}` : "/search", {
-      replace: true,
-    });
   };
 
   const [propertyTypes, setPropertyTypes] = useState([]);
@@ -266,44 +237,47 @@ function SearchPage() {
   // =========================
   // SEARCH CLICK
   // =========================
-  const handleSearchClick = () => {
-    const params = new URLSearchParams();
+const handleSearchClick = () => {
+  const params = new URLSearchParams();
 
-    if (location?.trim()) {
-      params.set("search_loc", location.trim());
+  const currentLocation = String(location || "").trim();
+  const currentPropertyType = Number(propertyType);
+
+  if (currentLocation) {
+    params.set("search_loc", currentLocation);
+  }
+
+  if (currentPropertyType) {
+    params.set("propertyType", String(currentPropertyType));
+  }
+
+  const query = params.toString();
+
+  navigate(query ? `/search?${query}` : "/search");
+};
+
+useEffect(() => {
+  const params = new URLSearchParams(routerLocation.search);
+
+  const queryLocation = params.get("search_loc");
+  const queryPropertyType = params.get("propertyType");
+
+  // URL -> Context only when value exists in URL
+  if (queryLocation && queryLocation !== location) {
+    setLocation(queryLocation);
+  }
+
+  if (queryPropertyType) {
+    const numericId = Number(queryPropertyType);
+
+    if (
+      !Number.isNaN(numericId) &&
+      Number(propertyType) !== numericId
+    ) {
+      setPropertyType(numericId);
     }
-
-    if (propertyType) {
-      params.set("propertyType", propertyType);
-    }
-
-    const qs = params.toString();
-
-    navigate(qs ? `/search?${qs}` : "/search");
-  };
-
-  useEffect(() => {
-    const params = new URLSearchParams(routerLocation.search);
-
-    const queryLocation = params.get("search_loc");
-    const queryPropertyType = params.get("propertyType");
-
-    if (queryLocation && location !== queryLocation) {
-      setLocation(queryLocation);
-    }
-
-    if (!queryLocation && location) {
-      clearLocation();
-    }
-
-    if (queryPropertyType) {
-      const numericId = Number(queryPropertyType);
-
-      if (!Number.isNaN(numericId) && Number(propertyType) !== numericId) {
-        setPropertyType(numericId);
-      }
-    }
-  }, [routerLocation.search]);
+  }
+}, [routerLocation.search]);
 
   return (
     <div

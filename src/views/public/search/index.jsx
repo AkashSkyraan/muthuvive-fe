@@ -227,7 +227,7 @@ const PropertySearchResults = () => {
 
         const params = {
           page,
-          limit,
+          limit: 6,
 
           ...(urlLocation && {
             location: urlLocation,
@@ -264,7 +264,7 @@ const PropertySearchResults = () => {
             }),
         };
 
-        console.log("API PARAMS:", params);
+      
 
         const response = await axiosInstance.get("/property/get-property", {
           params,
@@ -313,8 +313,8 @@ const PropertySearchResults = () => {
     filters.ownershipType,
     filters.amenities,
     filters.facingDirection,
-     filters.min_price,
-  filters.max_price,
+    filters.min_price,
+    filters.max_price,
   ]);
 
   // ============================================================
@@ -396,24 +396,32 @@ const PropertySearchResults = () => {
         {/* =====================================================
             MAIN CONTENT
         ====================================================== */}
-        <div className="flex flex-col lg:flex-row gap-6 my-6">
-          {/* ===================================================
-              DESKTOP FILTER
-          ==================================================== */}
+        <div
+          className="
+    flex
+    flex-col
+    lg:flex-row
+    gap-6
+    my-6
+    lg:h-[calc(100vh-80px)]
+    lg:overflow-hidden
+  "
+        >
+          {/* FILTER */}
           <aside
             className="
-              hidden
-              lg:block
-              w-full
-              lg:w-[30%]
-              shrink-0
-              lg:sticky
-              lg:top-[80px]
-              lg:self-start
-              lg:max-h-[calc(100vh-100px)]
-              lg:overflow-y-auto
-              pr-1
-            "
+      hidden
+      lg:block
+      w-full
+      lg:w-[30%]
+      shrink-0
+      lg:h-full
+      lg:overflow-y-auto
+
+      [scrollbar-width:none]
+      [-ms-overflow-style:none]
+      [&::-webkit-scrollbar]:hidden
+    "
           >
             <SearchFilters
               sortByOptions={sortByOptions}
@@ -429,10 +437,23 @@ const PropertySearchResults = () => {
             />
           </aside>
 
-          {/* ===================================================
-              RESULTS
-          ==================================================== */}
-          <div className="w-full lg:w-[65%] mx-auto">
+          {/* RESULTS - ONLY THIS SCROLLS */}
+          <div
+            className="
+      w-full
+      lg:w-[65%]
+      mx-auto
+
+      lg:h-full
+      lg:overflow-y-auto
+      lg:scroll-smooth
+      lg:overscroll-contain
+
+      [scrollbar-width:none]
+      [-ms-overflow-style:none]
+      [&::-webkit-scrollbar]:hidden
+    "
+          >
             {/* RESULT COUNT */}
             <div className="flex items-center justify-between mb-4">
               <p className="text-sm text-gray-700">
@@ -443,27 +464,26 @@ const PropertySearchResults = () => {
               </p>
             </div>
 
-            {/* LOADING */}
+            {/* RESULTS */}
             {loading ? (
               <div className="flex justify-center py-16">
                 <div className="flex flex-col items-center gap-3">
                   <div
                     className="
-                      h-8
-                      w-8
-                      animate-spin
-                      rounded-full
-                      border-4
-                      border-gray-200
-                      border-t-blue-600
-                    "
+              h-8
+              w-8
+              animate-spin
+              rounded-full
+              border-4
+              border-gray-200
+              border-t-blue-600
+            "
                   />
 
                   <p className="text-sm text-gray-500">Loading properties...</p>
                 </div>
               </div>
             ) : properties.length === 0 ? (
-              /* NO RESULTS */
               <div className="flex flex-col items-center justify-center py-16">
                 <p className="text-base font-medium text-gray-700">
                   No properties found
@@ -474,7 +494,6 @@ const PropertySearchResults = () => {
                 </p>
               </div>
             ) : (
-              /* PROPERTY GRID */
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {properties.map((property, index) => (
                   <ProjectCard
@@ -485,15 +504,13 @@ const PropertySearchResults = () => {
               </div>
             )}
 
-            {/* =================================================
-                PAGINATION
-            ================================================== */}
+            {/* PAGINATION */}
             {totalResults > 0 && (
-              <div className="mt-8 flex justify-center">
+              <div className="mt-8 flex justify-center pb-8">
                 <Pagination
                   current={page}
                   pageSize={limit}
-                  total={totalResults}
+                  totalPages={Math.ceil(totalResults / 6)}
                   onChange={handlePageChange}
                   onShowSizeChange={(_, size) => handleLimitChange(size)}
                 />

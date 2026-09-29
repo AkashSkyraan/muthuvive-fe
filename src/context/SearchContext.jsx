@@ -25,16 +25,24 @@ export const SearchProvider = ({ children }) => {
   const [locationPermission, setLocationPermission] = useState("unknown");
 
   // =========================
-  // URL -> STATE (initial + back/forward)
+  // URL -> STATE
   // =========================
   useEffect(() => {
-    const urlLocation = searchParams.get("location") || "";
+    const urlLocation = searchParams.get("search_loc") || "";
     const urlPropertyType = searchParams.get("propertyType") || "";
 
-    setLocationState((prev) => (prev !== urlLocation ? urlLocation : prev));
-    setPropertyTypeState((prev) =>
-      prev !== urlPropertyType ? urlPropertyType : prev,
-    );
+    // URL-la value irundha mattum state update pannu
+    if (urlLocation) {
+      setLocationState((prev) =>
+        prev !== urlLocation ? urlLocation : prev,
+      );
+    }
+
+    if (urlPropertyType) {
+      setPropertyTypeState((prev) =>
+        prev !== urlPropertyType ? urlPropertyType : prev,
+      );
+    }
   }, [searchParams]);
 
   // =========================
@@ -93,9 +101,11 @@ export const SearchProvider = ({ children }) => {
         if (error.code === error.PERMISSION_DENIED) {
           setLocationPermission("denied");
         }
+
         if (error.code === error.POSITION_UNAVAILABLE) {
           setLocationPermission("unavailable");
         }
+
         if (error.code === error.TIMEOUT) {
           setLocationPermission("timeout");
         }
@@ -112,17 +122,18 @@ export const SearchProvider = ({ children }) => {
   }, []);
 
   // =========================
-  // FIRST MOUNT — geolocation (URL la location illena mattum)
+  // FIRST MOUNT — geolocation
   // =========================
   useEffect(() => {
-    if (!searchParams.get("location")) {
+    const urlLocation = searchParams.get("search_loc");
+
+    if (!urlLocation) {
       getCurrentLocation();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [searchParams, getCurrentLocation]);
 
   // =========================
-  // SET LOCATION (manual)
+  // SET LOCATION
   // =========================
   const setLocation = useCallback((value) => {
     setLocationState(value);
@@ -166,25 +177,20 @@ export const SearchProvider = ({ children }) => {
   return (
     <SearchContext.Provider
       value={{
-        // location
         location,
         setLocation,
         clearLocation,
 
-        // property type
         propertyType,
         setPropertyType,
         clearPropertyType,
 
-        // coordinates
         latitude,
         longitude,
 
-        // status
         locationLoading,
         locationPermission,
 
-        // actions
         getCurrentLocation,
         clearAll,
       }}

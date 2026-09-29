@@ -6,6 +6,8 @@ import { useLoginModal } from "../../context/LoginModalContext.jsx";
 // Renders a singling card. Pass one `listing` object with
 // { id, image, category, title, price, address, area, hospitals, schools }.
 const ProjectCard = ({ listing, user }) => {
+
+  console.log(listing, "lis")
   const { openLoginModal } = useLoginModal();
 
   const [isBookmarked, setIsBookmarked] = useState(
