@@ -16,7 +16,7 @@ const tabOptions = [
   },
 ];
 
-const DTCP_TYPE = 5;
+const DTCP_TYPE = 2;
 
 // ============================================================
 // FORMAT PRICE
@@ -108,7 +108,7 @@ const DTCPProjects = () => {
   const fetchProjects = async (tab) => {
     try {
       // Convert UI tab value to API status value
-      const status = tab === "available" ? "inprogress" : "sold";
+      const status = tab === "available" ? "posted" : "sold";
 
       const response = await getProperties({
         limit: 5,
