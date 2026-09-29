@@ -22,8 +22,8 @@ const MyPlans = () => {
         setLoading(true);
 
         const payload = {
-          user_id: 15,
-          prop_id: "PLJm9G610",
+          user_id: 1,
+          prop_id: propId,
           // user_id: user?.id,
           // prop_id: propId,
         };

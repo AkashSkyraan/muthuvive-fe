@@ -15,8 +15,8 @@ const ProfilePage = () => {
   const { type, emailVerified, mobileVerified, verifiedEmail, verifiedMobile } =
     location.state || {};
 
-  console.log("user details", user);
-  console.log("Profile Route State:", location.state);
+  // console.log("user details", user);
+  // console.log("Profile Route State:", location.state);
 
   const [savedFullName, setSavedFullName] = useState(user?.user_name);
 
@@ -46,9 +46,8 @@ const ProfilePage = () => {
           setIsChangingMobile(true);
 
           const payload = {
-            // user_id: user?.id,
+            user_id: user?.id,
             mobile: verifiedMobile,
-            user_id: 15,
           };
 
           console.log("Update Mobile Payload:", payload);
@@ -83,9 +82,8 @@ const ProfilePage = () => {
           setIsChangingEmail(true);
 
           const payload = {
-            // user_id: user?.id,
+            user_id: user?.id,
             email: verifiedEmail,
-            user_id: 15,
           };
 
           console.log("Update Email Payload:", payload);
@@ -162,9 +160,8 @@ const ProfilePage = () => {
   const handleSaveName = async () => {
     try {
       const payload = {
-        // user_id: user?.id,
+        user_id: user?.id,
         name: fullName,
-        user_id: 15,
       };
 
       const response = await updateProfile(payload);

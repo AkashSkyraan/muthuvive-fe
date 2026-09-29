@@ -5,27 +5,9 @@ import {
   InfoCircleOutlined,
 } from "@ant-design/icons";
 
-const mockActivities = [
-  {
-    id: 1,
-    requested_at: "2026-04-23 15:12:00",
-    is_approved: 1,
-    approved_at: "2026-04-23 15:12:00",
-    is_rejected: 1,
-    rejected_reason:
-      "Your Request Was Rejected Because The Submitted Property Details Or Documents Did Not Meet Our Listing Requirements.",
-  },
-  {
-    id: 2,
-    requested_at: "2026-04-20 11:30:00",
-    is_approved: 0,
-    approved_at: null,
-    is_rejected: 0,
-    rejected_reason: null,
-  },
-];
+const PropertyActivity = ({ activities = {} }) => {
+  console.log("from property activity:", activities);
 
-const PropertyActivity = ({ activities = mockActivities }) => {
   const [isOpen, setIsOpen] = useState(true);
 
   const formatDate = (dateValue) => {
@@ -56,11 +38,6 @@ const PropertyActivity = ({ activities = mockActivities }) => {
     return `${day}-${month}-${year}, ${weekday}, ${time}`;
   };
 
-  // Find the rejected activity, if any
-  const rejectedActivity = activities.find(
-    (activity) => Number(activity.is_rejected) === 1,
-  );
-
   return (
     <div className="w-full">
       {/* Property Activity Accordion */}
@@ -85,56 +62,95 @@ const PropertyActivity = ({ activities = mockActivities }) => {
         {/* Accordion Content */}
         {isOpen && (
           <div className="border-t border-gray-200 px-4 py-4 sm:px-5 sm:py-5">
-            <div className="flex flex-col gap-6">
-              {activities.map((activity) => (
-                <div key={activity.id}>
-                  {/* Request Sent */}
-                  <div>
+            <div className="flex flex-col gap-4">
+              {/* Request Sent */}
+              {activities?.requested_at && (
+                <div>
+                  <p className="text-xs text-gray-400 sm:text-sm">
+                    Request Send
+                  </p>
+
+                  <p className="mt-1 text-xs font-semibold text-gray-900 sm:text-sm">
+                    {formatDate(activities.requested_at)}
+                  </p>
+                </div>
+              )}
+
+              {/* Request Approved */}
+              {activities?.approved_at && (
+                <div className="mt-6">
+                  <p className="text-xs text-gray-400 sm:text-sm">
+                    Request Approved
+                  </p>
+
+                  <p className="mt-1 text-xs font-semibold text-gray-900 sm:text-sm">
+                    {formatDate(activities.approved_at)}
+                  </p>
+                </div>
+              )}
+
+              {/* Request Rejected */}
+              {activities?.rejected_at && (
+                <div className="mt-6">
+                  <p className="text-xs text-gray-400 sm:text-sm">
+                    Request Rejected
+                  </p>
+
+                  <p className="mt-1 text-xs font-semibold text-gray-900 sm:text-sm">
+                    {formatDate(activities.rejected_at)}
+                  </p>
+                </div>
+              )}
+
+              {/* Request Pending */}
+              {/* {activities?.requested_at &&
+                !activities?.approved_at &&
+                !activities?.rejected_at &&
+                !activities?.expired_at &&
+                !activities?.sold_at && (
+                  <div className="mt-6">
                     <p className="text-xs text-gray-400 sm:text-sm">
-                      Request Send
+                      Request Status
                     </p>
 
                     <p className="mt-1 text-xs font-semibold text-gray-900 sm:text-sm">
-                      {formatDate(activity.requested_at)}
+                      Pending Approval
                     </p>
                   </div>
+                )} */}
 
-                  {/* Request Approved */}
-                  {Number(activity.is_approved) === 1 &&
-                    activity.approved_at && (
-                      <div className="mt-6">
-                        <p className="text-xs text-gray-400 sm:text-sm">
-                          Request Approved
-                        </p>
+              {/* Request Expired */}
+              {activities?.expired_at && (
+                <div className="mt-6">
+                  <p className="text-xs text-gray-400 sm:text-sm">
+                    Request Expired
+                  </p>
 
-                        <p className="mt-1 text-xs font-semibold text-gray-900 sm:text-sm">
-                          {formatDate(activity.approved_at)}
-                        </p>
-                      </div>
-                    )}
-
-                  {/* Request Pending */}
-                  {Number(activity.is_approved) !== 1 &&
-                    Number(activity.is_rejected) !== 1 && (
-                      <div className="mt-6">
-                        <p className="text-xs text-gray-400 sm:text-sm">
-                          Request Status
-                        </p>
-
-                        <p className="mt-1 text-xs font-semibold text-gray-900 sm:text-sm">
-                          Pending Approval
-                        </p>
-                      </div>
-                    )}
+                  <p className="mt-1 text-xs font-semibold text-gray-900 sm:text-sm">
+                    {formatDate(activities.expired_at)}
+                  </p>
                 </div>
-              ))}
+              )}
+
+              {/* Property Sold */}
+              {activities?.sold_at && (
+                <div className="mt-6">
+                  <p className="text-xs text-gray-400 sm:text-sm">
+                    Property Sold
+                  </p>
+
+                  <p className="mt-1 text-xs font-semibold text-gray-900 sm:text-sm">
+                    {formatDate(activities.sold_at)}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         )}
       </div>
 
       {/* Rejected Reason */}
-      {rejectedActivity && (
+      {activities?.rejected_reason && (
         <div className="mt-4 text-start w-full rounded-lg bg-[#FFC2C2] px-4 py-3 sm:px-5 sm:py-4">
           <div className="flex items-center gap-x-2">
             <InfoCircleOutlined className="text-xs text-[#D41010] sm:text-sm" />
@@ -145,7 +161,7 @@ const PropertyActivity = ({ activities = mockActivities }) => {
           </div>
 
           <p className="mt-2 text-xs leading-4 text-gray-900 sm:text-sm sm:leading-5 font-medium">
-            {rejectedActivity.rejected_reason}
+            {activities.rejected_reason}
           </p>
         </div>
       )}

@@ -49,6 +49,7 @@ const MyProperties = () => {
   // FILTER STATES
   // ============================================================
 
+  const { user } = useAuth();
   const { setIsLoading } = useLoader();
   const [selectedFilters, setSelectedFilters] = useState([]);
 
@@ -116,7 +117,7 @@ const MyProperties = () => {
         await new Promise((resolve) => setTimeout(resolve, 9000));
 
         const payload = {
-          user_id: 1,
+          user_id: user?.id,
           search: search,
           page: Number(currentPage),
           limit: 1,

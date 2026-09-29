@@ -5,10 +5,13 @@ import ProjectCard from "../../../components/cards/ProjectCard.jsx";
 import { Link } from "react-router-dom";
 
 import { getProperties } from "../../../api/getProperties.api.js";
+import { useAuth } from "../../../context/UserContext.jsx";
 
 // Dynamic data - now comes from API
 const MarketListings = () => {
   const [listings, setListings] = useState([]);
+
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -52,7 +55,7 @@ const MarketListings = () => {
               to={`/properties/${listing.category}/${listing.id}`}
               key={listing.id}
             >
-              <ProjectCard listing={listing} />
+              <ProjectCard listing={listing} user={user?.id || null} />
             </Link>
           ))}
         </div>
