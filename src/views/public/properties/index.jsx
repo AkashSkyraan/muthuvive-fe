@@ -23,7 +23,7 @@ const categoryData = {
       image: images.agriBannerImage,
     },
     tabs: [
-      { key: "available", label: "Available Projects" },
+      { key: "posted", label: "Available Projects" },
       { key: "sold", label: "Sold Projects" },
     ],
   },
@@ -38,7 +38,7 @@ const categoryData = {
       image: images.farmlandBannerImage,
     },
     tabs: [
-      { key: "available", label: "Available Projects" },
+      { key: "posted", label: "Available Projects" },
       { key: "sold", label: "Sold Projects" },
     ],
   },
@@ -53,7 +53,7 @@ const categoryData = {
       image: images.residentialBannerImage,
     },
     tabs: [
-      { key: "available", label: "Available Projects" },
+      { key: "posted", label: "Available Projects" },
       { key: "sold", label: "Sold Projects" },
     ],
     categories: [
@@ -75,7 +75,7 @@ const categoryData = {
       image: images.residentialBannerImage,
     },
     tabs: [
-      { key: "available", label: "Available Projects" },
+      { key: "posted", label: "Available Projects" },
       { key: "sold", label: "Sold Projects" },
     ],
     categories: [
@@ -97,7 +97,7 @@ const categoryData = {
       image: images.commercialBannerImage,
     },
     tabs: [
-      { key: "available", label: "Available Projects" },
+      { key: "posted", label: "Available Projects" },
       { key: "sold", label: "Sold Projects" },
     ],
   },
@@ -112,7 +112,7 @@ const categoryData = {
       image: images.dtcpBannerImage,
     },
     tabs: [
-      { key: "available", label: "Available Projects" },
+      { key: "posted", label: "Available Projects" },
       { key: "sold", label: "Sold Projects" },
     ],
   },
@@ -127,7 +127,7 @@ const categoryData = {
       image: images.commercialBannerImage,
     },
     tabs: [
-      { key: "available", label: "Available Projects" },
+      { key: "posted", label: "Available Projects" },
       { key: "sold", label: "Sold Projects" },
     ],
   },
@@ -142,7 +142,7 @@ const categoryData = {
       image: images.commercialBannerImage,
     },
     tabs: [
-      { key: "available", label: "Available Projects" },
+      { key: "posted", label: "Available Projects" },
       { key: "sold", label: "Sold Projects" },
     ],
   },
@@ -163,7 +163,7 @@ const CATEGORY_TYPE_MAP = {
 // ============================================================
 
 const TAB_STATUS_MAP = {
-  available: "available",
+  available: "posted",
   sold: "sold",
 
   // For your commercial/residential tabs
