@@ -142,7 +142,7 @@ const EnquiryForm = () => {
                   <Input
                     placeholder="Full Name"
                     variant="borderless"
-                    className="!px-0 !py-3 !border-0 !border-b !border-gray-200 !rounded-none !shadow-none !text-base"
+                    className="!px-0 !py-3 !border-0 !border-b !border-gray-200 !rounded-none !shadow-none !text-base !text-black"
                   />
                 </Form.Item>
 
@@ -163,7 +163,7 @@ const EnquiryForm = () => {
                   <Input
                     placeholder="Mobile Number"
                     variant="borderless"
-                    className="!px-0 !py-3 !border-0 !border-b !border-gray-200 !rounded-none !shadow-none !text-base"
+                    className="!px-0 !py-3 !border-0 !border-b !border-gray-200 !rounded-none !shadow-none !text-base !text-black"
                   />
                 </Form.Item>
 
@@ -181,7 +181,7 @@ const EnquiryForm = () => {
                   <Input
                     placeholder="E-Mail"
                     variant="borderless"
-                    className="!px-0 !py-3 !border-0 !border-b !border-gray-200 !rounded-none !shadow-none !text-base"
+                    className="!px-0 !py-3 !border-0 !border-b !border-gray-200 !rounded-none !shadow-none !text-base !text-black"
                   />
                 </Form.Item>
 

@@ -19,7 +19,7 @@ const PropertyHeader = ({ data = {} }) => {
   const [showPrice, setShowPrice] = useState(false);
 
   useEffect(() => {
-    setShowPrice([5, 6].includes(Number(category)));
+    setShowPrice([1, 2].includes(Number(category)));
   }, [category]);
 
   const contactNumber = aboutUs?.[0]?.mobile;

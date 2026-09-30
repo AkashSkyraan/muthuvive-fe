@@ -3,15 +3,19 @@ import icons from "../../config/Icons.jsx";
 import { CircleSmall } from "lucide-react";
 import { useLoginModal } from "../../context/LoginModalContext.jsx";
 import { showStatusMessage } from "../common/MessagePopup.jsx";
+import axiosInstance from "../../api/axios.js";
 
 // Renders a singling card. Pass one `listing` object with
 // { id, image, category, title, price, address, area, hospitals, schools }.
 const ProjectCard = ({ listing, user }) => {
   const { openLoginModal } = useLoginModal();
 
-  const [isBookmarked, setIsBookmarked] = useState(
-    Boolean(listing?.is_bookmarked),
-  );
+  const [isBookmarked, setIsBookmarked] = useState(false);
+
+  if (listing?.is_bookmarked === 1 && user === listing?.user_id) {
+    isBookmarked(true);
+    console.log(listing?.is_bookmarked);
+  }
 
   const [bookmarkLoading, setBookmarkLoading] = useState(false);
 
@@ -34,8 +38,9 @@ const ProjectCard = ({ listing, user }) => {
     try {
       setBookmarkLoading(true);
 
-      const response = await AxiosInstance.post("/properties/bookmark", {
+      const response = await axiosInstance.post("/property/add-bookmark", {
         prop_id: listing.prop_id,
+        user_id: user,
       });
 
       if (response?.data?.success === 1) {
@@ -128,9 +133,9 @@ const ProjectCard = ({ listing, user }) => {
 
             <span
               className="text-sm text-gray-500 truncate"
-              title={listing?.highlights?.name}
+              title={listing?.property_highs?.name}
             >
-              {listing?.highlights?.name}
+              {listing?.property_highs?.name}
             </span>
           </div>
 

@@ -44,7 +44,7 @@ const PropertyCategoryForm = ({ onPrevious }) => {
   // ============================================================
 
   const filteredPropertyCategories = propertyCategories.filter(
-    (item) => item.id !== 5 && item.id !== 6,
+    (item) => item.id !== 1 && item.id !== 2 && item.id !== 5,
   );
 
   // ============================================================

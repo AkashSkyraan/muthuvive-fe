@@ -37,14 +37,6 @@ const Header = () => {
 
   const [isLoginPopupOpen, setIsLoginPopupOpen] = useState(false);
 
-  const handleSellProperty = () => {
-    if (!isLoggedIn) {
-      openLoginModal();
-      return;
-    }
-
-    navigate("/sell-property");
-  };
   // Lock scroll if account Popover is open
   useScrollLock(isDesktopAccountOpen || isMobileAccountOpen);
 
@@ -80,7 +72,16 @@ const Header = () => {
   // Login Status
   // ---------------------------------------------------------
 
-  const isLoggedIn = !!user;
+  const isLoggedIn = !user;
+
+  const handleSellProperty = () => {
+    if (!user) {
+      openLoginModal();
+      return;
+    }
+
+    navigate("/sell-property");
+  };
 
   // ---------------------------------------------------------
   // Get User First Letter
@@ -814,15 +815,14 @@ const Header = () => {
             {/* ================================================= */}
 
             <div className="mt-8 text-start">
-              <Link to="/sell-property" onClick={closeMobileMenu}>
-                <Button
-                  type="primary"
-                  className="!bg-secondary w-auto max-w-[500px] !py-5 !text-base"
-                  block
-                >
-                  Sell my Properties
-                </Button>
-              </Link>
+              <Button
+                type="primary"
+                className="!bg-secondary w-auto max-w-[500px] !py-5 !text-base"
+                block
+                onClick={handleSellProperty}
+              >
+                Sell my Properties
+              </Button>
             </div>
           </div>
         </div>

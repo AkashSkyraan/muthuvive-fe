@@ -8,11 +8,24 @@ import facebookIcon from "../assets/icons/facebook.png";
 import twitterIcon from "../assets/icons/twitter.png";
 import images from "../config/Images";
 import icons from "../config/Icons";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAboutUs } from "../context/AboutusContext";
+import { useAuth } from "../context/UserContext";
+import { useLoginModal } from "../context/LoginModalContext";
 
 const Footer = () => {
   const { aboutUs, loading, error } = useAboutUs();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { openLoginModal } = useLoginModal();
+
+  const handleSellProperty = () => {
+    if (!user?.id) {
+      openLoginModal();
+      return;
+    }
+    navigate("/sell-property");
+  };
   return (
     <div className="w-full bg-[#141B34] overflow-x-clip">
       <div className="w-[90%] p-4 mx-auto py-14">
@@ -66,7 +79,7 @@ const Footer = () => {
                 <Link to="/properties/dtcp-approved">Properties</Link>
               </li> */}
               <li>
-                <Link to="/sell-property">Sell my properties</Link>
+                <button onClick={handleSellProperty}>Sell my properties</button>
               </li>
               <li>
                 <Link to="gallery">Gallery</Link>

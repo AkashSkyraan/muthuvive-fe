@@ -4,7 +4,7 @@ import { getUser } from "../api/auth.api";
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState({});
   const [loading, setLoading] = useState(true);
 
   const fetchUser = async () => {
@@ -14,6 +14,7 @@ export const AuthProvider = ({ children }) => {
       const response = await getUser();
 
       if (response?.success === true || response?.success === 1) {
+        // setUser(response?.data?.[0] || null);
         setUser(response?.data?.[0] || null);
       } else {
         setUser(null);
@@ -22,6 +23,12 @@ export const AuthProvider = ({ children }) => {
       console.error("Get User Error:", error);
       setUser(null);
     } finally {
+      // setUser({
+      //   id: 1,
+      //   user_name: "AKASH",
+      //   email: "abcdef@gmail.com",
+      //   mobile: "9876543210",
+      // });
       setLoading(false);
     }
   };

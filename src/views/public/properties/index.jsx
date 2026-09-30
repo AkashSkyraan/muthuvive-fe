@@ -149,13 +149,13 @@ const categoryData = {
 };
 
 const CATEGORY_TYPE_MAP = {
-  "agriculture-land": 1,
-  farmland: 6,
-  "commercial-building": 4,
-  "commercial-land": 2,
-  "dtcp-approved": 5,
-  "investment-land": 3,
-  "residential-building": 7,
+  "agriculture-land": 3,
+  farmland: 1,
+  "commercial-building": 7,
+  "commercial-land": 4,
+  "dtcp-approved": 2,
+  "investment-land": 6,
+  "residential-building": 8,
 };
 
 // ============================================================
@@ -163,12 +163,12 @@ const CATEGORY_TYPE_MAP = {
 // ============================================================
 
 const TAB_STATUS_MAP = {
-  available: "available",
+  available: "posted",
   sold: "sold",
 
   // For your commercial/residential tabs
-  "Ongoing-Projects": "inprogress",
-  "Sold-Projects": "sold",
+  // "Ongoing-Projects": "inprogress",
+  // "Sold-Projects": "sold",
 };
 
 // ============================================================

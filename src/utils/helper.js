@@ -12,3 +12,7 @@ export const preventInvalidSpaces = (e) => {
     e.preventDefault();
   }
 };
+
+export const createSlug = (value) => {
+  return value?.toLowerCase().trim().replace(/\s+/g, "-");
+};

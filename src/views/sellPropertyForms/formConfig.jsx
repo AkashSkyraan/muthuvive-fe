@@ -6,11 +6,11 @@ import CommercialFeatureForm from "../../components/forms/featuresForms/Commerci
 import MediaForm from "../../components/forms/mediaForms/MediaForm";
 
 export const categoryConfigMap = {
-  1: "Agriculture Land",
-  2: "Commercial Land",
-  3: "Investment Land",
-  4: "Commercial Buildings",
-  7: "Residential Buildings",
+  3: "Agriculture Land",
+  4: "Commercial Land",
+  6: "Investment Land",
+  7: "Commercial Buildings",
+  8: "Residential Buildings",
 };
 export const sellPropertyFormConfig = {
   "Agriculture Land": {

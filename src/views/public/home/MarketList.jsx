@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 
 import { getProperties } from "../../../api/getProperties.api.js";
 import { useAuth } from "../../../context/UserContext.jsx";
+import { createSlug } from "../../../utils/helper.js";
 
 // Dynamic data - now comes from API
 const MarketListings = () => {
@@ -52,7 +53,7 @@ const MarketListings = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10 text-start">
           {listings.map((listing) => (
             <Link
-              to={`/properties/${listing.category}/${listing.id}`}
+              to={`/properties/${createSlug(listing.category_name)}/${listing.prop_id}`}
               key={listing.id}
             >
               <ProjectCard listing={listing} user={user?.id || null} />

@@ -36,6 +36,7 @@ const SellPropertyLayout = () => {
   // Confirm back navigation
   const handleConfirmBack = () => {
     setShowBackModal(false);
+    console.log("opened");
 
     // Go to home page
     navigate("/");

@@ -30,6 +30,15 @@ const ProfilePage = () => {
   const [isChangingEmail, setIsChangingEmail] = useState(false);
 
   useEffect(() => {
+    if (!user || !user.id) return;
+
+    setSavedFullName(user.user_name || "");
+    setFullName(user.user_name || "");
+    setMobileNumber(user.mobile || "");
+    setEmail(user.email || "");
+  }, [user]);
+
+  useEffect(() => {
     const updateVerifiedContact = async () => {
       const isMobileUpdate =
         type === "mobile" && mobileVerified === true && verifiedMobile;
