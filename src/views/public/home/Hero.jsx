@@ -5,6 +5,7 @@ import images from "../../../config/Images.jsx";
 import icons from "../../../config/Icons.jsx";
 import SearchPage from "../search/SearhPage.jsx";
 import { Link } from "react-router-dom";
+import PaidAndPost from "../individualProperty/PaidAndPost.jsx";
 
 const features = [
   {
@@ -75,6 +76,7 @@ const Hero = () => {
                 Contact Us
               </Button>
             </Link>
+            <PaidAndPost />
           </div>
         </div>
 
