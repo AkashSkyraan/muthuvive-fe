@@ -34,9 +34,10 @@ import { useAuth } from "../../../context/UserContext";
 // FILE SIZE LIMITS
 // ============================================================
 
-const IMAGE_MAX_SIZE = 10 * 1024 * 1024;
+const IMAGE_MAX_SIZE = 3 * 1024 * 1024;
 const VIDEO_MAX_SIZE = 20 * 1024 * 1024;
-const DOCUMENT_MAX_SIZE = 10 * 1024 * 1024;
+const DOCUMENT_MAX_SIZE = 5 * 1024 * 1024;
+const PATTA_MAX_SIZE = 5 * 1024 * 1024;
 
 // ============================================================
 // MEDIA COUNT LIMITS
@@ -50,6 +51,9 @@ const VIDEO_MAX_COUNT = 2;
 
 const DOCUMENT_MIN_COUNT = 1;
 const DOCUMENT_MAX_COUNT = 2;
+
+const PATTA_MIN_COUNT = 1;
+const PATTA_MAX_COUNT = 5;
 
 // ============================================================
 // COVER IMAGE CROP SETTINGS
@@ -252,7 +256,6 @@ const CoverCropModal = ({ open, imageFile, onCancel, onSave }) => {
     const rad = (rotationDeg * Math.PI) / 180;
 
     const cos = Math.abs(Math.cos(rad));
-
     const sin = Math.abs(Math.sin(rad));
 
     const bboxWAtScale1 = naturalSize.w * cos + naturalSize.h * sin;
@@ -281,7 +284,6 @@ const CoverCropModal = ({ open, imageFile, onCancel, onSave }) => {
     const rad = (rotationDeg * Math.PI) / 180;
 
     const cos = Math.abs(Math.cos(rad));
-
     const sin = Math.abs(Math.sin(rad));
 
     return {
@@ -305,7 +307,6 @@ const CoverCropModal = ({ open, imageFile, onCancel, onSave }) => {
     const scale = computeBaseScale(0);
 
     const dispW = naturalSize.w * scale;
-
     const dispH = naturalSize.h * scale;
 
     setZoom(1);
@@ -314,7 +315,6 @@ const CoverCropModal = ({ open, imageFile, onCancel, onSave }) => {
 
     setPos({
       x: (frameSize.w - dispW) / 2,
-
       y: (frameSize.h - dispH) / 2,
     });
 
@@ -331,7 +331,6 @@ const CoverCropModal = ({ open, imageFile, onCancel, onSave }) => {
     const { w: bboxW, h: bboxH } = getBBoxSize(scale, rotationValue);
 
     const minX = frameSize.w - bboxW;
-
     const minY = frameSize.h - bboxH;
 
     return {
@@ -455,7 +454,6 @@ const CoverCropModal = ({ open, imageFile, onCancel, onSave }) => {
     const canvas = document.createElement("canvas");
 
     canvas.width = COVER_IMAGE_WIDTH;
-
     canvas.height = COVER_IMAGE_HEIGHT;
 
     const ctx = canvas.getContext("2d");
@@ -475,7 +473,6 @@ const CoverCropModal = ({ open, imageFile, onCancel, onSave }) => {
 
     ctx.translate(
       (bboxSize.w * outputScale) / 2,
-
       (bboxSize.h * outputScale) / 2,
     );
 
@@ -564,9 +561,7 @@ const CoverCropModal = ({ open, imageFile, onCancel, onSave }) => {
             "
             style={{
               width: bboxSize.w || undefined,
-
               height: bboxSize.h || undefined,
-
               transform: `translate(${pos.x}px, ${pos.y}px)`,
             }}
           >
@@ -700,6 +695,9 @@ const MediaUploadForm = () => {
 
   const [documents, setDocuments] = useState([]);
 
+  // PATTA
+  const [pattas, setPattas] = useState([]);
+
   // IMAGE PREVIEW
   const [previewVisible, setPreviewVisible] = useState(false);
 
@@ -719,6 +717,9 @@ const MediaUploadForm = () => {
   const videosInputRef = useRef(null);
 
   const documentsInputRef = useRef(null);
+
+  // PATTA INPUT
+  const pattaInputRef = useRef(null);
 
   // ==========================================================
   // COVER IMAGE
@@ -837,6 +838,7 @@ const MediaUploadForm = () => {
 
     e.target.value = "";
   };
+
   // ==========================================================
   // VIDEOS
   // ==========================================================
@@ -892,6 +894,7 @@ const MediaUploadForm = () => {
 
     e.target.value = "";
   };
+
   // ==========================================================
   // DOCUMENTS
   // ==========================================================
@@ -945,6 +948,63 @@ const MediaUploadForm = () => {
 
     e.target.value = "";
   };
+
+  // ==========================================================
+  // PATTA
+  // ==========================================================
+
+  const handlePattaChange = (e) => {
+    const files = Array.from(e.target.files || []);
+
+    if (!files.length) {
+      return;
+    }
+
+    const remainingSlots = PATTA_MAX_COUNT - pattas.length;
+
+    if (remainingSlots <= 0) {
+      showStatusMessage({
+        type: "error",
+        text: `Maximum ${PATTA_MAX_COUNT} patta images are allowed`,
+      });
+
+      e.target.value = "";
+      return;
+    }
+
+    if (files.length > remainingSlots) {
+      showStatusMessage({
+        type: "error",
+        text: `You can upload a maximum of ${PATTA_MAX_COUNT} patta documents`,
+      });
+    }
+
+    const allowedFiles = files.slice(0, remainingSlots);
+
+    const newPattas = allowedFiles.map((file) => ({
+      id: `${file.name}-${file.lastModified}-${Math.random()}`,
+
+      file,
+
+      url: URL.createObjectURL(file),
+
+      error: getSizeError(file, PATTA_MAX_SIZE, "Patta"),
+    }));
+
+    const hasInvalidPattas = newPattas.some((patta) => patta.error);
+
+    if (hasInvalidPattas) {
+      showStatusMessage({
+        type: "error",
+        text: "One or more patta images exceed the allowed size of 10 MB",
+      });
+    }
+
+    setPattas((prev) => [...prev, ...newPattas]);
+
+    e.target.value = "";
+  };
+
   // ==========================================================
   // REMOVE COVER
   // ==========================================================
@@ -998,6 +1058,22 @@ const MediaUploadForm = () => {
   };
 
   // ==========================================================
+  // REMOVE PATTA
+  // ==========================================================
+
+  const removePatta = (id) => {
+    setPattas((prev) => {
+      const pattaToRemove = prev.find((patta) => patta.id === id);
+
+      if (pattaToRemove?.url) {
+        URL.revokeObjectURL(pattaToRemove.url);
+      }
+
+      return prev.filter((patta) => patta.id !== id);
+    });
+  };
+
+  // ==========================================================
   // PREVIEW NAVIGATION
   // ==========================================================
 
@@ -1033,7 +1109,8 @@ const MediaUploadForm = () => {
     Boolean(coverImage?.error) ||
     images.some((image) => image.error) ||
     videos.some((video) => video.error) ||
-    documents.some((document) => document.error);
+    documents.some((document) => document.error) ||
+    pattas.some((patta) => patta.error);
 
   // ==========================================================
   // SUBMIT DISABLED CHECK
@@ -1048,6 +1125,8 @@ const MediaUploadForm = () => {
     videos.length > VIDEO_MAX_COUNT ||
     documents.length < DOCUMENT_MIN_COUNT ||
     documents.length > DOCUMENT_MAX_COUNT ||
+    pattas.length < PATTA_MIN_COUNT ||
+    pattas.length > PATTA_MAX_COUNT ||
     isSubmitting;
 
   // ==========================================================
@@ -1165,6 +1244,29 @@ const MediaUploadForm = () => {
 
       return;
     }
+
+    // ------------------------------------------------------
+    // Property Patta - minimum 1, maximum 2
+    // ------------------------------------------------------
+
+    if (pattas.length < PATTA_MIN_COUNT) {
+      showStatusMessage({
+        type: "error",
+        text: `Please upload at least ${PATTA_MIN_COUNT} patta image`,
+      });
+
+      return;
+    }
+
+    if (pattas.length > PATTA_MAX_COUNT) {
+      showStatusMessage({
+        type: "error",
+        text: `Maximum ${PATTA_MAX_COUNT} patta images are allowed`,
+      });
+
+      return;
+    }
+
     // ------------------------------------------------------
     // Prevent duplicate submit
     // ------------------------------------------------------
@@ -1172,6 +1274,7 @@ const MediaUploadForm = () => {
     if (isSubmitting) {
       return;
     }
+
     // ------------------------------------------------------
     // Property ID check
     // ------------------------------------------------------
@@ -1225,7 +1328,15 @@ const MediaUploadForm = () => {
       );
 
       // ------------------------------------------------------
-      // 5. STORE IDS IN CONTEXT
+      // 5. PATTA
+      // ------------------------------------------------------
+
+      const pattaIds = await Promise.all(
+        pattas.map((patta) => uploadSingleFile(patta.file)),
+      );
+
+      // ------------------------------------------------------
+      // 6. STORE IDS IN CONTEXT
       // ------------------------------------------------------
 
       updateFormData("media", "cover", coverId);
@@ -1236,13 +1347,16 @@ const MediaUploadForm = () => {
 
       updateFormData("media", "pr_doc", documentIds);
 
+      updateFormData("media", "patta", pattaIds);
+
       // ------------------------------------------------------
-      // 6. FINAL PAYLOAD
+      // 7. FINAL PAYLOAD
       // ------------------------------------------------------
 
       const now = new Date();
 
       const requestedAt = now.toISOString().slice(0, 19).replace("T", " ");
+
       const payload = {
         step: 4,
 
@@ -1258,6 +1372,8 @@ const MediaUploadForm = () => {
 
         pr_doc: documentIds,
 
+        patta: pattaIds,
+
         status: "requested",
 
         requested_at: requestedAt,
@@ -1266,7 +1382,7 @@ const MediaUploadForm = () => {
       // console.log("Final Media Payload:", payload);
 
       // ------------------------------------------------------
-      // 7. SAVE PROPERTY
+      // 8. SAVE PROPERTY
       // ------------------------------------------------------
 
       const response = await postSellPropertyForm(payload);
@@ -1295,8 +1411,6 @@ const MediaUploadForm = () => {
     navigate("/sell-property/features");
   };
 
-  // console.log("changes done");
-
   return (
     <>
       <StatusMessage placement="top-center" />
@@ -1311,8 +1425,9 @@ const MediaUploadForm = () => {
         </h2>
 
         <p className="text-base text-gray-500 mt-1">
-          Upload Photos minimum(10) per photo within 3 mb &amp; Video Minimum(2)
-          Per video within 20 mb &amp; document within 5 mb.
+          Upload Photos minimum(3) per photo within 3 mb &amp; Video Minimum(1)
+          Per video within 20 mb &amp; document within 5 mb &amp; patta within 5
+          mb.
         </p>
 
         {/* ====================================================
@@ -2126,11 +2241,254 @@ const MediaUploadForm = () => {
               ))}
             </div>
           )}
+        </div>
+
+        {/* ====================================================
+            PATTA
+        ==================================================== */}
+
+        <div className="mt-6">
+          <p
+            className="
+              text-base
+              font-semibold
+              text-gray-900
+              mb-2
+            "
+          >
+            Upload Property Patta
+          </p>
+          <input
+            ref={pattaInputRef}
+            type="file"
+            accept="image/jpeg,image/png,application/pdf"
+            multiple
+            className="hidden"
+            onChange={handlePattaChange}
+          />
+          <button
+            type="button"
+            onClick={() => pattaInputRef.current?.click()}
+            className="
+              w-full
+              h-32
+              sm:h-36
+              rounded-lg
+              border-2
+              border-dashed
+              border-gray-300
+              bg-[#F2F2F2]
+              flex
+              flex-col
+              items-center
+              justify-center
+              gap-y-1
+              hover:border-secondary
+              transition-colors
+            "
+          >
+            <PictureOutlined
+              className="
+                text-xl
+                text-gray-400
+              "
+            />
+
+            <span
+              className="
+                text-sm
+                font-medium
+                text-secondary
+              "
+            >
+              Upload Patta
+            </span>
+
+            <span className="text-xs text-gray-400 font-semibold">
+              Support format jpeg, Png and pdf
+            </span>
+          </button>
+          {pattas.length > 0 && (
+            <div className="mt-3">
+              {/* ==================================================
+        PATTA IMAGES
+    ================================================== */}
+
+              {pattas.some((patta) => patta.file.type.startsWith("image/")) && (
+                <div>
+                  <p
+                    className="
+            text-base
+            font-semibold
+            text-gray-900
+            mb-3
+          "
+                  >
+                    Uploaded Patta Images
+                  </p>
+
+                  <div
+                    className="
+            grid
+            grid-cols-3
+            sm:grid-cols-4
+            md:grid-cols-6
+            gap-3
+          "
+                  >
+                    {pattas
+                      .filter((patta) => patta.file.type.startsWith("image/"))
+                      .map((patta) => (
+                        <div
+                          key={patta.id}
+                          className={`
+                  relative
+                  h-24
+                  sm:h-28
+                  rounded-lg
+                  overflow-hidden
+                  border-2
+                  ${patta.error ? "border-red-500" : "border-transparent"}
+                `}
+                        >
+                          <img
+                            src={patta.url}
+                            alt="patta"
+                            className="
+                    w-full
+                    h-full
+                    object-cover
+                  "
+                          />
+
+                          <button
+                            type="button"
+                            onClick={() => removePatta(patta.id)}
+                            className="
+                    absolute
+                    top-1.5
+                    right-1.5
+                    z-10
+                    w-6
+                    h-6
+                    rounded-full
+                    bg-white/90
+                    flex
+                    items-center
+                    justify-center
+                    text-red-500
+                  "
+                          >
+                            <DeleteOutlined className="text-xs" />
+                          </button>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
+
+              {/* ==================================================
+        PATTA PDF DOCUMENTS
+    ================================================== */}
+
+              {pattas.some(
+                (patta) => patta.file.type === "application/pdf",
+              ) && (
+                <div className="mt-4">
+                  <p
+                    className="
+            text-base
+            font-semibold
+            text-gray-900
+            mb-2
+          "
+                  >
+                    Uploaded Patta Documents
+                  </p>
+
+                  <div
+                    className="
+            flex
+            flex-col
+            gap-y-2
+          "
+                  >
+                    {pattas
+                      .filter((patta) => patta.file.type === "application/pdf")
+                      .map((patta) => (
+                        <div
+                          key={patta.id}
+                          className={`
+                  flex
+                  items-center
+                  gap-x-3
+                  bg-[#F2F2F2]
+                  border
+                  rounded-lg
+                  px-4
+                  py-3
+                  ${patta.error ? "border-red-500" : "border-gray-200"}
+                `}
+                        >
+                          <FilePdfOutlined
+                            className="
+                    text-red-500!
+                    text-lg
+                    shrink-0
+                    border-8
+                    border-white
+                    rounded-md
+                  "
+                          />
+
+                          <div
+                            className="
+                    flex-1
+                    min-w-0
+                  "
+                          >
+                            <p
+                              className="
+                      text-sm
+                      text-gray-800
+                      truncate
+                    "
+                            >
+                              {patta.file.name}
+                            </p>
+
+                            <p
+                              className="
+                      text-xs
+                      text-gray-400
+                    "
+                            >
+                              {formatFileSize(patta.file.size)}
+                            </p>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => removePatta(patta.id)}
+                            className="
+                    text-gray-400
+                    hover:text-gray-600
+                    shrink-0
+                  "
+                          >
+                            <CloseOutlined />
+                          </button>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* ==================================================
               FORM NAVIGATION
           ================================================== */}
-
           <FormNavigationButtons
             nextLabel={isSubmitting ? "Submitting..." : "submit"}
             onNext={handleSubmit}

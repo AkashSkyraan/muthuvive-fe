@@ -1,6 +1,7 @@
 import React from "react";
 import ProjectCard from "../../../components/cards/ProjectCard";
 import { Link } from "react-router-dom";
+import { useAuth } from "../../../context/UserContext";
 
 // listings shape: array of the same objects ProjectCard already expects
 // { id, image, category, title, price, address, area, hospitals, schools }
@@ -15,12 +16,16 @@ const PropertyGrid = ({ listings = [] }) => {
   }
 
   const categorySlugMap = {
-    1: "agriculture-land",
-    2: "commercial-land",
-    3: "investment-land",
-    4: "commercial-building",
+    1: "farmland",
+    2: "dtcp-approved",
+    3: "agriculture-land",
+    4: "commercial-land",
+    6: "investment-land",
+    7: "commercial-building",
     7: "residential-building",
   };
+
+  const { user } = useAuth();
 
   return (
     <div className="w-full py-10">
@@ -29,7 +34,11 @@ const PropertyGrid = ({ listings = [] }) => {
           <Link
             to={`/properties/${categorySlugMap[listing?.category]}/${listing.prop_id}`}
           >
-            <ProjectCard key={listing.id} listing={listing} />
+            <ProjectCard
+              key={listing.id}
+              listing={listing}
+              user={user?.id || null}
+            />
           </Link>
         ))}
       </div>

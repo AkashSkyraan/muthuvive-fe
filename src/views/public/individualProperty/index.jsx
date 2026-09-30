@@ -11,6 +11,7 @@ import AmenitiesSection from "./AmenitiesSection.jsx";
 import HighlightsSection from "./HighlightsSection.jsx";
 import PriceDetailsSection from "./PriceDetailsSection.jsx";
 import DocumentSection from "./PropertyDocument.jsx";
+import PattaSection from "./PropertyPatta.jsx";
 import NearbyProperties from "../../../components/cards/NearByProperties.jsx";
 
 import Enquiry from "./Enquiry.jsx";
@@ -94,6 +95,10 @@ const PropertyDetails = () => {
       label: "Document",
     },
     {
+      key: "layout",
+      label: "Layout",
+    },
+    {
       key: "Near-by-properties",
       label: "Near By Properties",
     },
@@ -148,8 +153,7 @@ const PropertyDetails = () => {
         // ======================================================
 
         const hasPlanDetails =
-          property?.user_id != null && property?.purchase_plan != null;
-        // console.log("to show plan:", hasPlanDetails);
+          property?.user_id != null && property?.status === "approved";
 
         if (hasPlanDetails) {
           setShowPlanDetails(true);
@@ -159,12 +163,10 @@ const PropertyDetails = () => {
             // 3. PLAN API
             // ==================================================
 
-            const planResponse = await getSubscriptionPlans({
-              id: property.purchase_plan,
-            });
+            const planResponse = await getSubscriptionPlans();
             // console.log("Plan response:", planResponse);
 
-            setPlanDetailsData(planResponse);
+            setPlanDetailsData([planResponse[0]]);
           } catch (planError) {
             console.error("Failed to fetch plan details:", planError);
 
@@ -376,7 +378,7 @@ const PropertyDetails = () => {
                               : "",
           },
 
-          ...([5, 6].includes(Number(property?.category))
+          ...([1, 2].includes(Number(property?.category))
             ? [
                 {
                   label: "Price",
@@ -487,6 +489,20 @@ const PropertyDetails = () => {
             }))
           : [];
 
+        const pattaFields = Array.isArray(property?.media?.patta)
+          ? property.media.patta.map((patta, index) => ({
+              id: patta?.id ?? index + 1,
+
+              url: patta?.url || patta?.path || patta,
+
+              alt: "Patta",
+
+              mime_type: patta?.mime_type,
+
+              media_type: patta?.media_type,
+            }))
+          : [];
+
         // ======================================================
         // 4. NEARBY PROPERTY API
         // ======================================================
@@ -527,6 +543,8 @@ const PropertyDetails = () => {
           priceDetailsFields,
 
           documentsFields,
+
+          pattaFields,
         }));
       } catch (error) {
         console.error("Failed to fetch property details:", error);
@@ -557,6 +575,7 @@ const PropertyDetails = () => {
     highlightsFields,
     priceDetailsFields,
     documentsFields,
+    pattaFields,
   } = propertyData;
 
   // ==========================================================
@@ -591,16 +610,19 @@ const PropertyDetails = () => {
     Number(user?.id) === Number(propertyUserId);
 
   const showPaidAndPost =
-    user?.id != null &&
-    propertyUserId != null &&
-    Number(user.id) === Number(propertyUserId) &&
-    propertyStatus === "approved";
+    (user?.id != null &&
+      propertyUserId != null &&
+      Number(user.id) === Number(propertyUserId) &&
+      propertyStatus === "approved") ||
+    propertyStatus === "expired";
 
   const showPlanActivity =
-    user?.id != null &&
-    propertyUserId != null &&
-    Number(user?.id) === Number(propertyUserId) &&
-    propertyStatus === "posted";
+    (user?.id != null &&
+      propertyUserId != null &&
+      Number(user?.id) === Number(propertyUserId) &&
+      propertyStatus === "posted") ||
+    propertyStatus === "expired" ||
+    propertyStatus === "sold";
 
   return (
     <main className="w-[90%] mx-auto min-h-screen bg-white">
@@ -673,6 +695,10 @@ const PropertyDetails = () => {
               <div id="document">
                 <DocumentSection fields={documentsFields} />
               </div>
+
+              <div id="layout">
+                <PattaSection fields={pattaFields} />
+              </div>
             </div>
 
             {/* ========================================================
@@ -690,7 +716,7 @@ const PropertyDetails = () => {
               )}
 
               {/* Paid and Post Button */}
-              {showPaidAndPost && <PaidAndPost />}
+              {showPaidAndPost && <PaidAndPost type={propertyStatus} />}
 
               {/* Plan Activity */}
               {showPlanActivity && <PlanActivity prop_id={currentPropertyId} />}
