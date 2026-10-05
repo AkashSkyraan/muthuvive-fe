@@ -9,6 +9,7 @@ import {
 } from "../../../api/propertyFormDropdown.api";
 import { postSellPropertyForm } from "../../../api/sellPropertyForm.api";
 import { useAuth } from "../../../context/UserContext";
+import { useLocation } from "react-router-dom";
 
 const VISIBLE_COUNT = 7;
 
@@ -72,6 +73,9 @@ const PropertyFeaturesForm = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const location = useLocation();
+
+  const { user_id } = location.state || {};
 
   const { formData, propertyId, updateFormData } = useSellProperty();
 
@@ -200,7 +204,7 @@ const PropertyFeaturesForm = () => {
 
       const payload = {
         step: 3,
-        user_id: user?.id,
+        user_id: user_id,
         prop_id: propertyId,
         amenities: latestFeatures.amenities,
         prop_highs: latestFeatures["prop_highs"],
@@ -210,7 +214,11 @@ const PropertyFeaturesForm = () => {
 
       const response = await postSellPropertyForm(payload);
 
-      navigate("/sell-property/media");
+      navigate("/sell-property/media", {
+        state: {
+          user_id: user_id,
+        },
+      });
     } catch (error) {
       console.error("Property features validation failed:", error);
     }

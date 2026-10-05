@@ -10,6 +10,7 @@ import FormNavigationButtons from "../../formNavButtons";
 import { useSellProperty } from "../../../context/SellPropertyContext";
 import { postSellPropertyForm } from "../../../api/sellPropertyForm.api";
 import { useAuth } from "../../../context/UserContext";
+import { useLocation } from "react-router-dom";
 
 // ---------------------------------------------------------
 // Options
@@ -223,8 +224,10 @@ const CommercialPropertyDetailsForm = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const { user } = useAuth();
-  
- 
+  const location = useLocation();
+
+  const { user_id } = location.state || {};
+
   const { formData, updateFormData, propertyId, category } = useSellProperty();
 
   const [hasBuildUpArea, setHasBuildUpArea] = useState(true);
@@ -550,7 +553,7 @@ const CommercialPropertyDetailsForm = () => {
 
       const payload = {
         step: 2,
-        user_id: user?.id,
+        user_id: user_id,
         prop_id: propertyId,
 
         ...convertedPropertyDetails,
@@ -578,7 +581,11 @@ const CommercialPropertyDetailsForm = () => {
       // Next Step
       // ---------------------------------------------------
 
-      navigate("/sell-property/features");
+      navigate("/sell-property/features", {
+        state: {
+          user_id: user_id,
+        },
+      });
     } catch (error) {
       // AntD validation error
       // console.log("Commercial property details validation failed:", error);
