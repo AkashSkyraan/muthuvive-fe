@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Form, Select, Modal } from "antd";
 import { DownOutlined } from "@ant-design/icons";
-import FormNavigationButtons from "../../fornNavButtons";
+import FormNavigationButtons from "../../formNavButtons";
 import { useNavigate } from "react-router-dom";
 import { useSellProperty } from "../../../context/SellPropertyContext";
 import { getPropertyCategories } from "../../../api/propertyFormDropdown.api";

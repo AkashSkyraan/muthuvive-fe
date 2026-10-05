@@ -18,6 +18,30 @@ const GetInTouch = () => {
   const [form] = Form.useForm();
   const [submitting, setSubmitting] = useState(false);
 
+  // Watch form values
+  const fullName = Form.useWatch("fullName", form);
+  const mobileNumber = Form.useWatch("mobileNumber", form);
+  const email = Form.useWatch("email", form);
+  const message = Form.useWatch("message", form);
+
+  // Check all fields based on the existing validation rules
+  const isFullNameValid =
+    fullName?.trim().length >= 3 && fullName?.trim().length <= 100;
+
+  const isMobileValid = /^[6-9]\d{9}$/.test(mobileNumber || "");
+
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email || "");
+
+  const isMessageValid =
+    message?.trim().length > 0 && message?.trim().length <= 200;
+
+  const canSubmit =
+    isFullNameValid &&
+    isMobileValid &&
+    isEmailValid &&
+    isMessageValid &&
+    !submitting;
+
   const handleFinish = async (values) => {
     const updatedFormData = {
       ...formData,
@@ -61,6 +85,7 @@ const GetInTouch = () => {
   return (
     <>
       <StatusMessage placement="top-right" />
+
       <div className="w-full py-16">
         <div className="w-[90%] mx-auto flex flex-col lg:flex-row gap-10 lg:gap-16">
           {/* Left content */}
@@ -92,6 +117,7 @@ const GetInTouch = () => {
                     Address
                   </h3>
                 </div>
+
                 <p className="text-base text-gray-500 mt-2">
                   {aboutUs?.[0]?.address}
                 </p>
@@ -108,6 +134,7 @@ const GetInTouch = () => {
                     Mobile Number
                   </h3>
                 </div>
+
                 <p className="text-base text-gray-500 mt-2">
                   +91 {aboutUs?.[0]?.mobile}
                 </p>
@@ -124,6 +151,7 @@ const GetInTouch = () => {
                     Email Address
                   </h3>
                 </div>
+
                 <p className="text-base text-gray-500 mt-2">
                   {aboutUs?.[0]?.email}
                 </p>
@@ -142,6 +170,7 @@ const GetInTouch = () => {
                 onFinish={handleFinish}
                 requiredMark={false}
               >
+                {/* Full Name */}
                 <Form.Item
                   label={
                     <span className="text-base font-medium text-gray-800">
@@ -149,8 +178,12 @@ const GetInTouch = () => {
                     </span>
                   }
                   name="fullName"
+                  className="text-start"
                   rules={[
-                    { required: true, message: "Please enter your full name" },
+                    {
+                      required: true,
+                      message: "Please enter your full name",
+                    },
                     {
                       min: 3,
                       message: "Name must be at least 3 characters",
@@ -163,10 +196,13 @@ const GetInTouch = () => {
                 >
                   <Input
                     placeholder="Enter Your Full name"
-                    className="!bg-white !border-gray-200 !py-2.5 !text-sm"
+                    className={`!border-gray-200 !py-2.5 !text-sm ${
+                      fullName?.trim() ? "!bg-[#eaf1fd]" : "!bg-white"
+                    }`}
                   />
                 </Form.Item>
 
+                {/* Mobile Number */}
                 <Form.Item
                   label={
                     <span className="text-base font-medium text-gray-800">
@@ -174,6 +210,7 @@ const GetInTouch = () => {
                     </span>
                   }
                   name="mobileNumber"
+                  className="text-start"
                   rules={[
                     {
                       required: true,
@@ -186,11 +223,14 @@ const GetInTouch = () => {
                   ]}
                 >
                   <Input
-                    placeholder="Enter Your email / Mobile number"
-                    className="!bg-white !border-gray-200 !py-2.5 !text-sm"
+                    placeholder="Enter Your Mobile number"
+                    className={`!border-gray-200 !py-2.5 !text-sm ${
+                      mobileNumber?.trim() ? "!bg-[#eaf1fd]" : "!bg-white"
+                    }`}
                   />
                 </Form.Item>
 
+                {/* Email */}
                 <Form.Item
                   label={
                     <span className="text-base font-medium text-gray-800">
@@ -198,20 +238,27 @@ const GetInTouch = () => {
                     </span>
                   }
                   name="email"
+                  className="text-start"
                   rules={[
                     {
                       required: true,
                       message: "Please enter your email address",
                     },
-                    { type: "email", message: "Enter a valid email address" },
+                    {
+                      type: "email",
+                      message: "Enter a valid email address",
+                    },
                   ]}
                 >
                   <Input
-                    placeholder="Enter Your email / Mobile number"
-                    className="!bg-white !border-gray-200 !py-2.5 !text-sm"
+                    placeholder="Enter Your email"
+                    className={`!border-gray-200 !py-2.5 !text-sm ${
+                      email?.trim() ? "!bg-[#eaf1fd]" : "!bg-white"
+                    }`}
                   />
                 </Form.Item>
 
+                {/* Message */}
                 <Form.Item
                   label={
                     <span className="text-base font-medium text-gray-800">
@@ -219,8 +266,12 @@ const GetInTouch = () => {
                     </span>
                   }
                   name="message"
+                  className="text-start"
                   rules={[
-                    { required: true, message: "Please enter your message" },
+                    {
+                      required: true,
+                      message: "Please enter your message",
+                    },
                     {
                       max: 200,
                       message: "Message cannot exceed 200 characters",
@@ -230,16 +281,23 @@ const GetInTouch = () => {
                   <Input.TextArea
                     placeholder="Enter Your thoughts here ....."
                     rows={5}
-                    className="!bg-white !border-gray-200 !text-sm"
+                    className={`!border-gray-200 !text-sm !resize-none ${
+                      message?.trim() ? "!bg-[#eaf1fd]" : "!bg-white"
+                    }`}
                   />
                 </Form.Item>
 
+                {/* Button */}
                 <Form.Item className="!mb-0">
                   <Button
                     htmlType="submit"
                     loading={submitting}
-                    disabled={submitting}
-                    className="!bg-secondary !text-white !text-sm !border-none !font-medium !h-11 !px-8"
+                    disabled={!canSubmit}
+                    className={`!text-sm !border-none !font-medium !h-11 !px-8 ${
+                      canSubmit
+                        ? "!bg-secondary !text-white"
+                        : "!bg-gray-400 !text-white"
+                    }`}
                   >
                     Send Message
                   </Button>

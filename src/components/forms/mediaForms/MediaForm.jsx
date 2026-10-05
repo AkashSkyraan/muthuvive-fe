@@ -18,7 +18,7 @@ import {
   LeftOutlined,
 } from "@ant-design/icons";
 
-import FormNavigationButtons from "../../fornNavButtons";
+import FormNavigationButtons from "../../formNavButtons";
 
 import { postUpload } from "../../../api/upload.api";
 import { postSellPropertyForm } from "../../../api/sellPropertyForm.api";

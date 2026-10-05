@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Form } from "antd";
 import { useNavigate } from "react-router-dom";
-import FormNavigationButtons from "../../fornNavButtons";
+import FormNavigationButtons from "../../formNavButtons";
 import { useSellProperty } from "../../../context/SellPropertyContext";
 import {
   getAmenity,

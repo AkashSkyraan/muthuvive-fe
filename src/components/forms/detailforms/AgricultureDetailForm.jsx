@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Form, Input, Select } from "antd";
 import { DownOutlined } from "@ant-design/icons";
-import FormNavigationButtons from "../../fornNavButtons";
+import FormNavigationButtons from "../../formNavButtons";
 import { useNavigate } from "react-router-dom";
 import { useSellProperty } from "../../../context/SellPropertyContext";
 import { postSellPropertyForm } from "../../../api/sellPropertyForm.api";

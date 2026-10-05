@@ -14,9 +14,19 @@ const EnquiryForm = () => {
   const [submitting, setSubmitting] = useState(false);
 
   // Watch both checkboxes so the submit button only activates once agreed
+
+  const fullName = Form.useWatch("fullName", form);
+  const mobileNumber = Form.useWatch("mobileNumber", form);
+  const email = Form.useWatch("email", form);
+
   const agreeContact = Form.useWatch("agreeContact", form);
   const agreeTerms = Form.useWatch("agreeTerms", form);
-  const canSubmit = agreeContact && agreeTerms;
+  const canSubmit =
+    fullName?.trim() &&
+    mobileNumber?.trim() &&
+    email?.trim() &&
+    agreeContact &&
+    agreeTerms;
 
   const handleFinish = async (values) => {
     const updatedFormData = {
