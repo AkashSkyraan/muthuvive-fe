@@ -14,8 +14,8 @@ export const AuthProvider = ({ children }) => {
       const response = await getUser();
 
       if (response?.success === true || response?.success === 1) {
-        // setUser(response?.data?.[0] || null);
-        setUser(response?.data?.[0] || null);
+        console.log(response.data[0])
+        setUser(response?.data[0] || null);
       } else {
         setUser(null);
       }

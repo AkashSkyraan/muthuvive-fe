@@ -225,7 +225,7 @@ const PropertyDetailsForm = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const { user } = useAuth();
-
+  console.log(user)
   const { formData, updateFormData, propertyId } = useSellProperty();
 
   // -------------------------------------------------------

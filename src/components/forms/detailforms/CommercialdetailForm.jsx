@@ -223,7 +223,8 @@ const CommercialPropertyDetailsForm = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const { user } = useAuth();
-
+  
+ 
   const { formData, updateFormData, propertyId, category } = useSellProperty();
 
   const [hasBuildUpArea, setHasBuildUpArea] = useState(true);
