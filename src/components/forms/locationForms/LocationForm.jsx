@@ -70,9 +70,9 @@ const LocationForm = () => {
     }
   };
 
-  useEffect (()=>{
-  fetchUser()
-  },[])
+  useEffect(() => {
+    fetchUser();
+  }, []);
 
   // ============================================================
   // Restore saved location data from Context
@@ -387,7 +387,11 @@ const LocationForm = () => {
       }
 
       // Move to next step only after successful API call
-      navigate("/sell-property/details");
+      navigate("/sell-property/details", {
+        state: {
+          user_id: user,
+        },
+      });
     } catch (error) {
       console.error("Failed to save property:", error);
 

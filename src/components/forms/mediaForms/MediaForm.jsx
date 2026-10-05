@@ -29,6 +29,7 @@ import "../mediaForms/MediaForm.css";
 import { useNavigate } from "react-router-dom";
 import StatusMessage, { showStatusMessage } from "../../common/MessagePopup";
 import { useAuth } from "../../../context/UserContext";
+import { useLocation } from "react-router-dom";
 
 // ============================================================
 // FILE SIZE LIMITS
@@ -682,6 +683,10 @@ const MediaUploadForm = () => {
   const navigate = useNavigate();
 
   const { user } = useAuth();
+
+  const location = useLocation();
+
+  const { user_id } = location.state || {};
 
   const { propertyId, updateFormData } = useSellProperty();
 
@@ -1360,7 +1365,7 @@ const MediaUploadForm = () => {
       const payload = {
         step: 4,
 
-        user_id: user?.id,
+        user_id: user_id,
 
         prop_id: propertyId,
 

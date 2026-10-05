@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useSellProperty } from "../../../context/SellPropertyContext";
 import { postSellPropertyForm } from "../../../api/sellPropertyForm.api";
 import { useAuth } from "../../../context/UserContext";
+import { useLocation } from "react-router-dom";
 
 // ---------------------------------------------------------
 // Options
@@ -225,7 +226,10 @@ const PropertyDetailsForm = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const { user } = useAuth();
-  console.log(user)
+  const location = useLocation();
+
+  const { user_id } = location.state || {};
+  console.log("passed from previous", user_id);
   const { formData, updateFormData, propertyId } = useSellProperty();
 
   // -------------------------------------------------------
@@ -486,7 +490,7 @@ const PropertyDetailsForm = () => {
 
       const payload = {
         step: 2,
-        user_id: user?.id,
+        user_id: user_id,
         prop_id: propertyId,
         ...latestPropertyDetails,
       };
@@ -510,7 +514,11 @@ const PropertyDetailsForm = () => {
       // Next Step
       // ---------------------------------------------------
 
-      navigate("/sell-property/features");
+      navigate("/sell-property/features", {
+        state: {
+          user_id: user_id,
+        },
+      });
     } catch (error) {
       // AntD validation errors come here.
       // console.log("Property details validation failed:", error);
