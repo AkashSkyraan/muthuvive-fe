@@ -6,7 +6,7 @@ import {
   PlusOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import FormNavigationButtons from "../../fornNavButtons";
+import FormNavigationButtons from "../../formNavButtons";
 import { useSellProperty } from "../../../context/SellPropertyContext";
 import { postSellPropertyForm } from "../../../api/sellPropertyForm.api";
 import { useAuth } from "../../../context/UserContext";
@@ -233,7 +233,7 @@ const CommercialPropertyDetailsForm = () => {
   // Check whether BHK should be shown
   // -------------------------------------------------------
 
-  const showBHK = Number(category) === 7;
+  const showBHK = Number(category) === 8;
 
   // -------------------------------------------------------
   // Watch conditional fields

@@ -8,7 +8,7 @@ import facebookIcon from "../assets/icons/facebook.png";
 import twitterIcon from "../assets/icons/twitter.png";
 import images from "../config/Images";
 import icons from "../config/Icons";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAboutUs } from "../context/AboutusContext";
 import { useAuth } from "../context/UserContext";
 import { useLoginModal } from "../context/LoginModalContext";
@@ -17,7 +17,19 @@ const Footer = () => {
   const { aboutUs, loading, error } = useAboutUs();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const { openLoginModal } = useLoginModal();
+
+  const handleFooterNavigation = (path) => {
+    if (location.pathname === path) {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    } else {
+      navigate(path);
+    }
+  };
 
   const handleSellProperty = () => {
     if (!user?.id) {
@@ -82,13 +94,19 @@ const Footer = () => {
                 <button onClick={handleSellProperty}>Sell my properties</button>
               </li>
               <li>
-                <Link to="gallery">Gallery</Link>
+                <button onClick={() => handleFooterNavigation("/gallery")}>
+                  Gallery
+                </button>
               </li>
               <li>
-                <Link to="/about">About Us</Link>
+                <button onClick={() => handleFooterNavigation("/about")}>
+                  About Us
+                </button>
               </li>
               <li>
-                <Link to="contactus">Contact Us</Link>
+                <button onClick={() => handleFooterNavigation("/contactus")}>
+                  Contact Us
+                </button>
               </li>
             </ul>
           </div>
