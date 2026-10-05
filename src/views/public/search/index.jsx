@@ -31,11 +31,6 @@ const PropertySearchResults = () => {
   const urlLocation = searchParams.get("location")?.trim() || "";
   const urlPropertyType = searchParams.get("propertyType")?.trim() || "";
 
-  // console.log(urlLocation , urlPropertyType)
-
-  // ============================================================
-  // FILTER OPTIONS
-  // ============================================================
   const sortByOptions = useMemo(
     () => [
       { label: "Available", value: "posted" },
@@ -263,8 +258,6 @@ const PropertySearchResults = () => {
               max_price: filters.max_price,
             }),
         };
-
-      
 
         const response = await axiosInstance.get("/property/get-property", {
           params,

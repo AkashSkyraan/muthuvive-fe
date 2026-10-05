@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import icons from "../../config/Icons.jsx";
 import { CircleSmall } from "lucide-react";
 import { useLoginModal } from "../../context/LoginModalContext.jsx";
@@ -7,17 +7,14 @@ import axiosInstance from "../../api/axios.js";
 
 // Renders a singling card. Pass one `listing` object with
 // { id, image, category, title, price, address, area, hospitals, schools }.
-const ProjectCard = ({ listing, user }) => {
 
-  console.log(listing, "lis")
+
+const ProjectCard = ({ listing, user }) => {
   const { openLoginModal } = useLoginModal();
 
-  const [isBookmarked, setIsBookmarked] = useState(false);
+  
 
-  if (listing?.is_bookmarked === 1 && user === listing?.user_id) {
-    isBookmarked(true);
-    console.log(listing?.is_bookmarked);
-  }
+  const [isBookmarked, setIsBookmarked] = useState(false);
 
   const [bookmarkLoading, setBookmarkLoading] = useState(false);
 
@@ -69,6 +66,16 @@ const ProjectCard = ({ listing, user }) => {
     }
   };
 
+  useEffect(() => {
+    if (
+      Number(listing?.is_bookmarked) === 1 &&
+      Number(user) !== Number(listing?.user_id)
+    ) {
+      setIsBookmarked(true);
+    } else {
+      setIsBookmarked(false);
+    }
+  }, [listing?.is_bookmarked, listing?.user_id, user]);
   return (
     <div className="bg-white rounded-lg overflow-hidden border border-gray-100 cursor-pointer">
       <div className="relative h-48 sm:h-44 lg:h-48">
@@ -128,16 +135,23 @@ const ProjectCard = ({ listing, user }) => {
           </span>
         </div>
 
-        <div className="flex items-center flex-wrap gap-x-4 gap-y-2 mt-3 pt-4 justify-around">
+        <div className="flex items-center flex-wrap gap-x-10 gap-y-2 mt-3 pt-4 justify-between">
+          {/* Highlight */}
           {/* Highlight */}
           <div className="flex items-center gap-x-1.5 max-w-[45%]">
             <CircleSmall className="w-5 h-5 shrink-0" />
 
             <span
               className="text-sm text-gray-500 truncate"
-              title={listing?.property_highs?.name}
+              title={
+                Array.isArray(listing?.property_highs)
+                  ? listing?.property_highs?.[0]?.name || ""
+                  : listing?.property_highs?.name || ""
+              }
             >
-              {listing?.property_highs?.name}
+              {Array.isArray(listing?.property_highs)
+                ? listing?.property_highs?.[0]?.name || "-"
+                : listing?.property_highs?.name || "-"}
             </span>
           </div>
 
@@ -147,9 +161,15 @@ const ProjectCard = ({ listing, user }) => {
 
             <span
               className="text-sm text-gray-500 truncate"
-              title={listing?.amenities?.name}
+              title={
+                Array.isArray(listing?.amenities)
+                  ? listing?.amenities?.[0]?.name || ""
+                  : listing?.amenities?.name || ""
+              }
             >
-              {listing?.amenities?.name}
+              {Array.isArray(listing?.amenities)
+                ? listing?.amenities?.[0]?.name || "-"
+                : listing?.amenities?.name || "-"}
             </span>
           </div>
         </div>

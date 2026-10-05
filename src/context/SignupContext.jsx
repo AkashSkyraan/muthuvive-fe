@@ -4,6 +4,7 @@ const SignupContext = createContext(null);
 
 export const SignupProvider = ({ children }) => {
   const [signupData, setSignupData] = useState({
+    name : "",
     email: "",
     mobile: "",
     emailVerified: false,
@@ -44,6 +45,7 @@ export const SignupProvider = ({ children }) => {
 
   const clearSignupData = () => {
     setSignupData({
+      name : "",
       email: "",
       mobile: "",
       emailVerified: false,
@@ -51,11 +53,19 @@ export const SignupProvider = ({ children }) => {
     });
   };
 
+
+  const updateSignupData = (data) => {
+  setSignupData((prev) => ({
+    ...prev,
+    ...data,
+  }));
+};
   return (
     <SignupContext.Provider
       value={{
         signupData,
         setSignupData,
+        updateSignupData,
         verifyEmail,
         verifyMobile,
         resetEmailVerification,

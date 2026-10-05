@@ -52,7 +52,6 @@ const PaidAndPost = () => {
           try {
             setLoading(true);
 
-            
             const verifyResponse = await verifyPayment({
               razorpay_order_id: response.razorpay_order_id,
 
@@ -92,8 +91,6 @@ const PaidAndPost = () => {
           color: "#00942A",
         },
       };
-
-      
 
       const razorpay = new window.Razorpay(options);
 

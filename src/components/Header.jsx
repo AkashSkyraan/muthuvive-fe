@@ -72,7 +72,7 @@ const Header = () => {
   // Login Status
   // ---------------------------------------------------------
 
-  const isLoggedIn = !user;
+  const isLoggedIn = user;
 
   const handleSellProperty = () => {
     if (!user) {

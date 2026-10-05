@@ -46,17 +46,18 @@ function Signup() {
 
   const {
     signupData,
+    updateSignupData,
     resetEmailVerification,
     resetMobileVerification,
     clearSignupData,
   } = useSignup();
 
-  const { emailVerified, mobileVerified } = signupData;
+  const { emailVerified, mobileVerified, name } = signupData;
 
   const [showPassword, setShowPassword] = useState(false);
 
   const [formData, setFormData] = useState({
-    name: "",
+    name: signupData.name || "",
     email: signupData.email || "",
     mobile: signupData.mobile || "",
     password: "",
@@ -72,10 +73,14 @@ function Signup() {
 
   const [loading, setLoading] = useState(false);
 
-  /*
-   * OTP verify செய்து signup page-க்கு வந்த பிறகு
-   * Context value formData-க்கு sync ஆகும்.
-   */
+  useEffect(() => {
+    if (location.state?.name) {
+      setFormData((prev) => ({
+        ...prev,
+        name: location.state.name,
+      }));
+    }
+  }, [location.state]);
   useEffect(() => {
     setFormData((prev) => ({
       ...prev,
@@ -98,6 +103,20 @@ function Signup() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    if (name === "name") {
+      setFormData((prev) => ({
+        ...prev,
+        name: value,
+      }));
+
+      // Save name in Signup Context
+      updateSignupData({
+        name: value,
+      });
+
+      return;
+    }
 
     if (name === "email") {
       const email = value.trim();
@@ -172,6 +191,7 @@ function Signup() {
             type: "email",
             purpose: 1,
             from: "signup",
+            name: formData.name,
           },
         });
       } else {
@@ -227,6 +247,7 @@ function Signup() {
             type: "mobile",
             purpose: 1,
             from: "signup",
+            name: formData.name,
           },
         });
       } else {

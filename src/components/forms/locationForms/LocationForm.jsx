@@ -8,6 +8,8 @@ import { useSellProperty } from "../../../context/SellPropertyContext";
 
 import { postSellPropertyForm } from "../../../api/sellPropertyForm.api";
 import { useAuth } from "../../../context/UserContext";
+import { getUser } from "../../../api/auth.api";
+import axiosInstance from "../../../api/axios";
 
 // Dynamic data - replace with API response
 const countries = [{ value: "india", label: "India" }];
@@ -18,7 +20,7 @@ const selectClassName =
 const LocationForm = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const [user, setUser] = useState(0);
 
   const { formData, updateFormData, propertyId, setPropertyId } =
     useSellProperty();
@@ -44,6 +46,29 @@ const LocationForm = () => {
   useEffect(() => {
     updateFormData("location", "country", "india");
   }, []);
+
+  const [userLoading, setUserLoading] = useState(true);
+
+  const fetchUser = async () => {
+    try {
+      setUserLoading(true);
+
+      const response = await getUser();
+
+      const userId = response?.data?.[0]?.id;
+
+      if (userId) {
+        setUser(userId);
+      } else {
+        setUser(null);
+      }
+    } catch (err) {
+      console.error("Get User Error:", err);
+      setUser(null);
+    } finally {
+      setUserLoading(false);
+    }
+  };
 
   // ============================================================
   // Restore saved location data from Context
@@ -328,9 +353,9 @@ const LocationForm = () => {
 
     const payload = {
       step: 1,
-      user_id: user?.id,
 
       ...formData.category,
+      user_id: user,
 
       // Use latest form values
       country: values.country || "india",
@@ -345,6 +370,7 @@ const LocationForm = () => {
     };
 
     try {
+      console.log(payload.user_id, "abc");
       const response = await postSellPropertyForm(payload);
 
       // If creating a new property, store the returned property ID

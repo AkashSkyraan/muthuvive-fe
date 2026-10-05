@@ -4,61 +4,36 @@ import ProjectCard from "../../../components/cards/ProjectCard";
 import Header from "./header";
 import Pagination from "../../../components/common/pagination/Pagination";
 import CategoryFilter from "../myProperties/CategoryFilter";
-import images from "../../../config/Images";
 
 import { getBookmarkedProperties } from "../../../api/getProperties.api";
+
 import { Link } from "react-router-dom";
 import { useLoader } from "../../../context/LoaderContext";
 import { useAuth } from "../../../context/UserContext";
+import axiosInstance from "../../../api/axios";
 
 const MyProperties = () => {
-  const filterOptions = [
-    {
-      id: 1,
-      name: "Agriculture Land",
-      value: "agriculture-land",
-    },
-    {
-      id: 2,
-      name: "Commercial Land",
-      value: "commercial-land",
-    },
-    {
-      id: 3,
-      name: "Investment",
-      value: "investment",
-    },
-    {
-      id: 4,
-      name: "Commercial / Residential Buildings",
-      value: "commercial-residential-buildings",
-    },
-  ];
-
-  const requestCategories = [
-    { value: "all", label: "All" },
-    { value: 6, label: "farmland" },
-    { value: 1, label: "agriculture" },
-    { value: 5, label: "dtcp" },
-    { value: 3, label: "investment" },
-    { value: 2, label: "commercial-land" },
-    { value: 4, label: "Commercial-buildings" },
-    { value: 7, label: "residential-buildings" },
-  ];
-
-  // ============================================================
-  // FILTER STATES
-  // ============================================================
-
   const { user } = useAuth();
   const { setIsLoading } = useLoader();
-  const [selectedFilters, setSelectedFilters] = useState([]);
 
-  // Search text
-  const [search, setSearch] = useState("");
+  // ============================================================
+  // CATEGORY DATA
+  // ============================================================
 
-  // Active category
+  const [requestCategories, setRequestCategories] = useState([
+    {
+      value: "all",
+      label: "All",
+    },
+  ]);
+
   const [activeCategory, setActiveCategory] = useState("all");
+
+  // ============================================================
+  // SEARCH
+  // ============================================================
+
+  const [search, setSearch] = useState("");
 
   // ============================================================
   // PROPERTY DATA
@@ -66,29 +41,118 @@ const MyProperties = () => {
 
   const [properties, setProperties] = useState([]);
 
-  // API loading state
-  const [loading, setLoading] = useState(false);
-
   // ============================================================
   // PAGINATION
   // ============================================================
 
   const [currentPage, setCurrentPage] = useState(1);
-
   const [totalPages, setTotalPages] = useState(0);
 
+  const LIMIT = 10;
+
   // ============================================================
-  // FILTER CHANGE
+  // GET PROPERTY CATEGORIES
+  // ============================================================
+  //
+  // Separate API:
+  //
+  // GET /property/get-prop-category
+  //
+  // Expected:
+  //
+  // {
+  //   success: 1,
+  //   data: [
+  //     {
+  //       id: 1,
+  //       name: "Agriculture"
+  //     },
+  //     {
+  //       id: 2,
+  //       name: "Commercial"
+  //     }
+  //   ]
+  // }
+  //
   // ============================================================
 
-  const handleFilterChange = (values) => {
-    setSelectedFilters(values);
-  };
+  useEffect(() => {
+    let cancelled = false;
 
-  const handleSearch = (value) => {
-    setSearch(value);
-    setCurrentPage(1);
-  };
+    const fetchPropertyCategories = async () => {
+      try {
+        const response = await axiosInstance.get("/property/properties");
+
+        if (cancelled) return;
+
+        // ========================================================
+        // GET CATEGORY DATA
+        // ========================================================
+
+        const responseData = response?.data?.data;
+
+        const categories = Array.isArray(responseData)
+          ? responseData
+          : Array.isArray(responseData?.categories)
+            ? responseData.categories
+            : [];
+
+        // ========================================================
+        // MAP id + name
+        // ========================================================
+
+        const categoryOptions = categories
+          .filter(
+            (item) => item?.id !== undefined && item?.id !== null && item?.name,
+          )
+          .map((item) => ({
+            value: Number(item.id),
+            label: String(item.name).trim(),
+          }));
+
+        // ========================================================
+        // REMOVE DUPLICATES
+        // ========================================================
+
+        const uniqueCategories = Array.from(
+          new Map(categoryOptions.map((item) => [item.value, item])).values(),
+        );
+
+        // ========================================================
+        // ALL ALWAYS FIRST
+        // ========================================================
+
+        setRequestCategories([
+          {
+            value: "all",
+            label: "All",
+          },
+          ...uniqueCategories,
+        ]);
+      } catch (error) {
+        if (cancelled) return;
+
+        console.error(
+          "Failed to fetch property categories:",
+          error?.response?.data || error,
+        );
+
+        // Keep All if API fails
+        setRequestCategories([
+          {
+            value: "all",
+            label: "All",
+          },
+        ]);
+      }
+    };
+
+    fetchPropertyCategories();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // ============================================================
   // CATEGORY CHANGE
@@ -100,95 +164,118 @@ const MyProperties = () => {
   };
 
   // ============================================================
-  // PAGINATION CHANGE
+  // SEARCH
   // ============================================================
 
-  const handlePageChange = (page) => {
-    setCurrentPage(Number(page));
+  const handleSearch = (value) => {
+    setSearch(value || "");
+    setCurrentPage(1);
   };
 
   // ============================================================
-  // FETCH SAVED PROPERTIES
+  // PAGINATION
+  // ============================================================
+
+  const handlePageChange = (page) => {
+    setCurrentPage(Number(page) || 1);
+  };
+
+  // ============================================================
+  // GET BOOKMARKED PROPERTIES
   // ============================================================
 
   useEffect(() => {
+    let cancelled = false;
+
     const fetchProperties = async () => {
+      if (!user?.id) {
+        setProperties([]);
+        setTotalPages(0);
+        return;
+      }
+
       try {
         setIsLoading(true);
-        await new Promise((resolve) => setTimeout(resolve, 9000));
 
         const payload = {
-          user_id: user?.id,
-          search: search,
-          page: Number(currentPage),
-          limit: 1,
-          type: activeCategory,
-          // categories: selectedFilters,
+          user_id: Number(user.id),
+          search: search.trim(),
+          page: currentPage,
+          limit: LIMIT,
+
+          // ======================================================
+          // ONLY SEND TYPE WHEN CATEGORY SELECTED
+          // ======================================================
+
+          ...(activeCategory !== "all" && {
+            type: Number(activeCategory),
+          }),
         };
 
-        // ------------------------------------------------------
-        // API CALL
-        // ------------------------------------------------------
+        console.log("BOOKMARK PAYLOAD:", payload);
 
         const response = await getBookmarkedProperties(payload);
 
-        const data = response[0] || response || {};
-        // console.log(data?.pagination?.totalPages);
+        if (cancelled) return;
 
-        setProperties(data?.properties || []);
-        setTotalPages(data?.pagination?.totalPages || 0);
+        const data = Array.isArray(response)
+          ? response?.[0] || {}
+          : response || {};
 
-        // ------------------------------------------------------
-        // TEMPORARY
-        // ------------------------------------------------------
+        const propertyList = Array.isArray(data?.properties)
+          ? data.properties
+          : [];
 
-        // setProperties([]);
-        // setTotalPages(0);
+        setProperties(propertyList);
+
+        setTotalPages(Number(data?.pagination?.totalPages) || 0);
       } catch (error) {
-        console.error("Failed to fetch properties:", error);
+        if (cancelled) return;
+
+        console.error(
+          "Failed to fetch bookmarked properties:",
+          error?.response?.data || error,
+        );
 
         setProperties([]);
         setTotalPages(0);
       } finally {
-        setIsLoading(false);
+        if (!cancelled) {
+          setIsLoading(false);
+        }
       }
     };
 
     fetchProperties();
-  }, [currentPage, activeCategory, search, selectedFilters]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id, currentPage, activeCategory, search, setIsLoading]);
 
   // ============================================================
-  // SELL PROPERTY
+  // RENDER
   // ============================================================
-
-  const handleSellProperty = () => {
-    // console.log("Sell my property");
-  };
-
-  // ============================================================
-  // SORT
-  // ============================================================
-
-  const handleSort = () => {
-    // console.log("Sort clicked");
-  };
 
   return (
     <div className="w-full">
-      <div className="w-[95%] mx-auto my-5 text-start">
-        <Header
-          onSearch={handleSearch}
-          // filterOptions={filterOptions}
-          // selectedFilters={selectedFilters}
-          // onFilterChange={handleFilterChange}
-          // onSellProperty={handleSellProperty}
-          // onSortClick={handleSort}
-        />
+      <div className="mx-auto my-5 w-[95%] text-start">
+        {/* ======================================================
+            HEADER
+        ====================================================== */}
 
-        <div className="flex flex-col lg:flex-row gap-0 mt-6">
-          {/* LEFT SIDE - 35%*/}
+        <Header onSearch={handleSearch} />
 
-          <div className="w-full lg:w-[30%] shrink-0 justify-items-center">
+        {/* ======================================================
+            CONTENT
+        ====================================================== */}
+
+        <div className="mt-6 flex flex-col gap-0 lg:flex-row">
+          {/* ====================================================
+              CATEGORY FILTER
+          ==================================================== */}
+
+          <div className="w-full shrink-0 justify-items-center lg:w-[30%]">
             <CategoryFilter
               options={requestCategories}
               value={activeCategory}
@@ -196,35 +283,25 @@ const MyProperties = () => {
             />
           </div>
 
-          {/* RIGHT SIDE - 65% */}
+          {/* ====================================================
+              PROPERTY LIST
+          ==================================================== */}
 
           <div className="w-full lg:w-[70%]">
-            <div className="bg-white border border-gray-100 rounded-xl min-h-[400px] p-4">
-              {/* ==================================================
-                  LOADING
-                  ================================================== */}
-
-              {loading ? (
-                <div className="flex justify-center py-10">Loading...</div>
-              ) : properties.length === 0 ? (
-                /* ================================================
-                   EMPTY STATE
-                   ================================================ */
-
-                <div className="flex justify-center py-10 text-gray-500">
+            <div className="min-h-[400px] rounded-xl border border-gray-100 bg-white p-4">
+              {properties.length === 0 ? (
+                <div className="flex min-h-[350px] items-center justify-center text-gray-500">
                   No properties found
                 </div>
               ) : (
-                /* ================================================
-                   PROPERTY LIST
-                   ================================================ */
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   {properties.map((property) => (
                     <Link
-                      to={`/properties/${property.category}/${property.prop_id}`}
+                      key={property?.prop_id}
+                      to={`/properties/${property?.category}/${property?.prop_id}`}
+                      className="block"
                     >
-                      <ProjectCard key={property.id} listing={property} />
+                      <ProjectCard listing={property} user={user?.id} />
                     </Link>
                   ))}
                 </div>
@@ -232,10 +309,10 @@ const MyProperties = () => {
 
               {/* ==================================================
                   PAGINATION
-                  ================================================== */}
+              ================================================== */}
 
-              {totalPages > 0 && (
-                <div>
+              {totalPages > 1 && (
+                <div className="mt-6">
                   <Pagination
                     current={currentPage}
                     totalPages={totalPages}

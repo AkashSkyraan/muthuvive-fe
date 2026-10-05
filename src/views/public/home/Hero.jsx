@@ -76,7 +76,6 @@ const Hero = () => {
                 Contact Us
               </Button>
             </Link>
-            <PaidAndPost />
           </div>
         </div>
 

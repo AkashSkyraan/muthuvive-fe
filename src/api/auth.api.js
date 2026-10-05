@@ -77,6 +77,8 @@ export const resetPassword = async (payload) => {
 export const getUser = async () => {
   try {
     const response = await axiosInstance.get("/user/get-user");
+
+    console.log(response.data)
     return response.data;
   } catch (error) {
     throw error;

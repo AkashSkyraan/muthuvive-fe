@@ -237,47 +237,44 @@ function SearchPage() {
   // =========================
   // SEARCH CLICK
   // =========================
-const handleSearchClick = () => {
-  const params = new URLSearchParams();
+  const handleSearchClick = () => {
+    const params = new URLSearchParams();
 
-  const currentLocation = String(location || "").trim();
-  const currentPropertyType = Number(propertyType);
+    const currentLocation = String(location || "").trim();
+    const currentPropertyType = Number(propertyType);
 
-  if (currentLocation) {
-    params.set("search_loc", currentLocation);
-  }
-
-  if (currentPropertyType) {
-    params.set("propertyType", String(currentPropertyType));
-  }
-
-  const query = params.toString();
-
-  navigate(query ? `/search?${query}` : "/search");
-};
-
-useEffect(() => {
-  const params = new URLSearchParams(routerLocation.search);
-
-  const queryLocation = params.get("search_loc");
-  const queryPropertyType = params.get("propertyType");
-
-  // URL -> Context only when value exists in URL
-  if (queryLocation && queryLocation !== location) {
-    setLocation(queryLocation);
-  }
-
-  if (queryPropertyType) {
-    const numericId = Number(queryPropertyType);
-
-    if (
-      !Number.isNaN(numericId) &&
-      Number(propertyType) !== numericId
-    ) {
-      setPropertyType(numericId);
+    if (currentLocation) {
+      params.set("search_loc", currentLocation);
     }
-  }
-}, [routerLocation.search]);
+
+    if (currentPropertyType) {
+      params.set("propertyType", String(currentPropertyType));
+    }
+
+    const query = params.toString();
+
+    navigate(query ? `/search?${query}` : "/search");
+  };
+
+  useEffect(() => {
+    const params = new URLSearchParams(routerLocation.search);
+
+    const queryLocation = params.get("search_loc");
+    const queryPropertyType = params.get("propertyType");
+
+    // URL -> Context only when value exists in URL
+    if (queryLocation && queryLocation !== location) {
+      setLocation(queryLocation);
+    }
+
+    if (queryPropertyType) {
+      const numericId = Number(queryPropertyType);
+
+      if (!Number.isNaN(numericId) && Number(propertyType) !== numericId) {
+        setPropertyType(numericId);
+      }
+    }
+  }, [routerLocation.search]);
 
   return (
     <div
@@ -327,9 +324,7 @@ useEffect(() => {
             bg-white
             px-4
             transition
-            focus-within:border-blue-500
-            focus-within:ring-2
-            focus-within:ring-blue-100
+           
             min-[850px]:h-[45px]
             min-[850px]:rounded-sm
             min-[850px]:px-5
@@ -455,7 +450,7 @@ useEffect(() => {
                       text-left
                       transition
                       hover:bg-gray-50
-                      active:bg-gray-100
+                      // active:bg-gray-100
                       last:border-b-0
                       sm:px-5
                     "

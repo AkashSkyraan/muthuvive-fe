@@ -22,6 +22,8 @@ export const getBookmarkedProperties = async (filters = {}) => {
   const response = await axiosInstance.get("/property/get-bookmarks", {
     params: filters,
   });
+
+  console.log(response.data.data)
   return response.data.data;
 };
 

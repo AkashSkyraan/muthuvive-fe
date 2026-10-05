@@ -22,7 +22,7 @@ function VerifyOTP() {
     resetMobileVerification,
   } = useSignup();
 
-  const { identifier, type, purpose, from } = location.state || {};
+  const { identifier, type, purpose, from, name } = location.state || {};
 
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
 
@@ -139,6 +139,7 @@ function VerifyOTP() {
           editing: true,
           type,
           identifier,
+          name,
         },
       });
 
