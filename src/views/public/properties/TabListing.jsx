@@ -1,6 +1,41 @@
 import React, { useEffect, useRef, useState } from "react";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 
+/*
+ * Get the exact scroll position of a category button
+ * relative to the scroll container.
+ */
+const getItemScrollLeft = (item, container) => {
+  const itemRect = item.getBoundingClientRect();
+  const containerRect = container.getBoundingClientRect();
+
+  return itemRect.left - containerRect.left + container.scrollLeft;
+};
+
+/*
+ * Finds which category button sits closest to the
+ * current scroll position.
+ */
+const getClosestIndex = (items, container) => {
+  if (!items.length) return 0;
+
+  let closestIndex = 0;
+  let closestDistance = Infinity;
+
+  items.forEach((item, index) => {
+    const itemScrollLeft = getItemScrollLeft(item, container);
+
+    const distance = Math.abs(itemScrollLeft - container.scrollLeft);
+
+    if (distance < closestDistance) {
+      closestDistance = distance;
+      closestIndex = index;
+    }
+  });
+
+  return closestIndex;
+};
+
 const CategoryTabs = ({ categories = [], onChange }) => {
   const scrollRef = useRef(null);
 
@@ -11,31 +46,49 @@ const CategoryTabs = ({ categories = [], onChange }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   /*
-   * Find which category is currently closest
-   * to the left edge of the scroll container.
+   * These are based on the actual scroll position
+   * of the container.
+   */
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  /*
+   * Check the actual scroll position and find
+   * the category closest to the left edge.
    */
   const checkCurrentSlide = () => {
     const el = scrollRef.current;
 
     if (!el) return;
 
-    const items = Array.from(el.children);
+    /*
+     * Only get category buttons.
+     *
+     * This avoids counting the divider <span>
+     * as a category.
+     */
+    const items = Array.from(el.querySelectorAll("[data-category-tab]"));
 
     if (!items.length) return;
 
-    let closestIndex = 0;
-    let closestDistance = Infinity;
+    /*
+     * Check the actual scroll position.
+     *
+     * Small tolerance is used because browsers can
+     * have fractional pixel values while scrolling.
+     */
+    const isAtStart = el.scrollLeft <= 1;
 
-    items.forEach((item, index) => {
-      const distance = Math.abs(item.offsetLeft - el.scrollLeft);
+    const isAtEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 1;
 
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closestIndex = index;
-      }
-    });
+    setCanScrollLeft(!isAtStart);
+    setCanScrollRight(!isAtEnd);
 
-    setCurrentSlide(closestIndex);
+    /*
+     * Find the category closest to the
+     * current scroll position.
+     */
+    setCurrentSlide(getClosestIndex(items, el));
   };
 
   useEffect(() => {
@@ -47,7 +100,7 @@ const CategoryTabs = ({ categories = [], onChange }) => {
     if (!el) return;
 
     /*
-     * Wait until categories have been rendered
+     * Wait until categories are rendered
      * before checking the scroll position.
      */
     requestAnimationFrame(() => {
@@ -75,14 +128,30 @@ const CategoryTabs = ({ categories = [], onChange }) => {
 
     if (!el) return;
 
-    const items = el.children;
+    /*
+     * Only get category buttons.
+     * Dividers are excluded.
+     */
+    const items = Array.from(el.querySelectorAll("[data-category-tab]"));
 
     if (!items[index]) return;
 
     const targetItem = items[index];
 
+    /*
+     * Calculate the exact position of the target
+     * category relative to the scroll container.
+     */
+    const targetScrollLeft = getItemScrollLeft(targetItem, el);
+
+    /*
+     * Explicitly guarantee that the first category
+     * goes all the way to the beginning.
+     */
+    const finalScrollLeft = index === 0 ? 0 : targetScrollLeft;
+
     el.scrollTo({
-      left: targetItem.offsetLeft,
+      left: finalScrollLeft,
       behavior: "smooth",
     });
 
@@ -91,16 +160,63 @@ const CategoryTabs = ({ categories = [], onChange }) => {
 
   /*
    * Move exactly one category at a time.
+   *
+   * The current position is always calculated directly
+   * from the DOM so it does not depend on potentially
+   * stale React state.
    */
   const scrollBy = (direction) => {
-    const nextIndex =
-      direction === "left" ? currentSlide - 1 : currentSlide + 1;
+    const el = scrollRef.current;
 
-    if (nextIndex < 0 || nextIndex >= categories.length) {
-      return;
+    if (!el) return;
+
+    const items = Array.from(el.querySelectorAll("[data-category-tab]"));
+
+    if (!items.length) return;
+
+    /*
+     * Get the category that is actually closest
+     * to the current scroll position.
+     */
+    const closestIndex = getClosestIndex(items, el);
+
+    const lastIndex = items.length - 1;
+
+    let targetIndex;
+
+    if (direction === "left") {
+      /*
+       * If we are already at the first category,
+       * there is nowhere further to go.
+       */
+      if (closestIndex <= 0) {
+        /*
+         * Make sure we are completely at the beginning.
+         */
+        if (el.scrollLeft > 0) {
+          el.scrollTo({
+            left: 0,
+            behavior: "smooth",
+          });
+        }
+
+        return;
+      }
+
+      targetIndex = closestIndex - 1;
+    } else {
+      /*
+       * If we are already at the last category,
+       * there is nowhere further to go.
+       */
+      if (closestIndex >= lastIndex) {
+        return;
+      }
+
+      targetIndex = closestIndex + 1;
     }
 
-    scrollToCategory(nextIndex);
+    scrollToCategory(targetIndex);
   };
 
   const handleTabClick = (category) => {
@@ -110,21 +226,18 @@ const CategoryTabs = ({ categories = [], onChange }) => {
     onChange?.(category.key);
   };
 
-  /*
-   * Button states are now based on the actual
-   * first/last category position.
-   */
-  const canScrollLeft = currentSlide > 0;
-  const canScrollRight = currentSlide < categories.length - 1;
-
   return (
-    <div className={`flex w-full items-center gap-2 sm:gap-3`}>
+    <div className="flex w-full items-center gap-2 sm:gap-3">
       {/* Previous */}
       <button
         type="button"
         onClick={() => scrollBy("left")}
         disabled={!canScrollLeft}
-        className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-full bg-gray-100 text-gray-400 transition-colors disabled:cursor-not-allowed disabled:opacity-60 enabled:text-gray-700 enabled:hover:bg-gray-200"
+        className={`flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-full transition-colors ${
+          canScrollLeft
+            ? "bg-[#1557e8] text-white enabled:hover:bg-[#1148c4]"
+            : "bg-gray-100 text-gray-400"
+        }`}
       >
         <LeftOutlined className="text-xs" />
       </button>
@@ -141,6 +254,7 @@ const CategoryTabs = ({ categories = [], onChange }) => {
             <React.Fragment key={category.key}>
               <button
                 type="button"
+                data-category-tab
                 onClick={() => handleTabClick(category)}
                 className={`shrink-0 whitespace-nowrap border-b-2 pb-1 text-sm md:text-base font-medium transition-colors hover:cursor-pointer ${
                   isActive
@@ -164,7 +278,11 @@ const CategoryTabs = ({ categories = [], onChange }) => {
         type="button"
         onClick={() => scrollBy("right")}
         disabled={!canScrollRight}
-        className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-full bg-[#1557e8] text-white transition-colors enabled:hover:bg-[#1148c4]"
+        className={`flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-full transition-colors ${
+          canScrollRight
+            ? "bg-[#1557e8] text-white enabled:hover:bg-[#1148c4]"
+            : "bg-gray-100 text-gray-400"
+        }`}
       >
         <RightOutlined className="text-xs" />
       </button>

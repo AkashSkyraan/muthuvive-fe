@@ -31,11 +31,11 @@ const MyPropertyCard = ({ data }) => {
   } = data;
 
   const categorySlugMap = {
-    1: "agriculture-land",
-    2: "commercial-land",
-    3: "investment-land",
-    4: "commercial-building",
-    7: "residential-building",
+    3: "agriculture-land",
+    4: "commercial-land",
+    6: "investment-land",
+    7: "commercial-building",
+    8: "residential-building",
   };
   // ----------------------------------------------------------
   // Plan Details

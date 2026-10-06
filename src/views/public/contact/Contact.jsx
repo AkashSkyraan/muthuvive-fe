@@ -118,7 +118,10 @@ const GetInTouch = () => {
                   </h3>
                 </div>
 
-                <p className="text-base text-gray-500 mt-2">
+                <p
+                  className="text-base text-gray-500 mt-2 truncate"
+                  title={aboutUs?.[0]?.address}
+                >
                   {aboutUs?.[0]?.address}
                 </p>
               </div>

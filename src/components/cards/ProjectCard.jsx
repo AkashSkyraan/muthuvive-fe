@@ -5,17 +5,13 @@ import { useLoginModal } from "../../context/LoginModalContext.jsx";
 import { showStatusMessage } from "../common/MessagePopup.jsx";
 import axiosInstance from "../../api/axios.js";
 
-// Renders a singling card. Pass one `listing` object with
+// Renders a single card. Pass one `listing` object with
 // { id, image, category, title, price, address, area, hospitals, schools }.
-
 
 const ProjectCard = ({ listing, user }) => {
   const { openLoginModal } = useLoginModal();
 
-  
-
   const [isBookmarked, setIsBookmarked] = useState(false);
-
   const [bookmarkLoading, setBookmarkLoading] = useState(false);
 
   const handleBookmark = async (event) => {
@@ -43,13 +39,16 @@ const ProjectCard = ({ listing, user }) => {
       });
 
       if (response?.data?.success === 1) {
-        setIsBookmarked((prev) => !prev);
+        // Toggle bookmark state
+        const newBookmarkState = !isBookmarked;
+
+        setIsBookmarked(newBookmarkState);
 
         showStatusMessage({
           type: "success",
-          text: isBookmarked
-            ? "Property removed from bookmarks"
-            : "Property added to bookmarks",
+          text: newBookmarkState
+            ? "Property added to bookmarks"
+            : "Property removed from bookmarks",
         });
       } else {
         showStatusMessage({
@@ -60,22 +59,20 @@ const ProjectCard = ({ listing, user }) => {
     } catch (error) {
       console.error("Bookmark Error:", error);
 
-      message.error(error?.response?.data?.message || "Something went wrong");
+      showStatusMessage({
+        type: "error",
+        text: error?.response?.data?.message || "Something went wrong",
+      });
     } finally {
       setBookmarkLoading(false);
     }
   };
 
+  // Set initial bookmark state from API response
   useEffect(() => {
-    if (
-      Number(listing?.is_bookmarked) === 1 &&
-      Number(user) !== Number(listing?.user_id)
-    ) {
-      setIsBookmarked(true);
-    } else {
-      setIsBookmarked(false);
-    }
-  }, [listing?.is_bookmarked, listing?.user_id, user]);
+    setIsBookmarked(Number(listing?.is_bookmarked) === 1);
+  }, [listing?.is_bookmarked]);
+
   return (
     <div className="bg-white rounded-lg overflow-hidden border border-gray-100 cursor-pointer">
       <div className="relative h-48 sm:h-44 lg:h-48">
@@ -86,7 +83,7 @@ const ProjectCard = ({ listing, user }) => {
         />
 
         <button
-          className={`absolute top-2 right-2 w-8 h-8 rounded-md flex items-center justify-center hover:cursor-pointer `}
+          className="absolute top-2 right-2 w-8 h-8 rounded-md flex items-center justify-center hover:cursor-pointer"
           onClick={handleBookmark}
           disabled={bookmarkLoading}
         >
@@ -125,6 +122,7 @@ const ProjectCard = ({ listing, user }) => {
             alt="location"
             className="w-4 h-4 mt-0.5 shrink-0"
           />
+
           <span
             className="text-sm text-gray-500 truncate"
             title={[listing.city, listing.district, listing.state]
@@ -136,7 +134,6 @@ const ProjectCard = ({ listing, user }) => {
         </div>
 
         <div className="flex items-center flex-wrap gap-x-10 gap-y-2 mt-3 pt-4 justify-between">
-          {/* Highlight */}
           {/* Highlight */}
           <div className="flex items-center gap-x-1.5 max-w-[45%]">
             <CircleSmall className="w-5 h-5 shrink-0" />

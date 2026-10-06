@@ -40,7 +40,7 @@ const SubscriptionCard = ({ plans = [] }) => {
                 </span>
               </div>
 
-              <span className="rounded-sm border border-secondary px-2 py-1 text-sm font-medium text-secondary transition-colors hover:bg-secondary hover:text-primary sm:px-3">
+              <span className="rounded-sm border border-secondary px-2 py-1 text-sm font-medium text-secondary transition-colors sm:px-3 cursor-default">
                 {plan.duration} Plan
               </span>
             </div>
