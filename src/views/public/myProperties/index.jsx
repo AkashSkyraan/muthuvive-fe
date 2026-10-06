@@ -17,24 +17,29 @@ const MyProperties = () => {
 
   const filterOptions = [
     {
-      id: 1,
+      id: 3,
       name: "Agriculture Land",
       value: "agriculture-land",
     },
     {
-      id: 2,
+      id: 4,
       name: "Commercial Land",
       value: "commercial-land",
     },
     {
-      id: 3,
-      name: "Investment",
-      value: "investment",
+      id: 6,
+      name: "Investment Land",
+      value: "investment-land",
     },
     {
-      id: 4,
-      name: "Commercial / Residential Buildings",
-      value: "commercial-residential-buildings",
+      id: 7,
+      name: "Commercial Buildings",
+      value: "commercial-buildings",
+    },
+    {
+      id: 8,
+      name: "Residential Buildings",
+      value: "residential-buildings",
     },
   ];
 

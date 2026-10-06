@@ -163,7 +163,7 @@ const CATEGORY_TYPE_MAP = {
 // ============================================================
 
 const TAB_STATUS_MAP = {
-  available: "posted",
+  posted: "posted",
   sold: "sold",
 
   // For your commercial/residential tabs
@@ -175,7 +175,7 @@ const TAB_STATUS_MAP = {
 // API LIMIT
 // ============================================================
 
-const LIMIT = 2;
+const LIMIT = 6;
 
 // ============================================================
 // COMPONENT
@@ -278,6 +278,7 @@ const Properties = () => {
           type: Number(propertyType),
         });
 
+        console.log("called api");
         const data = response?.data || response || {};
 
         setProperties(data?.properties || []);

@@ -53,10 +53,7 @@ const extractMapUrl = (value) => {
   return srcMatch ? srcMatch[1] : null;
 };
 
-const PropertyLocation = ({
-  title = "Property Location",
-  fields = defaultFields,
-}) => {
+const PropertyLocation = ({ title = "Property Location", fields = [] }) => {
   // The "Map" entry (if present) is pulled out of the fields list —
   // it drives the iframe below instead of rendering as a normal
   // label/value cell. A null/missing value means no map available.

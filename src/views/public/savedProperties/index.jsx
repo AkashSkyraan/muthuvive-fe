@@ -48,7 +48,7 @@ const MyProperties = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
 
-  const LIMIT = 10;
+  const LIMIT = 9;
 
   // ============================================================
   // GET PROPERTY CATEGORIES
@@ -212,7 +212,7 @@ const MyProperties = () => {
           }),
         };
 
-        console.log("BOOKMARK PAYLOAD:", payload);
+        // console.log("BOOKMARK PAYLOAD:", payload);
 
         const response = await getBookmarkedProperties(payload);
 

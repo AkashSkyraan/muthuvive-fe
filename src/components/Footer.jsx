@@ -40,9 +40,9 @@ const Footer = () => {
   };
   return (
     <div className="w-full bg-[#141B34] overflow-x-clip">
-      <div className="w-[90%] p-4 mx-auto py-14">
+      <div className="w-[90%] p-4 mx-auto py-10 md:py-14">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-10 gap-y-6">
-          <div className="">
+          <div className="order-4 md:order-none">
             <h3 className="text-white text-xl text-start font-semibold mb-5">
               Contact Us
             </h3>
@@ -54,7 +54,9 @@ const Footer = () => {
                   alt="location"
                   className="w-4 h-4 mt-0.5"
                 />
-                <span>{aboutUs?.[0]?.address}</span>
+                <span className="truncate" title={aboutUs?.[0]?.address}>
+                  {aboutUs?.[0]?.address}
+                </span>
               </li>
               <li className="flex items-center gap-x-2">
                 <img src={icons.callWhiteIcon} alt="call" className="w-4 h-4" />
@@ -81,7 +83,7 @@ const Footer = () => {
             </div>
           </div>
 
-          <div className="">
+          <div className="order-2 md:order-none">
             <h3 className="text-white text-start text-xl font-semibold mb-3 sm:mb-5">
               Quick Access
             </h3>
@@ -111,7 +113,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          <div className="">
+          <div className="order-1 md:order-none">
             <h3 className="text-white text-xl text-start font-semibold mb-3 sm:mb-5">
               Properties
             </h3>
@@ -132,7 +134,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          <div className="">
+          <div className="order-3 md:order-none">
             <h3 className="text-white text-xl text-start font-semibold mb-3 sm:mb-5">
               About Us
             </h3>
