@@ -73,7 +73,18 @@ const Footer = () => {
             </ul>
 
             <div className="mt-4 sm:mt-6 bg-white rounded-md px-6 py-1 sm:px-10 sm:py-2 w-fit">
-              <Link to="/">
+              <Link
+                to="/"
+                onClick={(e) => {
+                  if (location.pathname === "/") {
+                    e.preventDefault();
+                    window.scrollTo({
+                      top: 0,
+                      behavior: "smooth",
+                    });
+                  }
+                }}
+              >
                 <img
                   src={images.logo}
                   alt="Logo"
@@ -194,6 +205,24 @@ const Footer = () => {
                 />
               </a>
             </div>
+          </div>
+        </div>
+        {/* PRIVACY POLICY & TERMS */}
+        <div className="border-t border-white/20 mt-10 pt-6">
+          <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-4 text-sm text-gray-300">
+            <Link
+              to="/privacy-policy"
+              className="hover:text-white transition-colors duration-200"
+            >
+              Privacy Policy
+            </Link>
+
+            <Link
+              to="/terms-and-conditions"
+              className="hover:text-white transition-colors duration-200"
+            >
+              Terms & Conditions
+            </Link>
           </div>
         </div>
       </div>

@@ -6,6 +6,12 @@ import icons from "../../../config/Icons.jsx";
 import SearchPage from "../search/SearhPage.jsx";
 import { Link } from "react-router-dom";
 import PaidAndPost from "../individualProperty/PaidAndPost.jsx";
+import {
+  heroContainer,
+  heroFadeUp,
+  heroFadeDown,
+} from "../../../animations/home/HeroAnimations.jsx";
+import { motion } from "framer-motion";
 
 const features = [
   {
@@ -45,25 +51,46 @@ const Hero = () => {
       />
       <div className="absolute inset-0 bg-black/20"></div>
 
-      <div className="relative w-[90%] mx-auto py-6 md:py-10">
+      <div className="relative w-[90%] mx-auto min-h-[85vh] flex flex-col justify-center py-4">
         {/* Search bar */}
 
-        <div className="flex-1 flex items-center  rounded-lg px-3">
-          <SearchPage />
+        <div className="flex-1 flex items-center rounded-lg px-3 mt-5">
+          <motion.div
+            variants={heroFadeDown}
+            initial="hidden"
+            animate="visible"
+            className="flex-1 flex items-center rounded-lg px-3"
+          >
+            <SearchPage />
+          </motion.div>
         </div>
 
         {/* Heading */}
-        <div className="mt-10 max-w-full md:max-w-[70%]">
-          <h1 className="text-3xl sm:text-3xl md:text-5xl font-bold text-start text-white leading-tight">
+        <motion.div
+          variants={heroContainer}
+          initial="hidden"
+          animate="visible"
+          className="mt-10 max-w-full md:max-w-[70%]"
+        >
+          <motion.h1
+            variants={heroFadeUp}
+            className="text-3xl sm:text-3xl md:text-5xl font-bold text-start text-white leading-tight"
+          >
             Find A Place You&rsquo;ll Love To Call Home
-          </h1>
+          </motion.h1>
 
-          <p className="mt-4 text-base md:text-base text-gray-200 text-start max-w-full md:max-w-[80%]">
+          <motion.p
+            variants={heroFadeUp}
+            className="mt-4 text-base md:text-base text-gray-200 text-start max-w-full md:max-w-[80%]"
+          >
             Discover verified properties that match your lifestyle, budget, and
-            location. Buy, sell, your perfect property with confidence.
-          </p>
+            location. Buy, sell your perfect property with confidence.
+          </motion.p>
 
-          <div className="flex flex-wrap items-center gap-4 mt-6 !z-[1]">
+          <motion.div
+            variants={heroFadeUp}
+            className="flex flex-wrap items-center gap-4 mt-6 !z-[1]"
+          >
             <Link to="/search">
               <Button className=" !z-[1] !bg-white !text-secondary !border-2 !border-transparent !font-medium !py-5 !px-9 !text-base">
                 Explore
@@ -72,18 +99,24 @@ const Hero = () => {
             <Link to="/contactus">
               <Button
                 ghost
-                className="!text-white !border-white !font-medium !py-5 !px-7 !border-2 !text-base"
+                className="!text-white !border-white !font-medium !py-5 !px-7 !border-2 !text-base hover:!bg-white hover:!text-secondary !transition-colors !duration-300 !ease-in-out"
               >
                 Contact Us
               </Button>
             </Link>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* Feature cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-12 pb-6">
+        <motion.div
+          variants={heroContainer}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-12 pb-6"
+        >
           {features.map((feature) => (
-            <div
+            <motion.div
+              variants={heroFadeUp}
               key={feature.title}
               className="bg-white/10 backdrop-blur-sm rounded-lg p-4 flex items-start gap-x-3"
             >
@@ -105,9 +138,9 @@ const Hero = () => {
                   {feature.desc}
                 </p>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </div>
   );

@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { getPropertiesByArea } from "../../../api/home.api.js";
+import { motion } from "framer-motion";
+
+import {
+  areaHeading,
+  areaText,
+  areaCardsContainer,
+  areaCardReveal,
+  subtleCardHover,
+} from "../../../animations/home/PropertyAreas.Animation.jsx";
 
 const PropertiesByArea = () => {
   const [areas, setAreas] = useState([]);
@@ -30,21 +39,41 @@ const PropertiesByArea = () => {
   return (
     <div className="w-full bg-[#eef2fd] py-16">
       <div className="w-[90%] mx-auto">
-        <div className="text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+        <motion.div
+          variants={areaHeading}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          className="text-center"
+        >
+          <motion.h2
+            variants={areaText}
+            className="text-2xl md:text-3xl font-bold text-gray-900"
+          >
             Properties By Area
-          </h2>
+          </motion.h2>
 
-          <p className="text-base text-gray-500 mt-3 max-w-2xl mx-auto">
+          <motion.p
+            variants={areaText}
+            className="text-base text-gray-500 mt-3 max-w-2xl mx-auto"
+          >
             Highlight the best of your properties by using the List Category
             shortcode. You can list categories, types, cities, areas and states
             of your choice.
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
-        <div className="grid grid-cols-1 min-[500px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8 mt-10 text-start">
+        <motion.div
+          variants={areaCardsContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.1 }}
+          className="grid grid-cols-1 min-[500px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8 mt-10 text-start"
+        >
           {areas.map((area) => (
-            <div
+            <motion.div
+              variants={areaCardReveal}
+              whileHover={subtleCardHover}
               key={area.id}
               className="bg-white rounded-sm py-0 flex items-center gap-x-5"
             >
@@ -61,9 +90,9 @@ const PropertiesByArea = () => {
 
                 <p className="text-sm text-gray-500 mt-0.5">{area.count}</p>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </div>
   );

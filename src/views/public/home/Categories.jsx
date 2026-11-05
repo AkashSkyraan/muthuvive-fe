@@ -1,6 +1,15 @@
 import React from "react";
 import { Button } from "antd";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+
+import {
+  servicesLeftReveal,
+  servicesItemReveal,
+  servicesCardsContainer,
+  serviceCardReveal,
+} from "../../../animations/home/ServicesAnimation.jsx";
+import AnimatedButton from "../../../animations/common/ButtonShine.jsx";
 
 const Categories = ({ services = [] }) => {
   const columns = services.length >= 6 ? 3 : 2;
@@ -8,34 +17,56 @@ const Categories = ({ services = [] }) => {
     <div className="w-full bg-[#eef2fd] py-16">
       <div className="w-[90%] mx-auto flex flex-col lg:flex-row gap-10 lg:gap-16">
         {/* Left content */}
-        <div className="lg:w-[35%] shrink-0 text-start">
-          <span className="inline-block bg-[#dbe4fb] text-secondary w-[45%] sm:[35%] text-center text-md font-medium px-5 py-1.5 rounded-md">
+        <motion.div className="lg:w-[35%] shrink-0 text-start">
+          <motion.span
+            variants={servicesItemReveal}
+            className="inline-block bg-[#dbe4fb] text-secondary w-[45%] sm:[35%] text-center text-md font-medium px-5 py-1.5 rounded-md"
+          >
             Categories
-          </span>
+          </motion.span>
 
-          <h2 className="text-2xl md:text-4xl font-bold text-gray-900 mt-4">
+          <motion.h2
+            variants={servicesItemReveal}
+            className="text-2xl md:text-4xl font-bold text-gray-900 mt-4"
+          >
             We Have The Service You Need
-          </h2>
+          </motion.h2>
 
-          <p className="text-base text-gray-500 mt-4 leading-relaxed">
+          <motion.p
+            variants={servicesItemReveal}
+            className="text-base text-gray-500 mt-4 leading-relaxed"
+          >
             Highlight the best of your properties by using the List Category
             shortcode. You can list categories, types, cities, areas and states
             of your choice.Highlight the best of your properties by using the
             List Category shortcode.
-          </p>
-          <Link to="/search">
-            <Button type="primary" className="!bg-secondary mt-6 !text-base">
-              Explore All Services
-            </Button>
-          </Link>
-        </div>
+          </motion.p>
+          <motion.div variants={servicesItemReveal}>
+            <Link to="/search">
+              <AnimatedButton
+                type="primary"
+                className="!bg-secondary mt-6 !text-base"
+              >
+                Explore All Services
+              </AnimatedButton>
+            </Link>
+          </motion.div>
+        </motion.div>
 
         {/* Right grid */}
-        <div
+        <motion.div
+          variants={servicesCardsContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.15 }}
           className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-${columns} gap-4 flex-1 text-start`}
         >
           {services.map((service) => (
-            <div key={service.title} className="bg-white rounded-lg p-5">
+            <motion.div
+              variants={serviceCardReveal}
+              key={service.title}
+              className="bg-white rounded-lg p-5"
+            >
               <div className="w-10 h-10 rounded-md bg-[#eef2fd] flex items-center justify-center">
                 <img
                   src={service.icon}
@@ -51,9 +82,9 @@ const Categories = ({ services = [] }) => {
               <p className="text-sm text-gray-500 mt-2 leading-relaxed">
                 {service.desc}
               </p>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </div>
   );

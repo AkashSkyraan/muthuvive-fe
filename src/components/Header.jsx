@@ -11,6 +11,8 @@ import useScrollLock from "../hooks/UseScrollLock.jsx";
 import { useAboutUs } from "../context/AboutusContext.jsx";
 import axiosInstance from "../api/axios.js";
 import { useLoginModal } from "../context/LoginModalContext.jsx";
+import { motion } from "framer-motion";
+import AnimatedButton from "../animations/common/ButtonShine.jsx";
 
 const Header = () => {
   const { aboutUs, loading, error } = useAboutUs();
@@ -385,7 +387,7 @@ const Header = () => {
             </Link>
           </li>
 
-          <li>
+          {/* <li>
             <Link
               to="/terms-and-conditions"
               onClick={closeAccountPopover}
@@ -403,7 +405,7 @@ const Header = () => {
             >
               Privacy Policy
             </Link>
-          </li>
+          </li> */}
         </ul>
 
         {/* ------------------------------------------------ */}
@@ -472,7 +474,17 @@ const Header = () => {
           {/* ================================================= */}
 
           <div className="flex items-center">
-            <Link to="/">
+            <Link
+              to="/"
+              onClick={() => {
+                if (location.pathname === "/") {
+                  window.scrollTo({
+                    top: 0,
+                    behavior: "smooth",
+                  });
+                }
+              }}
+            >
               <img
                 src={images.logo}
                 alt="Logo"
@@ -497,7 +509,21 @@ const Header = () => {
                     isActive("/") ? "text-secondary" : "hover:text-secondary"
                   }`}
                 >
-                  <Link to="/">Home</Link>
+                  <Link
+                    to="/"
+                    onClick={(e) => {
+                      if (location.pathname === "/") {
+                        e.preventDefault();
+
+                        window.scrollTo({
+                          top: 0,
+                          behavior: "smooth",
+                        });
+                      }
+                    }}
+                  >
+                    Home
+                  </Link>
                 </li>
 
                 {/* Properties */}
@@ -566,14 +592,14 @@ const Header = () => {
             {/* Sell Property */}
             {/* ================================================= */}
 
-            <div>
-              <Button
+            <div className="relative inline-flex overflow-hidden rounded-md isolate">
+              <AnimatedButton
                 type="primary"
                 className="!bg-secondary !text-base"
                 onClick={handleSellProperty}
               >
                 Sell my Properties
-              </Button>
+              </AnimatedButton>
             </div>
 
             {/* ================================================= */}
@@ -712,7 +738,18 @@ const Header = () => {
               <li className="transition-colors">
                 <Link
                   to="/"
-                  onClick={closeMobileMenu}
+                  onClick={(e) => {
+                    closeMobileMenu();
+
+                    if (location.pathname === "/") {
+                      e.preventDefault();
+
+                      window.scrollTo({
+                        top: 0,
+                        behavior: "smooth",
+                      });
+                    }
+                  }}
                   className={isActive("/") ? "!text-secondary" : "!text-black"}
                 >
                   Home
@@ -815,14 +852,14 @@ const Header = () => {
             {/* ================================================= */}
 
             <div className="mt-8 text-start">
-              <Button
+              <AnimatedButton
                 type="primary"
                 className="!bg-secondary w-auto max-w-[500px] !py-5 !text-base"
                 block
                 onClick={handleSellProperty}
               >
                 Sell my Properties
-              </Button>
+              </AnimatedButton>
             </div>
           </div>
         </div>

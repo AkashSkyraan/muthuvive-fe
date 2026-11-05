@@ -4,6 +4,14 @@ import images from "../../../config/Images.jsx";
 import TabSection from "../properties/TabSection.jsx";
 import { getProperties } from "../../../api/getProperties.api.js";
 import { IndianRupee } from "lucide-react";
+import { motion } from "framer-motion";
+
+import {
+  dtcpSection,
+  dtcpCardsContainer,
+  dtcpCard,
+  dtcpImageTap,
+} from "../../../animations/home/DtcpProjectAnimation.jsx";
 
 const tabOptions = [
   {
@@ -56,11 +64,14 @@ const formatPrice = (value) => {
 
 const ProjectCard = ({ project }) => {
   return (
-    <div className="relative rounded-lg overflow-hidden h-64 shrink-0 w-full sm:w-[calc(50%-11px)] md:w-[calc(33.33%-11px)] lg:w-[calc(20%-13px)]">
+    <motion.div
+      variants={dtcpCard}
+      className="relative rounded-lg overflow-hidden h-64 shrink-0 w-full sm:w-[calc(50%-11px)] md:w-[calc(33.33%-11px)] lg:w-[calc(20%-13px)] group"
+    >
       <img
         src={project.cover_image?.url}
         alt={project.prop_name}
-        className="w-full h-full object-cover"
+        className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-108"
       />
 
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
@@ -88,7 +99,7 @@ const ProjectCard = ({ project }) => {
           {project.city}, {project.district}, {project.state}
         </p>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
@@ -147,7 +158,13 @@ const DTCPProjects = () => {
   return (
     <div className="w-full py-16">
       <div className="w-[90%] mx-auto">
-        <div className="text-center">
+        <motion.div
+          variants={dtcpSection}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          className="text-center"
+        >
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
             Our DTCP Projects
           </h2>
@@ -157,22 +174,36 @@ const DTCPProjects = () => {
             shortcode. You can list categories, types, cities, areas and states
             of your choice.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="mt-6">
+        <motion.div
+          variants={dtcpSection}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ delay: 0.15 }}
+          className="mt-6"
+        >
           <TabSection
             tabs={tabOptions}
             alignment="center"
             value={activeTab}
             onChange={handleTabChange}
           />
-        </div>
+        </motion.div>
 
-        <div className="flex flex-wrap gap-4 mt-12">
+        <motion.div
+          key={projects.map((project) => project.id).join("-")}
+          variants={dtcpCardsContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.1 }}
+          className="flex flex-wrap gap-4 mt-12"
+        >
           {projects.map((project) => (
             <ProjectCard key={project.id} project={project} />
           ))}
-        </div>
+        </motion.div>
       </div>
     </div>
   );

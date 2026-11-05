@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import icons from "../../config/Icons.jsx";
-import { CircleSmall } from "lucide-react";
+import { Circle } from "lucide-react";
 import { useLoginModal } from "../../context/LoginModalContext.jsx";
 import { showStatusMessage } from "../common/MessagePopup.jsx";
 import axiosInstance from "../../api/axios.js";
@@ -74,12 +74,12 @@ const ProjectCard = ({ listing, user }) => {
   }, [listing?.is_bookmarked]);
 
   return (
-    <div className="bg-white rounded-lg overflow-hidden border border-gray-100 cursor-pointer">
+    <div className="bg-white rounded-lg overflow-hidden border border-gray-100 cursor-pointer group">
       <div className="relative h-48 sm:h-44 lg:h-48">
         <img
           src={listing?.cover_image?.url}
           alt={listing.prop_name}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-108"
         />
 
         <button
@@ -133,10 +133,13 @@ const ProjectCard = ({ listing, user }) => {
           </span>
         </div>
 
-        <div className="flex items-center flex-wrap gap-x-10 gap-y-2 mt-3 pt-4 justify-between">
+        <div className="flex items-start flex-wrap gap-x-10 gap-y-2 mt-3 pt-4 ">
           {/* Highlight */}
           <div className="flex items-center gap-x-1.5 max-w-[45%]">
-            <CircleSmall className="w-5 h-5 shrink-0" />
+            <Circle
+              fill="currentColor"
+              className="w-2 h-2 shrink-0 text-gray-500"
+            />
 
             <span
               className="text-sm text-gray-500 truncate"
@@ -154,7 +157,10 @@ const ProjectCard = ({ listing, user }) => {
 
           {/* Amenity */}
           <div className="flex items-center gap-x-1.5 max-w-[45%]">
-            <CircleSmall className="w-5 h-5 shrink-0" />
+            <Circle
+              fill="currentColor"
+              className="w-2 h-2 shrink-0 text-gray-500"
+            />
 
             <span
               className="text-sm text-gray-500 truncate"
