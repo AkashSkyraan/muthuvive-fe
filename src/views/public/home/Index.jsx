@@ -14,32 +14,32 @@ const index = () => {
     {
       icon: icons.farmlandIcon,
       title: "Farmland",
-      desc: "Cum Sociis Natoque Penatibus Et Magnis Dis Cum Sociis Natoque Penatibus Et Magnis Dis",
+      desc: "Explore peaceful farmland opportunities surrounded by nature, ideal for agricultural activities, farmhouse development and long-term land ownership.",
     },
     {
       icon: icons.dtcpApprovedIcon,
       title: "DTCP Approved",
-      desc: "Cum Sociis Natoque Penatibus Et Magnis Dis Cum Sociis Natoque Penatibus Et Magnis Dis",
+      desc: "Choose DTCP-approved plots with proper planning and documentation, offering greater confidence and clarity when investing in residential land.",
     },
     {
       icon: icons.constructionIcon,
       title: "Construction",
-      desc: "Cum Sociis Natoque Penatibus Et Magnis Dis Cum Sociis Natoque Penatibus Et Magnis Dis",
+      desc: "Get expert guidance for your construction needs through trusted consultancy referrals, helping you connect with the right professionals for your building plans.",
     },
     {
       icon: icons.agriculturalLandsIcon,
       title: "Agricultural Lands",
-      desc: "Cum Sociis Natoque Penatibus Et Magnis Dis Cum Sociis Natoque Penatibus Et Magnis Dis",
+      desc: "Discover agricultural land opportunities suitable for farming, cultivation and other permitted agricultural activities.",
     },
     {
       icon: icons.commercialLandIcon,
       title: "Commercial Land",
-      desc: "Cum Sociis Natoque Penatibus Et Magnis Dis Cum Sociis Natoque Penatibus Et Magnis Dis",
+      desc: "Find strategically located commercial properties suitable for business establishments, commercial development and future expansion.",
     },
     {
       icon: icons.investmentLandIcon,
       title: "Investment Land",
-      desc: "Cum Sociis Natoque Penatibus Et Magnis Dis",
+      desc: "Explore promising land investment opportunities with the potential for long-term value, helping you make informed decisions for your financial future.",
     },
   ];
   return (

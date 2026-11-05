@@ -6,6 +6,7 @@ import LegarCards from "./legalCards";
 import OurWorkers from "./OurWorkers";
 import Testimonials from "../../../components/cards/TestimonialsCard";
 import Enquiry from "./Enquiry";
+import Founder from "./Founder";
 
 const index = () => {
   return (
@@ -15,6 +16,7 @@ const index = () => {
       <Mission />
       <LegarCards />
       <OurWorkers />
+      <Founder />
       <Testimonials />
       <Enquiry />
     </div>

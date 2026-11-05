@@ -14,17 +14,22 @@ const AboutUs = () => {
           </span>
 
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mt-4 leading-snug">
-            Discover Your Life Buy Your Land & Plots You Want
+            Every piece of land holds the potential to build someone's dream and
+            create a better future.
           </h2>
 
           <p className="text-base text-gray-500 mt-4 leading-relaxed">
-            Trusted by industry leaders, built for long-lasting results, and
-            designed to deliver reliable, enduring success.Trusted by industry
-            leaders, built for long-lasting results, and designed to deliver
-            reliable, enduring success.Trusted by industry leaders, built for
-            long-lasting results, and designed to deliver reliable, enduring
-            success.Trusted by industry leaders, built for long-lasting results,
-            and designed to deliver reliable, enduring success.
+            With a vision to make property ownership simple, transparent and
+            accessible, Mr. Pon Muthuvel founded MuthVives Properties with a
+            commitment to helping individuals and families discover the right
+            land opportunities.Driven by a passion for real estate and customer
+            satisfaction, he believes in building relationships through trust,
+            transparency and dedicated service. His vision is to create
+            meaningful property ownership opportunities while guiding customers
+            towards confident and informed investment decisions. Under his
+            leadership, MuthVives Properties strives to deliver reliable
+            property solutions and build lasting relationships with every
+            customer.
           </p>
 
           <div className="flex flex-nowrap items-center gap-4 mt-6">

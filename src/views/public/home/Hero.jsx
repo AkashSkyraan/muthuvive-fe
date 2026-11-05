@@ -12,25 +12,26 @@ const features = [
     icon: icons.verifiedDocsIcon,
     iconBg: "bg-[#dbeafe]",
     title: "Verified Documents",
-    desc: "Cum Sociis Natoque Penatibus Et Magnis Dis",
-  },
-  {
-    icon: icons.dtcpIcon,
-    iconBg: "bg-[#d1fae5]",
-    title: "DTCP Approved",
-    desc: "Cum Sociis Natoque Penatibus Et Magnis Dis",
+    desc: " Ensuring property documents are properly verified.",
   },
   {
     icon: icons.legalIcon,
     iconBg: "bg-[#ede9fe]",
     title: "Legal Assistance",
-    desc: "Cum Sociis Natoque Penatibus Et Magnis Dis",
+    desc: " Expert guidance for a smooth property transaction.",
   },
+  {
+    icon: icons.dtcpIcon,
+    iconBg: "bg-[#d1fae5]",
+    title: "DTCP Approved",
+    desc: "Explore properties with valid DTCP approval.",
+  },
+
   {
     icon: icons.siteVisitIcon,
     iconBg: "bg-[#ffedd5]",
     title: "Site Visit Support",
-    desc: "Cum Sociis Natoque Penatibus Et Magnis Dis",
+    desc: "Visit and explore your property with our assistance.",
   },
 ];
 
@@ -44,7 +45,7 @@ const Hero = () => {
       />
       <div className="absolute inset-0 bg-black/20"></div>
 
-      <div className="relative w-[95%] mx-auto py-6 md:py-10">
+      <div className="relative w-[90%] mx-auto py-6 md:py-10">
         {/* Search bar */}
 
         <div className="flex-1 flex items-center  rounded-lg px-3">
@@ -59,7 +60,7 @@ const Hero = () => {
 
           <p className="mt-4 text-base md:text-base text-gray-200 text-start max-w-full md:max-w-[80%]">
             Discover verified properties that match your lifestyle, budget, and
-            location. Buy, sell, or rent your perfect property with confidence.
+            location. Buy, sell, your perfect property with confidence.
           </p>
 
           <div className="flex flex-wrap items-center gap-4 mt-6 !z-[1]">

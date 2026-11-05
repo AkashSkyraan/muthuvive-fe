@@ -17,7 +17,7 @@ const missionBlocks = [
     icon: icons.viewIcon,
     title: "Our Mission",
     description:
-      "Trusted by industry leaders, built for long-lasting results, and designed to deliver reliable, enduring success.Trusted by industry leaders, built for long-lasting results, and designed to deliver reliable, enduring success.Trusted by industry leaders, built for long-lasting results, and designed to deliver reliable, enduring success.",
+      "Our mission is to make property ownership an accessible, trustworthy and rewarding experience for everyone. We are committed to connecting people with the right land opportunities while ensuring transparency, reliability and customer satisfaction throughout the buying journey.",
   },
   {
     id: 3,
@@ -25,7 +25,7 @@ const missionBlocks = [
     icon: icons.targetIcon,
     title: "Our Vision",
     description:
-      "Trusted by industry leaders, built for long-lasting results, and designed to deliver reliable, enduring success.Trusted by industry leaders, built for long-lasting results, and designed to deliver reliable, enduring success.Trusted by industry leaders, built for long-lasting results, and designed to deliver reliable, enduring success.",
+      "We aspire to create a future where owning land is not just a dream but an achievable milestone for individuals and families. By continuously improving our services, identifying promising property opportunities and maintaining the highest standards of transparency, we aim to make a meaningful difference in the real estate industry.",
   },
   {
     id: 4,

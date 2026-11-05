@@ -8,32 +8,28 @@ const features = [
     icon: icons.verifiedDocsIcon,
     iconBg: "bg-[#dbeafe]",
     title: "Verified Documents",
-    description:
-      "Highlight the best of your properties by using the List Category shortcode. You can list categories, types, cities, areas and states of your choice.",
+    description: "Ensuring property documents are properly verified.",
   },
   {
     id: 2,
     icon: icons.dtcpApprovedIcon,
     iconBg: "bg-[#ccfbf1]",
-    title: "Verified Documents",
-    description:
-      "Highlight the best of your properties by using the List Category shortcode. You can list categories, types, cities, areas and states of your choice.",
+    title: "Legal Assistance",
+    description: "Expert guidance for a smooth property transaction.",
   },
   {
     id: 3,
     icon: icons.legalIcon,
     iconBg: "bg-[#ede9fe]",
-    title: "Legal Assistance",
-    description:
-      "Highlight the best of your properties by using the List Category shortcode. You can list categories, types, cities, areas and states of your choice.",
+    title: "DTCP Approved",
+    description: "Explore properties with valid DTCP approval.",
   },
   {
     id: 4,
     icon: icons.siteVisitIcon,
     iconBg: "bg-[#ffedd5]",
-    title: "Legal Assistance",
-    description:
-      "Highlight the best of your properties by using the List Category shortcode. You can list categories, types, cities, areas and states of your choice.",
+    title: "Site Visit Support",
+    description: "Visit and explore your property with our assistance.",
   },
 ];
 

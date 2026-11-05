@@ -31,8 +31,10 @@ import investmentBannerImage from "../assets/images/Category-Banner-images/Inves
 import residentialBannerImage from "../assets/images/Category-Banner-images/Residential-Buildings.jpg";
 import rectangle from "../assets/images/rectangle1.png";
 import propertydocument from "../assets/images/propertydocument.png";
+import FounderImage from "../assets/images/founder.png";
 
 export const images = {
+  FounderImage,
   propertydocument,
   rectangle,
   agriBannerImage,

@@ -199,11 +199,6 @@ const Header = () => {
     },
   ];
 
-
-  
-
-
-
   // ---------------------------------------------------------
   // Logged Out Popover
   // ---------------------------------------------------------
@@ -550,7 +545,7 @@ const Header = () => {
                       : "hover:text-secondary"
                   }`}
                 >
-                  <Link to="/about">AboutUs</Link>
+                  <Link to="/about">About Us</Link>
                 </li>
 
                 {/* Contact */}
@@ -562,7 +557,7 @@ const Header = () => {
                       : "hover:text-secondary"
                   }`}
                 >
-                  <Link to="/contactus">ContactUs</Link>
+                  <Link to="/contactus">Contact Us</Link>
                 </li>
               </ul>
             </div>
@@ -777,7 +772,7 @@ const Header = () => {
                     isActive("/about") ? "!text-secondary" : "!text-black"
                   }
                 >
-                  AboutUs
+                  About Us
                 </Link>
               </li>
 
@@ -791,7 +786,7 @@ const Header = () => {
                     isActive("/contactus") ? "!text-secondary" : "!text-black"
                   }
                 >
-                  ContactUs
+                  Contact Us
                 </Link>
               </li>
             </ul>
