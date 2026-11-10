@@ -5,7 +5,8 @@ import Button from "../../components/common/Button";
 import { preventInvalidSpaces } from "../../utils/helper";
 
 import { message } from "antd";
-import { LoginRequest } from "../../api/auth.api";
+import { getUser, LoginRequest } from "../../api/auth.api";
+import { useAuth } from "../../context/UserContext";
 
 function EyeIcon({ visible }) {
   return visible ? (
@@ -39,6 +40,7 @@ function EyeIcon({ visible }) {
 function Login() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { setUser } = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);
   const [identifier, setIdentifier] = useState(
@@ -75,13 +77,20 @@ function Login() {
       });
 
       if (response?.success === true || response?.success === 1) {
-        message.success(response?.message || "Login successful");
+        const userResponse = await getUser();
 
-        navigate("/");
+        if (userResponse?.success === true || userResponse?.success === 1) {
+          setUser(userResponse.data[0]);
+          message.success(response?.message || "Login successful");
+          navigate("/");
+          return;
+        }
+
+        // message.error("Unable to fetch user details. Please try again.");
+        message.error(response?.message || "Login failed");
+
         return;
       }
-
-      message.error(response?.message || "Login failed");
     } catch (error) {
       message.error("Something went wrong");
     } finally {

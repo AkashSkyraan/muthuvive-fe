@@ -7,6 +7,15 @@ import { postEnquiry } from "../../../api/aboutus.api.js";
 import StatusMessage, {
   showStatusMessage,
 } from "../../../components/common/MessagePopup.jsx";
+import { motion } from "framer-motion";
+
+import {
+  contactContainer,
+  contactFadeUp,
+  contactFormReveal,
+  contactFormContainer,
+  contactFieldReveal,
+} from "../../../animations/contactus/ContactForm.jsx";
 
 // Empty shape used to reset the context after a successful submit -
 // keep this in sync with whatever fields EnquiryContext actually stores.
@@ -89,23 +98,41 @@ const GetInTouch = () => {
       <div className="w-full py-16">
         <div className="w-[90%] mx-auto flex flex-col lg:flex-row gap-10 lg:gap-16">
           {/* Left content */}
-          <div className="lg:w-1/2 text-start">
-            <span className="inline-block bg-[#dbe4fb] text-secondary text-base font-medium px-3 py-1.5 rounded-md">
+          <motion.div
+            variants={contactContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            className="lg:w-1/2 text-start"
+          >
+            <motion.span
+              variants={contactFadeUp}
+              className="inline-block bg-[#dbe4fb] text-secondary text-base font-medium px-3 py-1.5 rounded-md"
+            >
               Contact Us
-            </span>
+            </motion.span>
 
-            <h2 className="text-3xl md:text-4xl font-bold mt-4 leading-tight">
+            <motion.h2
+              variants={contactFadeUp}
+              className="text-3xl md:text-4xl font-bold mt-4 leading-tight"
+            >
               <span className="text-secondary">Get In Touch</span>
               <br />
               <span className="text-gray-900">With Our Team</span>
-            </h2>
+            </motion.h2>
 
-            <p className="text-base text-gray-500 mt-4 max-w-md">
+            <motion.p
+              variants={contactFadeUp}
+              className="text-base text-gray-500 mt-4 max-w-md"
+            >
               Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit
               aut fugit,
-            </p>
+            </motion.p>
 
-            <div className="flex flex-col gap-y-4 mt-8">
+            <motion.div
+              variants={contactFadeUp}
+              className="flex flex-col gap-y-4 mt-8"
+            >
               <div className="bg-white shadow-md rounded-lg p-4">
                 <div className="flex items-center gap-x-2">
                   <img
@@ -159,11 +186,17 @@ const GetInTouch = () => {
                   {aboutUs?.[0]?.email}
                 </p>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
           {/* Right form card */}
-          <div className="lg:w-1/2 rounded-xl h-fit overflow-hidden shadow-lg bg-secondary px-0.5">
+          <motion.div
+            variants={contactFormReveal}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            className="lg:w-1/2 rounded-xl h-fit overflow-hidden shadow-lg bg-secondary px-0.5"
+          >
             <div className="h-6 md:h-10 bg-secondary rounded-t-4xl"></div>
 
             <div className="bg-[#dee9ff] p-2.5 sm:p-8 py-3 rounded-t-2xl">
@@ -173,141 +206,148 @@ const GetInTouch = () => {
                 onFinish={handleFinish}
                 requiredMark={false}
               >
-                {/* Full Name */}
-                <Form.Item
-                  label={
-                    <span className="text-base font-medium text-gray-800">
-                      Full Name
-                    </span>
-                  }
-                  name="fullName"
-                  className="text-start"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please enter your full name",
-                    },
-                    {
-                      min: 3,
-                      message: "Name must be at least 3 characters",
-                    },
-                    {
-                      max: 100,
-                      message: "Name cannot exceed 100 characters",
-                    },
-                  ]}
+                <motion.div
+                  variants={contactFormContainer}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.1 }}
                 >
-                  <Input
-                    placeholder="Enter Your Full name"
-                    className={`!border-gray-200 !py-2.5 !text-sm ${
-                      fullName?.trim() ? "!bg-[#eaf1fd]" : "!bg-white"
-                    }`}
-                  />
-                </Form.Item>
-
-                {/* Mobile Number */}
-                <Form.Item
-                  label={
-                    <span className="text-base font-medium text-gray-800">
-                      Mobile Number
-                    </span>
-                  }
-                  name="mobileNumber"
-                  className="text-start"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please enter your mobile number",
-                    },
-                    {
-                      pattern: /^[6-9]\d{9}$/,
-                      message: "Please enter a valid 10-digit mobile number",
-                    },
-                  ]}
-                >
-                  <Input
-                    placeholder="Enter Your Mobile number"
-                    className={`!border-gray-200 !py-2.5 !text-sm ${
-                      mobileNumber?.trim() ? "!bg-[#eaf1fd]" : "!bg-white"
-                    }`}
-                  />
-                </Form.Item>
-
-                {/* Email */}
-                <Form.Item
-                  label={
-                    <span className="text-base font-medium text-gray-800">
-                      Email Address
-                    </span>
-                  }
-                  name="email"
-                  className="text-start"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please enter your email address",
-                    },
-                    {
-                      type: "email",
-                      message: "Enter a valid email address",
-                    },
-                  ]}
-                >
-                  <Input
-                    placeholder="Enter Your email"
-                    className={`!border-gray-200 !py-2.5 !text-sm ${
-                      email?.trim() ? "!bg-[#eaf1fd]" : "!bg-white"
-                    }`}
-                  />
-                </Form.Item>
-
-                {/* Message */}
-                <Form.Item
-                  label={
-                    <span className="text-base font-medium text-gray-800">
-                      Message
-                    </span>
-                  }
-                  name="message"
-                  className="text-start"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please enter your message",
-                    },
-                    {
-                      max: 200,
-                      message: "Message cannot exceed 200 characters",
-                    },
-                  ]}
-                >
-                  <Input.TextArea
-                    placeholder="Enter Your thoughts here ....."
-                    rows={5}
-                    className={`!border-gray-200 !text-sm !resize-none ${
-                      message?.trim() ? "!bg-[#eaf1fd]" : "!bg-white"
-                    }`}
-                  />
-                </Form.Item>
-
-                {/* Button */}
-                <Form.Item className="!mb-0">
-                  <Button
-                    htmlType="submit"
-                    loading={submitting}
-                    disabled={!canSubmit}
-                    className={`!text-sm !border-none !font-medium !h-11 !px-8 ${
-                      canSubmit
-                        ? "!bg-secondary !text-white"
-                        : "!bg-gray-400 !text-white"
-                    }`}
+                  {/* Full Name */}
+                  <Form.Item
+                    label={
+                      <span className="text-base font-medium text-gray-800">
+                        Full Name
+                      </span>
+                    }
+                    name="fullName"
+                    className="text-start"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please enter your full name",
+                      },
+                      {
+                        min: 3,
+                        message: "Name must be at least 3 characters",
+                      },
+                      {
+                        max: 100,
+                        message: "Name cannot exceed 100 characters",
+                      },
+                    ]}
                   >
-                    Send Message
-                  </Button>
-                </Form.Item>
+                    <Input
+                      placeholder="Enter Your Full name"
+                      className={`!border-gray-200 !py-2.5 !text-sm ${
+                        fullName?.trim() ? "!bg-[#eaf1fd]" : "!bg-white"
+                      }`}
+                    />
+                  </Form.Item>
+
+                  {/* Mobile Number */}
+                  <Form.Item
+                    label={
+                      <span className="text-base font-medium text-gray-800">
+                        Mobile Number
+                      </span>
+                    }
+                    name="mobileNumber"
+                    className="text-start"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please enter your mobile number",
+                      },
+                      {
+                        pattern: /^[6-9]\d{9}$/,
+                        message: "Please enter a valid 10-digit mobile number",
+                      },
+                    ]}
+                  >
+                    <Input
+                      placeholder="Enter Your Mobile number"
+                      className={`!border-gray-200 !py-2.5 !text-sm ${
+                        mobileNumber?.trim() ? "!bg-[#eaf1fd]" : "!bg-white"
+                      }`}
+                    />
+                  </Form.Item>
+
+                  {/* Email */}
+                  <Form.Item
+                    label={
+                      <span className="text-base font-medium text-gray-800">
+                        Email Address
+                      </span>
+                    }
+                    name="email"
+                    className="text-start"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please enter your email address",
+                      },
+                      {
+                        type: "email",
+                        message: "Enter a valid email address",
+                      },
+                    ]}
+                  >
+                    <Input
+                      placeholder="Enter Your email"
+                      className={`!border-gray-200 !py-2.5 !text-sm ${
+                        email?.trim() ? "!bg-[#eaf1fd]" : "!bg-white"
+                      }`}
+                    />
+                  </Form.Item>
+
+                  {/* Message */}
+                  <Form.Item
+                    label={
+                      <span className="text-base font-medium text-gray-800">
+                        Message
+                      </span>
+                    }
+                    name="message"
+                    className="text-start"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please enter your message",
+                      },
+                      {
+                        max: 200,
+                        message: "Message cannot exceed 200 characters",
+                      },
+                    ]}
+                  >
+                    <Input.TextArea
+                      placeholder="Enter Your thoughts here ....."
+                      rows={5}
+                      className={`!border-gray-200 !text-sm !resize-none ${
+                        message?.trim() ? "!bg-[#eaf1fd]" : "!bg-white"
+                      }`}
+                    />
+                  </Form.Item>
+
+                  {/* Button */}
+                  <Form.Item className="!mb-0">
+                    <Button
+                      htmlType="submit"
+                      loading={submitting}
+                      disabled={!canSubmit}
+                      className={`!text-sm !border-none !font-medium !h-11 !px-8 ${
+                        canSubmit
+                          ? "!bg-secondary !text-white"
+                          : "!bg-gray-400 !text-white"
+                      }`}
+                    >
+                      Send Message
+                    </Button>
+                  </Form.Item>
+                </motion.div>
               </Form>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </>

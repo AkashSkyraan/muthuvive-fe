@@ -4,7 +4,7 @@ import { Circle } from "lucide-react";
 import { useLoginModal } from "../../context/LoginModalContext.jsx";
 import { showStatusMessage } from "../common/MessagePopup.jsx";
 import axiosInstance from "../../api/axios.js";
-
+import { motion } from "framer-motion";
 // Renders a single card. Pass one `listing` object with
 // { id, image, category, title, price, address, area, hospitals, schools }.
 
@@ -74,12 +74,39 @@ const ProjectCard = ({ listing, user }) => {
   }, [listing?.is_bookmarked]);
 
   return (
-    <div className="bg-white rounded-lg overflow-hidden border border-gray-100 cursor-pointer group">
+    <motion.div
+      initial={{
+        opacity: 0,
+        scale: 0.92,
+        y: 20,
+      }}
+      whileInView={{
+        opacity: 1,
+        scale: 1,
+        y: 0,
+      }}
+      viewport={{
+        once: true,
+        amount: 0.25,
+      }}
+      transition={{
+        duration: 0.8,
+        ease: [0.22, 1, 0.36, 1],
+      }}
+      className="bg-white rounded-lg overflow-hidden border border-gray-100 cursor-pointer group"
+    >
       <div className="relative h-48 sm:h-44 lg:h-48">
-        <img
+        <motion.img
           src={listing?.cover_image?.url}
           alt={listing.prop_name}
           className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-108"
+          initial={{ scale: 1.15 }}
+          whileInView={{ scale: 1 }}
+          viewport={{ once: true }}
+          transition={{
+            duration: 1.2,
+            ease: "easeOut",
+          }}
         />
 
         <button
@@ -177,7 +204,7 @@ const ProjectCard = ({ listing, user }) => {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

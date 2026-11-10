@@ -1,6 +1,17 @@
 import React from "react";
 import images from "../../../config/Images.jsx";
 import icons from "../../../config/Icons.jsx";
+import { motion } from "framer-motion";
+
+import {
+  missionContainer,
+  missionTextReveal,
+  missionContent,
+  missionContentItem,
+  missionImageReveal,
+  missionMainImage,
+  missionOverlayReveal,
+} from "../../../animations/aboutus/MissionAnimation.jsx";
 
 // Dynamic data - replace with API response if this content becomes CMS-driven
 const missionBlocks = [
@@ -39,25 +50,44 @@ const missionBlocks = [
 const Mission = () => {
   return (
     <div className="w-full py-16">
-      <div className="w-[90%] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <motion.div
+        variants={missionContainer}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.15 }}
+        className="w-[90%] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6"
+      >
         {missionBlocks.map((block) => {
           if (block.type === "text") {
             return (
-              <div
+              <motion.div
                 key={block.id}
+                variants={missionTextReveal}
                 className="bg-gradient-to-br from-[#fff6f6] to-[#eef3ff] rounded-xl p-6 md:p-8 flex flex-col justify-center text-start"
               >
-                <div className="flex items-center gap-x-3">
-                  <img src={block.icon} alt={block.title} className="w-8 h-8" />
-                  <h3 className="text-xl md:text-3xl font-semibold text-gray-900">
-                    {block.title}
-                  </h3>
-                </div>
+                <motion.div variants={missionContent} className="flex flex-col">
+                  <motion.div
+                    variants={missionContentItem}
+                    className="flex items-center gap-x-3"
+                  >
+                    <img
+                      src={block.icon}
+                      alt={block.title}
+                      className="w-8 h-8"
+                    />
+                    <h3 className="text-xl md:text-3xl font-semibold text-gray-900">
+                      {block.title}
+                    </h3>
+                  </motion.div>
 
-                <p className="text-base text-gray-600 mt-4 leading-relaxed">
-                  {block.description}
-                </p>
-              </div>
+                  <motion.p
+                    variants={missionContentItem}
+                    className="text-base text-gray-600 mt-4 leading-relaxed"
+                  >
+                    {block.description}
+                  </motion.p>
+                </motion.div>
+              </motion.div>
             );
           }
 
@@ -68,17 +98,20 @@ const Mission = () => {
               : "bottom-0 right-0 sm:-bottom-2 sm:-right-2 border-t-5 border-l-5 md:border-t-8 md:border-l-8 border-white rounded-2xl md:rounded-xl";
 
           return (
-            <div
+            <motion.div
+              variants={missionImageReveal}
               key={block.id}
               className="relative h-64 sm:h-72 lg:h-80 rounded-xl overflow-hidden"
             >
-              <img
+              <motion.img
+                variants={missionMainImage}
                 src={block.mainImage}
                 alt="mission"
                 className="w-full h-full object-cover rounded-xl"
               />
 
-              <div
+              <motion.div
+                variants={missionOverlayReveal}
                 className={`absolute ${overlayPositionClasses} w-36 h-26 sm:w-56 sm:h-40 overflow-hidden border-white shadow-lg`}
               >
                 <img
@@ -86,11 +119,11 @@ const Mission = () => {
                   alt="mission detail"
                   className="w-full h-full object-center"
                 />
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           );
         })}
-      </div>
+      </motion.div>
     </div>
   );
 };

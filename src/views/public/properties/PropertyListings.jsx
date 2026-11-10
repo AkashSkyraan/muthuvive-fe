@@ -7,6 +7,13 @@ import { useAuth } from "../../../context/UserContext";
 // { id, image, category, title, price, address, area, hospitals, schools }
 // Renders one ProjectCard per item - however many the API returns.
 const PropertyGrid = ({ listings = [] }) => {
+  const { user } = useAuth();
+
+  // useEffect(() => {
+  //   console.log("USER OBJECT:", user);
+  //   console.log("USER ID:", user?.id);
+  // }, [user]);
+
   if (listings.length === 0) {
     return (
       <div className="w-full py-16 text-center text-sm text-gray-500">
@@ -24,8 +31,6 @@ const PropertyGrid = ({ listings = [] }) => {
     7: "commercial-building",
     7: "residential-building",
   };
-
-  const { user } = useAuth();
 
   return (
     <div className="w-full py-10">

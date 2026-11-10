@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import images from "../../../config/Images";
+import {
+  founderImageReveal,
+  founderContentContainer,
+  founderLogoReveal,
+  founderTaglineReveal,
+  founderTitleReveal,
+} from "../../../animations/aboutus/FounderAnimation";
 
 const SWITCH_EVERY_MS = 10000;
 
@@ -73,19 +80,28 @@ const FounderMessage = () => {
 
   return (
     <section className="w-full mx-auto bg-white px-4 py-8 sm:px-6 sm:py-12">
-      <div className="mx-auto flex w-[95%] flex-col items-center gap-6 sm:gap-8 md:flex-row md:justify-center md:gap-12">
+      <motion.div
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.4 }}
+        className="mx-auto flex w-[95%] flex-col items-center gap-6 sm:gap-8 md:flex-row md:justify-center md:gap-12"
+      >
         {/* Photo */}
-        <div className="aspect-square w-44 shrink-0 overflow-hidden rounded-tl-[2rem] rounded-br-[3.5rem] bg-sky-100 sm:w-56 md:w-64 lg:w-72">
+        <motion.div
+          variants={founderImageReveal}
+          className="aspect-square w-44 shrink-0 overflow-hidden rounded-tl-[2rem] rounded-br-[3.5rem] bg-sky-100 sm:w-56 md:w-64 lg:w-72"
+        >
           <img
             src={images.FounderImage}
             alt="Mr. Ponmuthuvel, Founder & CEO"
             className="h-full w-full object-cover object-top"
           />
-        </div>
+        </motion.div>
 
         {/* Text */}
-        <div className="flex min-w-0 flex-col items-center text-center md:max-w-xl md:flex-none md:items-start md:text-left">
-          <img
+        <motion.div className="flex min-w-0 flex-col items-center text-center md:max-w-xl md:flex-none md:items-start md:text-left">
+          <motion.img
+            variants={founderLogoReveal}
             src={images.logo}
             alt="MuthVive's Properties"
             className="h-12 w-auto sm:h-14"
@@ -93,7 +109,10 @@ const FounderMessage = () => {
 
           {/* Changing block. Both languages are rendered invisibly in the same grid cell,
               so the block is always as tall as the taller one and nothing jumps. */}
-          <div className="mt-5 grid w-full sm:mt-6">
+          <motion.div
+            variants={founderTaglineReveal}
+            className="mt-5 grid w-full sm:mt-6"
+          >
             {languages.map((code) => (
               <div
                 key={code}
@@ -121,13 +140,16 @@ const FounderMessage = () => {
                 ))}
               </motion.div>
             </AnimatePresence>
-          </div>
+          </motion.div>
 
-          <p className="mt-5 font-serif text-xl font-semibold text-black sm:mt-6 sm:text-2xl md:text-[26px]">
+          <motion.p
+            variants={founderTitleReveal}
+            className="mt-5 font-serif text-xl font-semibold text-black sm:mt-6 sm:text-2xl md:text-[26px]"
+          >
             Founder &amp; CEO : Mr. Ponmuthuvel
-          </p>
-        </div>
-      </div>
+          </motion.p>
+        </motion.div>
+      </motion.div>
     </section>
   );
 };

@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { getGalleryImages } from "../../../api/gallery.api.js";
+import { AnimatePresence, motion } from "framer-motion";
+
+import {
+  galleryGrid,
+  galleryItem,
+} from "../../../animations/gallery/galleryAnimation.jsx";
 
 const formatCategoryLabel = (category) => {
   if (!category) return "";
@@ -288,36 +294,54 @@ const Gallery = () => {
         </div>
 
         {/* Clusters */}
-        <div className="flex flex-col gap-6 mt-8">
-          {clusters.map((cluster, index) =>
-            cluster.length === 5 ? (
-              <MasonryCluster
-                key={index}
-                images={cluster}
-                isDesktop={isDesktop}
-                heroPosition={heroPositions[index % 3]}
-              />
-            ) : (
-              // Leftover images
-              <div
-                key={index}
-                className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"
-              >
-                {cluster.map((image) => (
-                  <div
-                    key={image.id}
-                    className="h-[160px] sm:h-[180px] w-full overflow-hidden rounded-lg"
+        <div className="mt-8">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={activeTab}
+              variants={galleryGrid}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className="flex flex-col gap-6"
+            >
+              {clusters.map((cluster, index) =>
+                cluster.length === 5 ? (
+                  <motion.div
+                    key={`${activeTab}-${index}`}
+                    variants={galleryItem}
+                    layout
                   >
-                    <img
-                      src={image.src}
-                      alt="gallery"
-                      className="w-full h-full object-cover shadow-xl border border-gray-300"
+                    <MasonryCluster
+                      images={cluster}
+                      isDesktop={isDesktop}
+                      heroPosition={heroPositions[index % 3]}
                     />
-                  </div>
-                ))}
-              </div>
-            ),
-          )}
+                  </motion.div>
+                ) : (
+                  // Leftover images
+                  <motion.div
+                    key={`${activeTab}-${index}`}
+                    variants={galleryItem}
+                    layout
+                    className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"
+                  >
+                    {cluster.map((image) => (
+                      <div
+                        key={image.id}
+                        className="h-[160px] sm:h-[180px] w-full overflow-hidden rounded-lg"
+                      >
+                        <img
+                          src={image.src}
+                          alt="gallery"
+                          className="w-full h-full object-cover shadow-xl border border-gray-300"
+                        />
+                      </div>
+                    ))}
+                  </motion.div>
+                ),
+              )}
+            </motion.div>
+          </AnimatePresence>
         </div>
       </div>
     </div>

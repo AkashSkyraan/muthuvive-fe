@@ -10,6 +10,9 @@ import { CircleSmall } from "lucide-react";
 import { getSubscriptionPlans } from "../../api/subscriptionPlans.api.js";
 import { useNavigate } from "react-router-dom";
 
+import { motion } from "framer-motion";
+import { myPropertyCardVariants } from "../../animations/myproperties/MyPropertiesAnimation.jsx";
+
 const MyPropertyCard = ({ data }) => {
   const {
     cover_image,
@@ -195,11 +198,23 @@ const MyPropertyCard = ({ data }) => {
   };
 
   return (
-    <div className="bg-white border border-gray-100 rounded-xl p-4">
+    <motion.div
+      variants={myPropertyCardVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.2 }}
+      whileHover={{ y: -4 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+      className="bg-white border border-gray-100 rounded-xl p-4"
+    >
       <div className="flex flex-col sm:flex-row gap-7">
         {/* Image */}
         <div className="w-full h-40 sm:w-28 sm:h-28 rounded-lg overflow-hidden shrink-0">
-          <img
+          <motion.img
+            initial={{ scale: 1.12 }}
+            whileInView={{ scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1.2, ease: "easeOut" }}
             src={cover_image?.url}
             alt={prop_name}
             className="w-full h-full object-cover"
@@ -334,7 +349,7 @@ const MyPropertyCard = ({ data }) => {
           View More
         </Button>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

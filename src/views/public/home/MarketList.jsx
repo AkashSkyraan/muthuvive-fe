@@ -23,6 +23,7 @@ const MarketListings = () => {
   const [listings, setListings] = useState([]);
 
   const { user } = useAuth();
+  console.log("abc", user);
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -30,6 +31,8 @@ const MarketListings = () => {
         const response = await getProperties({
           limit: 6,
           status: "posted",
+          filter_by_owner: false,
+          user_id: user?.id,
         });
 
         const data = response?.data || response || [];

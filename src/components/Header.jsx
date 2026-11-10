@@ -187,7 +187,7 @@ const Header = () => {
     {
       key: "investment-land",
       label: "Investment",
-      icon: icons.investmentIcon,
+      icon: icons.investmentLandIcon,
     },
     {
       key: "commercial-building",

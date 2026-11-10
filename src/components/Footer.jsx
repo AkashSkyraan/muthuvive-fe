@@ -207,23 +207,31 @@ const Footer = () => {
             </div>
           </div>
         </div>
-        {/* PRIVACY POLICY & TERMS */}
-        <div className="border-t border-white/20 mt-10 pt-6">
-          <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-4 text-sm text-gray-300">
-            <Link
-              to="/privacy-policy"
-              className="hover:text-white transition-colors duration-200"
-            >
-              Privacy Policy
-            </Link>
+      </div>
+      {/* Bottom bar – Terms & Privacy */}
+      <div className="w-full bg-white">
+        <div className="mx-auto flex w-[90%] flex-wrap items-center justify-center gap-x-6 gap-y-1 px-4 py-3 text-xs text-black sm:justify-end">
+          <button
+            type="button"
+            onClick={() => handleFooterNavigation("/terms-and-conditions")}
+            className="flex cursor-pointer items-center gap-1.5 transition hover:text-secondary"
+          >
+            <span className="text-xs">&#9679;</span>
+            <span className="underline underline-offset-2 text-xs">
+              Terms &amp; Conditions
+            </span>
+          </button>
 
-            <Link
-              to="/terms-and-conditions"
-              className="hover:text-white transition-colors duration-200"
-            >
-              Terms & Conditions
-            </Link>
-          </div>
+          <button
+            type="button"
+            onClick={() => handleFooterNavigation("/privacy-policy")}
+            className="flex cursor-pointer items-center gap-1.5 transition hover:text-secondary"
+          >
+            <span className="text-xs">&#9679;</span>
+            <span className="underline underline-offset-2 text-xs">
+              Privacy Policy
+            </span>
+          </button>
         </div>
       </div>
     </div>
