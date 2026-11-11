@@ -157,7 +157,7 @@ const PlanCard = ({ plans = [] }) => {
 />
 
 <title>
-  Muthu Vive - Plan Invoice
+  Muth Vive - Plan Invoice
 </title>
 
 <style>
@@ -599,7 +599,7 @@ body {
     <div>
 
       <div class="logo">
-        MUTHU VIVE
+        MUTH VIVE
       </div>
 
       <div class="logo-subtitle">
@@ -829,7 +829,7 @@ body {
   <div class="footer">
 
     Thank you for choosing
-    <strong>Muthu Vive</strong>
+    <strong>Muth Vive</strong>
 
     <br />
 
