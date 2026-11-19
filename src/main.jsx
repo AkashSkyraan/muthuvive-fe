@@ -10,11 +10,13 @@ import { AuthProvider } from "./context/UserContext.jsx";
 import { SearchProvider } from "./context/SearchContext.jsx";
 import { LoginModalProvider } from "./context/LoginModalContext.jsx";
 import { LoaderProvider } from "./context/LoaderContext.jsx";
+import RootLoader from "./components/common/loader/roodLoader.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
       <LoaderProvider>
+        <RootLoader />
         <SignupProvider>
           <AuthProvider>
             <SearchProvider>

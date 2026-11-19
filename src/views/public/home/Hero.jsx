@@ -108,38 +108,64 @@ const Hero = () => {
         </motion.div>
 
         {/* Feature cards */}
+        {(() => null)()}
         <motion.div
           variants={heroContainer}
           initial="hidden"
           animate="visible"
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-12 pb-6"
         >
-          {features.map((feature) => (
-            <motion.div
-              variants={heroFadeUp}
-              key={feature.title}
-              className="bg-white/10 backdrop-blur-sm rounded-lg p-4 flex items-start gap-x-3"
-            >
-              <div
-                className={`w-10 h-10 rounded-md flex items-center justify-center shrink-0 self-center ${feature.iconBg}`}
-              >
-                <img
-                  src={feature.icon}
-                  alt={feature.title}
-                  className="w-5 h-5"
-                />
-              </div>
+          {features.map((feature, index) => {
+            const SWEEP = 1.6; // total time glare takes to cross all cards
+            const PAUSE = 3; // gap before next sweep
+            const CYCLE = SWEEP + PAUSE;
+            const slot = SWEEP / features.length;
+            const start = (index * slot) / CYCLE;
+            const end = ((index + 1) * slot) / CYCLE;
 
-              <div>
-                <h3 className="text-white text-base font-semibold text-start">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-300 text-sm text-start mt-1 w-full">
-                  {feature.desc}
-                </p>
-              </div>
-            </motion.div>
-          ))}
+            return (
+              <motion.div
+                variants={heroFadeUp}
+                key={feature.title}
+                className="relative overflow-hidden bg-white/10 backdrop-blur-sm rounded-lg p-4 flex items-start gap-x-3"
+              >
+                {/* Shiny glare (one continuous sweep across all cards) */}
+                <motion.span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute top-0 left-0 h-full w-1/3 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                  style={{ skewX: -20 }}
+                  initial={{ x: "-100%" }}
+                  animate={{ x: ["-100%", "-100%", "300%", "300%"] }}
+                  transition={{
+                    duration: CYCLE,
+                    times: [0, start, end, 1],
+                    ease: "linear",
+                    repeat: Infinity,
+                    delay: 1,
+                  }}
+                />
+
+                <div
+                  className={`relative w-10 h-10 rounded-md flex items-center justify-center shrink-0 self-center ${feature.iconBg}`}
+                >
+                  <img
+                    src={feature.icon}
+                    alt={feature.title}
+                    className="w-5 h-5"
+                  />
+                </div>
+
+                <div className="relative">
+                  <h3 className="text-white text-base font-semibold text-start">
+                    {feature.title}
+                  </h3>
+                  <p className="text-gray-300 text-sm text-start mt-1 w-full">
+                    {feature.desc}
+                  </p>
+                </div>
+              </motion.div>
+            );
+          })}
         </motion.div>
       </div>
     </div>

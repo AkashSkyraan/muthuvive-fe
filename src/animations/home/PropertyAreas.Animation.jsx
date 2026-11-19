@@ -41,7 +41,7 @@ export const areaCardsContainer = {
 
 export const areaCardReveal = {
   hidden: {
-    opacity: 0,
+    opacity: 1, // changed from 0
     y: 20,
     scale: 0.97,
   },

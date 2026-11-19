@@ -171,7 +171,7 @@ const Gallery = () => {
         setLoading(true);
         setError(null);
 
-        const data = await getGalleryImages();
+        const data = await getGalleryImages({ status: "active" });
 
         // Convert API response into the structure
         // your existing UI already expects.

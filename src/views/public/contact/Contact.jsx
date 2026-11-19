@@ -57,7 +57,7 @@ const GetInTouch = () => {
       name: values.fullName,
       mobile: values.mobileNumber,
       email: values.email,
-      message: values.message,
+      messages: values.message,
     };
 
     setSubmitting(true);

@@ -47,7 +47,7 @@ const EnquiryForm = ({ propertyId = 0, onSubmit }) => {
       name: values.fullName,
       mobile: values.mobileNumber,
       email: values.email,
-      message: values.message,
+      messages: values.message,
       property_id: propertyId,
       regarding: "Property Enquiry",
     };
