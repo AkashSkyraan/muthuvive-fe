@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useLoader } from "../../../context/LoaderContext";
 import { loaderManager } from "../../../utils/loaderManager"; // path maathikonga
+import "./loader.css";
 
 const MIN_VISIBLE = 500; // loader kuraindha pakshm 300ms theriyanum
 
@@ -103,7 +104,11 @@ const Loader = () => {
       role="status"
       aria-label="Loading"
     >
-      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full border-4 border-gray-200 border-t-secondary animate-spin" />
+      <img
+        src="/loader.svg"
+        alt="Loading"
+        className="loader-logo w-24 h-24 sm:w-32 sm:h-32"
+      />
     </div>
   );
 };

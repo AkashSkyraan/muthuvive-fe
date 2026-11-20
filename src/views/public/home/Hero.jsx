@@ -92,14 +92,14 @@ const Hero = () => {
             className="flex flex-wrap items-center gap-4 mt-6 !z-[1]"
           >
             <Link to="/search">
-              <Button className=" !z-[1] !bg-white !text-secondary !border-2 !border-transparent !font-medium !py-5 !px-9 !text-base">
+              <Button className=" !z-[1] !bg-white !text-secondary !border-2 !border-transparent !font-medium !py-5 !px-9 !text-base hover:!bg-secondary hover:!text-white !transition-all !duration-400 !ease-in-out">
                 Explore
               </Button>
             </Link>
             <Link to="/contactus">
               <Button
                 ghost
-                className="!text-white !border-white !font-medium !py-5 !px-7 !border-2 !text-base hover:!bg-white hover:!text-secondary !transition-colors !duration-300 !ease-in-out"
+                className="!text-white !border-white !font-medium !py-5 !px-7 !border-2 !text-base hover:!bg-white hover:!text-secondary !transition-colors !duration-400 !ease-in-out"
               >
                 Contact Us
               </Button>

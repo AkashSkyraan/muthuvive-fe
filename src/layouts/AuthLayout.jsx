@@ -1,29 +1,30 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
 import { images } from "../config/Images";
+import { motion } from "framer-motion";
 
 const features = [
   {
     title: "Verified Documents",
-    description: "Cum Sociis Natoque Penatibus Et Magnis Dis",
+    description: "Ensuring property documents are properly verified.",
     icon: images.document,
     iconClass: "blue",
   },
   {
     title: "Legal Assistance",
-    description: "Cum Sociis Natoque Penatibus Et Magnis Dis",
+    description: "Expert guidance for a smooth property transaction.",
     icon: images.legal,
     iconClass: "purple",
   },
   {
     title: "DTCP Approved",
-    description: "Cum Sociis Natoque Penatibus Et Magnis Dis",
+    description: "Explore properties with valid DTCP approval.",
     icon: images.dtcp,
     iconClass: "cyan",
   },
   {
     title: "Site Visit Support",
-    description: "Cum Sociis Natoque Penatibus Et Magnis Dis",
+    description: "Visit and explore your property with our assistance.",
     icon: images.map,
     iconClass: "orange",
   },
@@ -57,40 +58,65 @@ function AuthLayout() {
           </p>
 
           <div className="mt-12 grid w-full max-w-3xl grid-cols-1 gap-4 text-left sm:grid-cols-2">
-            {features.map((feature) => (
-              <div
-                key={feature.title}
-                className="flex min-h-[85px] items-center gap-4 rounded-sm border border-white/15 bg-white/10 p-4 backdrop-blur-md"
-              >
-                <div
-                  className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-xl ${
-                    feature.iconClass === "blue"
-                      ? "bg-blue-50"
-                      : feature.iconClass === "purple"
-                        ? "bg-purple-50"
-                        : feature.iconClass === "cyan"
-                          ? "bg-cyan-50"
-                          : "bg-orange-50"
-                  }`}
+            {features.map((feature, index) => {
+              const SWEEP = 2;
+              const PAUSE = 3;
+              const CYCLE = SWEEP + PAUSE;
+              const slot = SWEEP / features.length;
+              const start = (index * slot) / CYCLE;
+              const end = ((index + 1) * slot) / CYCLE;
+
+              return (
+                <motion.div
+                  key={feature.title}
+                  className="relative overflow-hidden flex min-h-[85px] items-center gap-4 rounded-sm border border-white/15 bg-white/10 p-4 backdrop-blur-md"
                 >
-                  <img
-                    src={feature.icon}
-                    alt={feature.title}
-                    className="h-7 w-7 object-contain"
+                  {/* Shiny glare */}
+                  <motion.span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute top-0 left-0 h-full w-1/3 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                    style={{ skewX: -20 }}
+                    initial={{ x: "-100%" }}
+                    animate={{ x: ["-100%", "-100%", "300%", "300%"] }}
+                    transition={{
+                      duration: CYCLE,
+                      times: [0, start, end, 1],
+                      ease: "linear",
+                      repeat: Infinity,
+                      delay: 1,
+                    }}
                   />
-                </div>
 
-                <div>
-                  <h3 className="text-sm font-semibold text-white">
-                    {feature.title}
-                  </h3>
+                  <div
+                    className={`relative flex h-14 w-14 shrink-0 items-center justify-center rounded-xl ${
+                      feature.iconClass === "blue"
+                        ? "bg-blue-50"
+                        : feature.iconClass === "purple"
+                          ? "bg-purple-50"
+                          : feature.iconClass === "cyan"
+                            ? "bg-cyan-50"
+                            : "bg-orange-50"
+                    }`}
+                  >
+                    <img
+                      src={feature.icon}
+                      alt={feature.title}
+                      className="h-7 w-7 object-contain"
+                    />
+                  </div>
 
-                  <p className="mt-1 text-xs leading-5 text-white/65">
-                    {feature.description}
-                  </p>
-                </div>
-              </div>
-            ))}
+                  <div className="relative">
+                    <h3 className="text-sm font-semibold text-white">
+                      {feature.title}
+                    </h3>
+
+                    <p className="mt-1 text-xs leading-5 text-white/65">
+                      {feature.description}
+                    </p>
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
